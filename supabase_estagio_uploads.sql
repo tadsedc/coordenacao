@@ -1,4 +1,4 @@
-﻿-- Estrutura para envio de PDFs assinados do módulo de estágio.
+-- Estrutura para envio de PDFs assinados do módulo de estágio.
 -- Execute no SQL Editor do Supabase.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -16,7 +16,7 @@ set public = false,
 
 create table if not exists public.estagio_uploads (
   id bigserial primary key,
-  acesso_id bigint,
+  acesso_id uuid,
   nome_estudante text,
   email text,
   curso text,
@@ -28,6 +28,55 @@ create table if not exists public.estagio_uploads (
   status text default 'enviado',
   criado_em timestamptz default now()
 );
+
+alter table public.estagio_uploads alter column acesso_id type uuid using case when acesso_id::text ~ '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}
+
+alter table public.estagio_uploads enable row level security;
+
+drop policy if exists "Estudante registra upload de estagio" on public.estagio_uploads;
+create policy "Estudante registra upload de estagio"
+on public.estagio_uploads
+for insert
+to anon
+with check (true);
+
+drop policy if exists "Coordenacao gerencia uploads de estagio" on public.estagio_uploads;
+create policy "Coordenacao gerencia uploads de estagio"
+on public.estagio_uploads
+for all
+to authenticated
+using (true)
+with check (true);
+
+grant select, insert, update, delete on public.estagio_uploads to anon, authenticated;
+grant usage, select on sequence public.estagio_uploads_id_seq to anon, authenticated;
+
+drop policy if exists "Estudante envia PDFs de estagio" on storage.objects;
+create policy "Estudante envia PDFs de estagio"
+on storage.objects
+for insert
+to anon
+with check (
+  bucket_id = 'estagio-documentos'
+  and lower(right(name, 4)) = '.pdf'
+);
+
+drop policy if exists "Coordenacao le PDFs de estagio" on storage.objects;
+create policy "Coordenacao le PDFs de estagio"
+on storage.objects
+for select
+to authenticated
+using (bucket_id = 'estagio-documentos');
+
+drop policy if exists "Coordenacao apaga PDFs de estagio" on storage.objects;
+create policy "Coordenacao apaga PDFs de estagio"
+on storage.objects
+for delete
+to authenticated
+using (bucket_id = 'estagio-documentos');
+
+notify pgrst, 'reload schema';
+ then acesso_id::text::uuid else null end;
 
 alter table public.estagio_uploads enable row level security;
 
