@@ -173,9 +173,7 @@ const bindBeforeMatrixEdit=bind;bind=function(){bindBeforeMatrixEdit();document.
 function saveTheme(){theme.brand=document.getElementById('theme-brand').value.trim()||'SalaCerta';theme.primary=document.getElementById('theme-primary').value;theme.accent=document.getElementById('theme-accent').value;theme.background=document.getElementById('theme-bg').value;if(state.pendingLogo)theme.logo=state.pendingLogo;localStorage.setItem('salacerta-theme',JSON.stringify(theme));applyTheme();state.pendingLogo=null;render();toast('Aparência atualizada.')}
 function resetTheme(){theme={...AEMS_THEME};localStorage.setItem('salacerta-theme',JSON.stringify(theme));applyTheme();state.pendingLogo=null;render();toast('Aparência restaurada.')}
 boot();
-</script></body></html>
-
-
+</script></body></html><script>
 const modalWithEdit=modal;
 modal=function(){
   if(!state.modal||state.modal.type!=='editclass')return modalWithEdit();
@@ -209,3 +207,4 @@ async function saveEditedClass(){
 
 const bindBeforeClassEdit=bind;
 bind=function(){bindBeforeClassEdit();document.querySelectorAll('[data-editclass]').forEach(b=>b.onclick=()=>{state.modal={type:'editclass',id:b.dataset.editclass};render()});document.querySelectorAll('input[name="edit-class-mode"]').forEach(x=>x.addEventListener('change',()=>{let semi=x.value==='semipresencial'&&x.checked;document.querySelectorAll('.edit-presencial-only').forEach(el=>el.classList.toggle('hidden',semi));document.getElementById('edit-semi-note')?.classList.toggle('hidden',!semi)}));document.getElementById('saveeditedclass')?.addEventListener('click',saveEditedClass)};
+</script>
