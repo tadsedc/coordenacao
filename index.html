@@ -207,4 +207,5 @@ async function saveEditedClass(){
 
 const bindBeforeClassEdit=bind;
 bind=function(){bindBeforeClassEdit();document.querySelectorAll('[data-editclass]').forEach(b=>b.onclick=()=>{state.modal={type:'editclass',id:b.dataset.editclass};render()});document.querySelectorAll('input[name="edit-class-mode"]').forEach(x=>x.addEventListener('change',()=>{let semi=x.value==='semipresencial'&&x.checked;document.querySelectorAll('.edit-presencial-only').forEach(el=>el.classList.toggle('hidden',semi));document.getElementById('edit-semi-note')?.classList.toggle('hidden',!semi)}));document.getElementById('saveeditedclass')?.addEventListener('click',saveEditedClass)};
+bind();
 </script>
