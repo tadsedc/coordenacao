@@ -461,7 +461,13 @@ bind();
   const priorBind=bind;
   bind=function(){
     priorBind();
+    document.querySelectorAll('[data-group-drag]').forEach(item=>{item.draggable=false;item.onpointerdown=e=>{if(e.target.closest('.chip-move,.chip-delete'))return;window.__activeGroupDrag=item;item.classList.add('dragging');e.preventDefault()};});
     document.querySelectorAll('[data-movegroup]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();moveGroup(b.dataset.movegroup,Number(b.dataset.move))});
   };
+  if(!window.__groupPointerEvents){
+    window.__groupPointerEvents=true;
+    document.addEventListener('pointermove',e=>{const active=window.__activeGroupDrag;if(!active)return;const target=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('[data-group-drag]');if(!target||target===active)return;const r=target.getBoundingClientRect();if(e.clientY>r.top+r.height/2)target.after(active);else target.before(active);e.preventDefault()},{passive:false});
+    document.addEventListener('pointerup',()=>{const active=window.__activeGroupDrag;if(!active)return;window.__activeGroupDrag=null;persistDraggedOrder(active)});
+  }
 })();
 </script>
