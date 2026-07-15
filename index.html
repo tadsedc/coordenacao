@@ -352,6 +352,64 @@ bind();
 })();
 </script>
 <script>
+/* Gestão dos acessos temporários de estágio pela coordenação. */
+(function(){
+  db.studentAccesses=db.studentAccesses||[];
+  const previousAccessLoad=loadData;
+  loadData=async function(){
+    await previousAccessLoad();
+    db.studentAccesses=[];
+    if(state.role==='coord'){
+      const q=await banco.from('estudante_acessos').select('id,nome,email,curso,codigo,senha,expira_em,ativo,criado_em,criado_por').order('criado_em',{ascending:false});
+      db.studentAccesses=q.error?[]:(q.data||[]).map(a=>({id:a.id,name:a.nome,email:a.email,course:a.curso,code:a.codigo,password:a.senha,expires:a.expira_em,active:a.ativo,created:a.criado_em,createdBy:a.criado_por}));
+    }
+  };
+  function accessPanel(){
+    const now=new Date();
+    const rows=(db.studentAccesses||[]).map(a=>{
+      const expired=!a.expires||new Date(a.expires+'T23:59:59')<now;
+      const active=!!a.active&&!expired;
+      const status=active?'<span class="status entregue">Ativo</span>':'<span class="status gerado">'+(expired?'Expirado':'Desativado')+'</span>';
+      return '<tr><td><b>'+a.name+'</b><br><small>'+a.email+'</small></td><td>'+a.course+'</td><td><code>'+a.code+'</code></td><td>'+ (a.expires?new Date(a.expires+'T12:00:00').toLocaleDateString('pt-BR'):'-') +'</td><td>'+status+'</td><td><div class="action-stack"><button class="mini" data-editstudentaccess="'+a.id+'">Editar</button><button class="mini danger" data-delstudentaccess="'+a.id+'">Excluir</button></div></td></tr>';
+    }).join('');
+    return '<div class="card" style="margin-top:18px"><div class="cardhead"><h2>Acessos temporários de estágio</h2><small>'+((db.studentAccesses||[]).length)+' acesso(s)</small></div><div class="table"><table><thead><tr><th>Estudante</th><th>Curso</th><th>Código</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6"><div class="empty">Nenhum acesso temporário cadastrado.</div></td></tr>')+'</tbody></table></div></div>';
+  }
+  const previousRequirements= requirements;
+  requirements=function(){return previousRequirements().replace('</div></main>',accessPanel()+'</div></main>')};
+  const previousModal=modal;
+  modal=function(){
+    if(state.modal?.type==='editstudentaccess'){
+      const a=(db.studentAccesses||[]).find(x=>String(x.id)===String(state.modal.id));
+      if(!a)return previousModal();
+      return '<div class="modalbg" data-close><div class="modal" onclick="event.stopPropagation()"><div class="modaltop"><div><h2>Editar acesso temporário</h2><p>Atualize a validade ou o status do acesso do estudante.</p></div><button class="close" data-close>×</button></div><div class="summary"><b>'+a.name+'</b><br>'+a.email+' · '+a.course+'<br><small>Código: '+a.code+'</small></div><div class="two"><div class="field"><label>Data de expiração</label><input id="sa_edit_expira" type="date" value="'+(a.expires||'')+'"></div><div class="field"><label>Status</label><select id="sa_edit_ativo"><option value="true" '+(a.active?'selected':'')+'>Ativo</option><option value="false" '+(!a.active?'selected':'')+'>Desativado</option></select></div></div><div class="actions"><button class="btn soft" data-close>Cancelar</button><button class="btn primary" id="savestudentaccessedit">Salvar alterações</button></div></div></div>';
+    }
+    return previousModal();
+  };
+  async function saveStudentAccessEdit(id){
+    const expires=document.getElementById('sa_edit_expira')?.value||null;
+    const active=document.getElementById('sa_edit_ativo')?.value==='true';
+    if(!expires)return toast('Informe a data de expiração.');
+    const {error}=await banco.from('estudante_acessos').update({expira_em:expires,ativo:active}).eq('id',id);
+    if(error)return toast('Não foi possível salvar o acesso: '+error.message);
+    state.modal=null;await loadData();render();toast('Acesso temporário atualizado.');
+  }
+  async function deleteStudentAccess(id){
+    const a=(db.studentAccesses||[]).find(x=>String(x.id)===String(id));
+    if(!confirm('Excluir o acesso temporário de '+(a?.name||'este estudante')+'?'))return;
+    const {error}=await banco.from('estudante_acessos').delete().eq('id',id);
+    if(error)return toast('Não foi possível excluir o acesso: '+error.message);
+    await loadData();render();toast('Acesso temporário excluído.');
+  }
+  const previousBind=bind;
+  bind=function(){
+    previousBind();
+    document.querySelectorAll('[data-editstudentaccess]').forEach(b=>b.onclick=()=>{state.modal={type:'editstudentaccess',id:b.dataset.editstudentaccess};render()});
+    document.querySelectorAll('[data-delstudentaccess]').forEach(b=>b.onclick=()=>deleteStudentAccess(b.dataset.delstudentaccess));
+    document.getElementById('savestudentaccessedit')?.addEventListener('click',()=>saveStudentAccessEdit(state.modal?.id));
+  };
+})();
+</script>
+<script>
 /* O curso da aula é derivado das turmas selecionadas. */
 (function(){
   const style=document.createElement('style');
