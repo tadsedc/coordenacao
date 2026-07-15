@@ -427,3 +427,25 @@ bind();
   };
 })();
 </script>
+<script>
+(function(){
+  const orderStyle=document.createElement('style');orderStyle.textContent='.group-order-buttons{display:inline-flex;gap:3px;margin-left:5px}.chip-move{border:1px solid #d8e5e1;background:#f4f8f6;color:var(--g2);border-radius:5px;width:20px;height:20px;line-height:16px;padding:0;cursor:pointer;font-weight:800}.chip-move:hover{background:#dff0ea}';document.head.appendChild(orderStyle);
+  function moveGroup(id,delta){
+    const items=[...db.groups].sort((a,b)=>(a.ordem||999999)-(b.ordem||999999));
+    const index=items.findIndex(x=>Number(x.id)===Number(id)),target=index+delta;
+    if(index<0||target<0||target>=items.length)return;
+    [items[index],items[target]]=[items[target],items[index]];
+    Promise.all(items.map((g,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',g.id))).then(results=>{const failed=results.find(x=>x.error);if(failed)return toast('Execute primeiro o script supabase_turmas_ordem.sql no Supabase.');loadData().then(render)}).catch(e=>toast('Não foi possível salvar a ordem: '+e.message));
+  }
+  const previousClasses=classes;
+  classes=function(){
+    const html=previousClasses();
+    return html.replace(/<button class="chip-delete" title="Excluir turma" data-delgroup="(\d+)">×<\/button>/g,(m,id)=>'<span class="group-order-buttons"><button class="chip-move" title="Mover turma para cima" data-movegroup="'+id+'" data-move="-1">↑</button><button class="chip-move" title="Mover turma para baixo" data-movegroup="'+id+'" data-move="1">↓</button></span>'+m);
+  };
+  const priorBind=bind;
+  bind=function(){
+    priorBind();
+    document.querySelectorAll('[data-movegroup]').forEach(b=>b.onclick=()=>moveGroup(b.dataset.movegroup,Number(b.dataset.move)));
+  };
+})();
+</script>
