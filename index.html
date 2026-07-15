@@ -346,11 +346,7 @@ bind();
   const previousBind=bind;
   bind=function(){
     previousBind();
-    document.querySelectorAll('[data-group-drag]').forEach(item=>{
-      item.addEventListener('dragstart',()=>item.classList.add('dragging'));
-      item.addEventListener('dragend',()=>{item.classList.remove('dragging');saveGroupOrder()});
-      item.addEventListener('dragover',e=>{e.preventDefault();const dragging=document.querySelector('.group-chip.dragging');if(!dragging||dragging===item)return;const box=item.getBoundingClientRect();const after=e.clientY>box.top+box.height/2;if(after)item.after(dragging);else item.before(dragging)});
-    });
+    // A ordenação é tratada pelo controlador final por ponteiro/RPC.
   };
   setTimeout(()=>{if(typeof auth!=='undefined'&&auth&&state.role==='coord'){loadData().then(render)},250);
 })();
@@ -421,9 +417,7 @@ bind();
   bind=function(){
     priorBind();
     document.querySelectorAll('[data-group-drag]').forEach(item=>{
-      item.addEventListener('dragstart',()=>item.classList.add('dragging'));
-      item.addEventListener('dragend',()=>{item.classList.remove('dragging');const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Boolean);Promise.all(ids.map((id,index)=>banco.from('turmas').update({ordem:index+1}).eq('id',id))).then(()=>{loadData().then(render)})});
-      item.addEventListener('dragover',e=>{e.preventDefault();const dragging=document.querySelector('.group-chip.dragging');if(!dragging||dragging===item)return;const box=item.getBoundingClientRect();if(e.clientY>box.top+box.height/2)item.after(dragging);else item.before(dragging)});
+      // A ordenação é tratada pelo controlador final por ponteiro/RPC.
     });
   };
 })();
