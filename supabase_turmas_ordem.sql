@@ -32,6 +32,12 @@ begin
   if p_ids is null or coalesce(array_length(p_ids, 1), 0) = 0 then
     return 0;
   end if;
+  -- Evita colisões caso exista uma restrição UNIQUE sobre a coluna ordem.
+  update public.turmas
+     set ordem = 100000 + array_position(p_ids, id)
+   where id = any(p_ids)
+     and ativa = true;
+
   for i in 1..array_length(p_ids, 1) loop
     update public.turmas
        set ordem = i
