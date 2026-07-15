@@ -429,7 +429,7 @@ bind();
 </script>
 <script>
 (function(){
-  const orderStyle=document.createElement('style');orderStyle.textContent='.group-order-buttons{display:inline-flex;gap:3px;margin-left:5px}.chip-move{border:1px solid #d8e5e1;background:#f4f8f6;color:var(--g2);border-radius:5px;width:20px;height:20px;line-height:16px;padding:0;cursor:pointer;font-weight:800}.chip-move:hover{background:#dff0ea}.group-section:nth-child(2){background:#fff8eb;border-color:#f0d29b}.group-section:nth-child(2) h3{color:#a86b09}.group-section:nth-child(3){background:#f2f5f4}';document.head.appendChild(orderStyle);
+  const orderStyle=document.createElement('style');orderStyle.textContent='.group-sections{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.group-section{background:#f8fbfa;border:1px solid #dce9e4;border-radius:12px;padding:12px}.group-section h3{font-size:12px;color:var(--g2);margin:0 0 9px}.group-section:nth-child(2){background:#fff8eb;border-color:#f0d29b}.group-section:nth-child(2) h3{color:#a86b09}.group-section:nth-child(3){background:#f2f5f4}.group-section-list{display:grid;gap:7px}.group-order-buttons{display:inline-flex;gap:3px;margin-left:5px}.chip-move{border:1px solid #d8e5e1;background:#f4f8f6;color:var(--g2);border-radius:5px;width:20px;height:20px;line-height:16px;padding:0;cursor:pointer;font-weight:800}.chip-move:hover{background:#dff0ea}@media(max-width:900px){.group-sections{grid-template-columns:1fr}}';document.head.appendChild(orderStyle);
   function moveGroup(id,delta){
     const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Boolean);
     const index=ids.indexOf(Number(id)),target=index+delta;
@@ -437,10 +437,12 @@ bind();
     [ids[index],ids[target]]=[ids[target],ids[index]];
     Promise.all(ids.map((groupId,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',groupId))).then(results=>{const failed=results.find(x=>x.error);if(failed)return toast('Execute primeiro o script supabase_turmas_ordem.sql no Supabase.');loadData().then(render)}).catch(e=>toast('Não foi possível salvar a ordem: '+e.message));
   }
-  const previousClasses=classes;
   classes=function(){
-    const html=previousClasses();
-    return html.replace(/<button class="chip-delete" title="Excluir turma" data-delgroup="(\d+)">×<\/button>/g,(m,id)=>'<span class="group-order-buttons"><button class="chip-move" title="Mover turma para cima" data-movegroup="'+id+'" data-move="-1">↑</button><button class="chip-move" title="Mover turma para baixo" data-movegroup="'+id+'" data-move="1">↓</button></span>'+m);
+    const section=(title,items)=>items.length?'<section class="group-section"><h3>'+title+'</h3><div class="group-section-list">'+items.map(g=>'<span class="group-chip" draggable="true" data-group-drag="'+g.id+'"><span><span class="drag-mark">⋮⋮</span> '+g.name+' <small>'+g.courses.join(' + ')+'</small></span><span class="group-order-buttons"><button class="chip-move" title="Mover turma para cima" data-movegroup="'+g.id+'" data-move="-1">↑</button><button class="chip-move" title="Mover turma para baixo" data-movegroup="'+g.id+'" data-move="1">↓</button><button class="chip-delete" title="Excluir turma" data-delgroup="'+g.id+'">×</button></span></span>').join('')+'</div></section>':'';
+    const ads=db.groups.filter(g=>g.courses.includes('ADS')&&!g.courses.includes('EDC')),edc=db.groups.filter(g=>g.courses.includes('EDC')&&!g.courses.includes('ADS')),shared=db.groups.filter(g=>g.courses.includes('ADS')&&g.courses.includes('EDC'));
+    const groups='<div class="group-panel"><div class="group-panel-head"><h2>Turmas cadastradas</h2><span>'+db.groups.length+' turma(s) disponíveis nos formulários e filtros</span></div><p class="group-order-hint">Use as setas ou arraste uma turma para ajustar a ordem.</p><div class="group-sections">'+section('Turmas de ADS',ads)+section('Turmas de EDC',edc)+section('Turmas compartilhadas · ADS e EDC',shared)+'</div></div>';
+    const actions='<div class="head-actions"><button class="btn soft" data-newgroup>＋ Nova turma</button><button class="btn primary" data-newclass>＋ Nova aula</button></div>';
+    return layout(head('Configuração acadêmica','Turmas e disciplinas','Cadastre as turmas uma vez e reutilize-as em toda a grade.',actions)+groups+'<div class="card"><div class="cardhead"><h2>Grade semanal</h2></div>'+table(list(true),true,true)+'</div>','Turmas e disciplinas');
   };
   const priorBind=bind;
   bind=function(){
