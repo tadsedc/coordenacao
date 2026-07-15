@@ -44,18 +44,32 @@ create policy "Estudante registra upload de estagio"
 on public.estagio_uploads
 for insert
 to anon
-with check (true);
+with check (
+  acesso_id is not null
+  and lower(nome_arquivo) like '%.pdf'
+  and lower(caminho) like '%.pdf'
+  and tipo_documento in ('convenio', 'tce', 'plano', 'relatorio', 'outros')
+);
 
 drop policy if exists "Coordenacao gerencia uploads de estagio" on public.estagio_uploads;
 create policy "Coordenacao gerencia uploads de estagio"
 on public.estagio_uploads
 for all
 to authenticated
-using (true)
-with check (true);
+using (exists (
+  select 1 from public.perfis p
+   where p.id = auth.uid() and p.papel = 'coordenador' and p.ativo = true
+))
+with check (exists (
+  select 1 from public.perfis p
+   where p.id = auth.uid() and p.papel = 'coordenador' and p.ativo = true
+));
 
-grant select, insert, update, delete on public.estagio_uploads to anon, authenticated;
-grant usage, select on sequence public.estagio_uploads_id_seq to anon, authenticated;
+revoke all on public.estagio_uploads from anon;
+revoke all on public.estagio_uploads from authenticated;
+grant insert on public.estagio_uploads to anon;
+grant select, insert, update, delete on public.estagio_uploads to authenticated;
+grant usage on sequence public.estagio_uploads_id_seq to anon, authenticated;
 
 drop policy if exists "Estudante envia PDFs de estagio" on storage.objects;
 create policy "Estudante envia PDFs de estagio"
@@ -65,6 +79,7 @@ to anon
 with check (
   bucket_id = 'estagio-documentos'
   and lower(right(name, 4)) = '.pdf'
+  and split_part(name, '/', 1) ~ '^[0-9a-fA-F-]{36}$'
 );
 
 drop policy if exists "Coordenacao le PDFs de estagio" on storage.objects;
@@ -72,13 +87,19 @@ create policy "Coordenacao le PDFs de estagio"
 on storage.objects
 for select
 to authenticated
-using (bucket_id = 'estagio-documentos');
+using (
+  bucket_id = 'estagio-documentos'
+  and exists (select 1 from public.perfis p where p.id = auth.uid() and p.papel = 'coordenador' and p.ativo = true)
+);
 
 drop policy if exists "Coordenacao apaga PDFs de estagio" on storage.objects;
 create policy "Coordenacao apaga PDFs de estagio"
 on storage.objects
 for delete
 to authenticated
-using (bucket_id = 'estagio-documentos');
+using (
+  bucket_id = 'estagio-documentos'
+  and exists (select 1 from public.perfis p where p.id = auth.uid() and p.papel = 'coordenador' and p.ativo = true)
+);
 
 notify pgrst, 'reload schema';
