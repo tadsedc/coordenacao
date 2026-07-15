@@ -435,15 +435,16 @@ bind();
     const index=ids.indexOf(Number(id)),target=index+delta;
     if(index<0||target<0||target>=ids.length)return;
     [ids[index],ids[target]]=[ids[target],ids[index]];
-    Promise.all(ids.map((groupId,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',groupId))).then(results=>{const failed=results.find(x=>x.error);if(failed)return toast('Execute primeiro o script supabase_turmas_ordem.sql no Supabase.');loadData().then(render)}).catch(e=>toast('Não foi possível salvar a ordem: '+e.message));
+    Promise.all(ids.map((groupId,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',groupId).select('id,ordem'))).then(results=>{const failed=results.find(x=>x.error||!(x.data||[]).length);if(failed)return toast(failed.error?'Erro ao salvar: '+failed.error.message:'Nenhuma turma foi atualizada. Verifique a coluna ordem e seu acesso de coordenador.');loadData().then(render)}).catch(e=>toast('Não foi possível salvar a ordem: '+e.message));
   }
   async function persistDraggedOrder(target){
     const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Boolean);
     if(!ids.length)return;
     target?.classList.remove('dragging');
-    const results=await Promise.all(ids.map((groupId,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',groupId)));
+    const results=await Promise.all(ids.map((groupId,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',groupId).select('id,ordem')));
     const failed=results.find(x=>x.error);
     if(failed)return toast('Não foi possível salvar a ordem: '+failed.error.message);
+    if(results.some(x=>!(x.data||[]).length))return toast('Nenhuma turma foi atualizada. Verifique a coluna ordem e seu acesso de coordenador.');
     await loadData();render();toast('Ordem das turmas atualizada.');
   }
   if(!window.__turmasDragCapture){
