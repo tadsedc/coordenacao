@@ -308,3 +308,21 @@ const bindBeforeTeacherEvalRoom=bind;
 bind=function(){bindBeforeTeacherEvalRoom();document.querySelectorAll('[data-editevalroom]').forEach(b=>b.onclick=()=>{state.modal={type:'editevalroom',id:b.dataset.editevalroom};render()});document.getElementById('save-eval-room')?.addEventListener('click',saveEvaluationRoom)};
 bind();
 </script>
+<script>
+/* Máscaras dos campos do Estágio: mantém os documentos no padrão brasileiro. */
+(function(){
+  function onlyDigits(value){return String(value||'').replace(/\D/g,'');}
+  function maskCPF(value){let d=onlyDigits(value).slice(0,11);if(d.length<=3)return d;if(d.length<=6)return d.slice(0,3)+'.'+d.slice(3);if(d.length<=9)return d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6);return d.slice(0,3)+'.'+d.slice(3,6)+'.'+d.slice(6,9)+'-'+d.slice(9);}
+  function maskPhone(value){let d=onlyDigits(value).slice(0,11);if(d.length<=2)return d;if(d.length<=6)return '('+d.slice(0,2)+') '+d.slice(2);if(d.length<=10)return '('+d.slice(0,2)+') '+d.slice(2,6)+'-'+d.slice(6);return '('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7);}
+  function maskCEP(value){let d=onlyDigits(value).slice(0,8);return d.length<=5?d:d.slice(0,5)+'-'+d.slice(5);}
+  function maskCNPJ(value){let d=onlyDigits(value).slice(0,14);if(d.length<=2)return d;if(d.length<=5)return d.slice(0,2)+'.'+d.slice(2);if(d.length<=8)return d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5);if(d.length<=12)return d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8);return d.slice(0,2)+'.'+d.slice(2,5)+'.'+d.slice(5,8)+'/'+d.slice(8,12)+'-'+d.slice(12);}
+  function maskTime(value){let d=onlyDigits(value).slice(0,4);return d.length<=2?d:d.slice(0,2)+':'+d.slice(2);}
+  function applyMask(id,type,placeholder){let el=document.getElementById(id);if(!el)return;el.inputMode='numeric';if(placeholder)el.placeholder=placeholder;let fn=type==='cpf'?maskCPF:type==='phone'?maskPhone:type==='cep'?maskCEP:type==='cnpj'?maskCNPJ:maskTime;let apply=()=>{let next=fn(el.value);if(el.value!==next)el.value=next;};el.addEventListener('input',apply);el.addEventListener('blur',apply);apply();}
+  function bindStageMasks(){
+    [['req_cpf','cpf','000.000.000-00'],['exp_cpf','cpf','000.000.000-00'],['req_tel','phone','(00) 00000-0000'],['emp_tel','phone','(00) 00000-0000'],['exp_tel','phone','(00) 00000-0000'],['exp_emp_tel','phone','(00) 00000-0000'],['exp_chefe_tel','phone','(00) 00000-0000'],['req_cep','cep','00000-000'],['emp_cep','cep','00000-000'],['exp_emp_cep','cep','00000-000'],['emp_cnpj','cnpj','00.000.000/0000-00'],['exp_emp_cnpj','cnpj','00.000.000/0000-00'],['est_horario_inicio','time','00:00'],['est_horario_fim','time','00:00']].forEach(args=>applyMask(...args));
+  }
+  const bindBeforeStageMasks=bind;
+  bind=function(){bindBeforeStageMasks();bindStageMasks();};
+  bindStageMasks();
+})();
+</script>
