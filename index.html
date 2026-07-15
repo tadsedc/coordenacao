@@ -437,6 +437,19 @@ bind();
     [ids[index],ids[target]]=[ids[target],ids[index]];
     Promise.all(ids.map((groupId,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',groupId))).then(results=>{const failed=results.find(x=>x.error);if(failed)return toast('Execute primeiro o script supabase_turmas_ordem.sql no Supabase.');loadData().then(render)}).catch(e=>toast('Não foi possível salvar a ordem: '+e.message));
   }
+  async function persistDraggedOrder(target){
+    const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Boolean);
+    if(!ids.length)return;
+    target?.classList.remove('dragging');
+    const results=await Promise.all(ids.map((groupId,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',groupId)));
+    const failed=results.find(x=>x.error);
+    if(failed)return toast('Não foi possível salvar a ordem: '+failed.error.message);
+    await loadData();render();toast('Ordem das turmas atualizada.');
+  }
+  if(!window.__turmasDragCapture){
+    window.__turmasDragCapture=true;
+    document.addEventListener('dragend',e=>{const target=e.target.closest?.('[data-group-drag]');if(!target)return;e.stopImmediatePropagation();persistDraggedOrder(target)},true);
+  }
   classes=function(){
     const section=(title,items)=>items.length?'<section class="group-section"><h3>'+title+'</h3><div class="group-section-list">'+items.map(g=>'<span class="group-chip" draggable="true" data-group-drag="'+g.id+'"><span><span class="drag-mark">⋮⋮</span> '+g.name+' <small>'+g.courses.join(' + ')+'</small></span><span class="group-order-buttons"><button class="chip-move" title="Mover turma para cima" data-movegroup="'+g.id+'" data-move="-1">↑</button><button class="chip-move" title="Mover turma para baixo" data-movegroup="'+g.id+'" data-move="1">↓</button><button class="chip-delete" title="Excluir turma" data-delgroup="'+g.id+'">×</button></span></span>').join('')+'</div></section>':'';
     const ads=db.groups.filter(g=>g.courses.includes('ADS')&&!g.courses.includes('EDC')),edc=db.groups.filter(g=>g.courses.includes('EDC')&&!g.courses.includes('ADS')),shared=db.groups.filter(g=>g.courses.includes('ADS')&&g.courses.includes('EDC'));
