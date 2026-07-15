@@ -324,10 +324,11 @@ bind();
   }
   loadData=async function(){await previousLoadData();await loadOrderedGroups()};
   async function saveGroupOrder(){
-    const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Boolean);
+    const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Number.isFinite);
     if(!ids.length)return;
-    const results=await Promise.all(ids.map((id,index)=>banco.from('turmas').update({ordem:index+1}).eq('id',id)));
-    const failed=results.find(x=>x.error);if(failed)return toast('Não foi possível salvar a ordem das turmas: '+failed.error.message);
+    const {data,error}=await banco.rpc('reordenar_turmas',{p_ids:ids});
+    if(error)return toast('Não foi possível salvar a ordem das turmas: '+error.message);
+    if(Number(data)!==ids.length)return toast('A ordem não foi salva para todas as turmas.');
     await loadData();render();toast('Ordem das turmas atualizada.');
   }
   function groupSection(title,items){
