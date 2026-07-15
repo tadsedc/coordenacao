@@ -120,3 +120,100 @@ update storage.buckets
  where id = 'estagio-documentos';
 
 notify pgrst, 'reload schema';
+
+-- Correções adicionais para instalações que executaram versões antigas dos scripts.
+-- Professores continuam podendo trabalhar nas próprias aulas; alterações estruturais
+-- de matriz, integralização e vínculos ficam restritas à coordenação.
+
+revoke all on public.estagio_uploads from anon;
+revoke all on public.estagio_uploads from authenticated;
+grant insert on public.estagio_uploads to anon;
+grant select, insert, update, delete on public.estagio_uploads to authenticated;
+
+drop policy if exists "Coordenacao gerencia uploads de estagio" on public.estagio_uploads;
+create policy "Coordenacao gerencia uploads de estagio"
+on public.estagio_uploads
+for all to authenticated
+using (public.usuario_e_coordenador())
+with check (public.usuario_e_coordenador());
+
+drop policy if exists "Estudante registra upload de estagio" on public.estagio_uploads;
+create policy "Estudante registra upload de estagio"
+on public.estagio_uploads
+for insert to anon
+with check (
+  acesso_id is not null
+  and lower(nome_arquivo) like '%.pdf'
+  and lower(caminho) like '%.pdf'
+  and tipo_documento in ('convenio', 'tce', 'plano', 'relatorio', 'outros')
+);
+
+drop policy if exists "Estudante envia PDFs de estagio" on storage.objects;
+drop policy if exists "Coordenacao le PDFs de estagio" on storage.objects;
+drop policy if exists "Coordenacao apaga PDFs de estagio" on storage.objects;
+drop policy if exists "Coordenacao atualiza PDFs de estagio" on storage.objects;
+
+create policy "Estudante envia PDFs de estagio"
+on storage.objects for insert to anon
+with check (
+  bucket_id = 'estagio-documentos'
+  and lower(right(name, 4)) = '.pdf'
+  and split_part(name, '/', 1) ~ '^[0-9a-fA-F-]{36}$'
+);
+
+create policy "Coordenacao le PDFs de estagio"
+on storage.objects for select to authenticated
+using (bucket_id = 'estagio-documentos' and public.usuario_e_coordenador());
+
+create policy "Coordenacao apaga PDFs de estagio"
+on storage.objects for delete to authenticated
+using (bucket_id = 'estagio-documentos' and public.usuario_e_coordenador());
+
+create policy "Coordenacao atualiza PDFs de estagio"
+on storage.objects for update to authenticated
+using (bucket_id = 'estagio-documentos' and public.usuario_e_coordenador())
+with check (bucket_id = 'estagio-documentos' and public.usuario_e_coordenador());
+
+-- Remove permissões administrativas atribuídas ao papel público por scripts antigos.
+revoke all on public.estudante_acessos from anon;
+revoke all on public.requerimentos_estagio from anon;
+grant insert on public.requerimentos_estagio to anon;
+
+drop policy if exists "coord gerencia acessos de estudantes" on public.estudante_acessos;
+create policy "coord gerencia acessos de estudantes"
+on public.estudante_acessos for all to authenticated
+using (public.usuario_e_coordenador())
+with check (public.usuario_e_coordenador());
+
+drop policy if exists "coord gerencia requerimentos" on public.requerimentos_estagio;
+create policy "coord gerencia requerimentos"
+on public.requerimentos_estagio for all to authenticated
+using (public.usuario_e_coordenador())
+with check (public.usuario_e_coordenador());
+
+-- Vínculos de aula: professor administra somente vínculos de suas próprias aulas.
+drop policy if exists "Coordenacao gerencia vinculos aula-turma" on public.aula_turmas;
+create policy "Coordenacao gerencia vinculos aula-turma"
+on public.aula_turmas for all to authenticated
+using (
+  public.usuario_e_coordenador()
+  or exists (select 1 from public.aulas a where a.id = aula_id and a.professor_id = auth.uid())
+)
+with check (
+  public.usuario_e_coordenador()
+  or exists (select 1 from public.aulas a where a.id = aula_id and a.professor_id = auth.uid())
+);
+
+drop policy if exists "Coordenacao gerencia matriz" on public.matriz_disciplinas;
+create policy "Coordenacao gerencia matriz"
+on public.matriz_disciplinas for all to authenticated
+using (public.usuario_e_coordenador())
+with check (public.usuario_e_coordenador());
+
+drop policy if exists "Coordenacao gerencia integralizacao" on public.turma_disciplinas;
+create policy "Coordenacao gerencia integralizacao"
+on public.turma_disciplinas for all to authenticated
+using (public.usuario_e_coordenador())
+with check (public.usuario_e_coordenador());
+
+notify pgrst, 'reload schema';
