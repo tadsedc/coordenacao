@@ -355,6 +355,47 @@ bind();
 })();
 </script>
 <script>
+/* O curso da aula é derivado das turmas selecionadas. */
+(function(){
+  const style=document.createElement('style');
+  style.textContent='.auto-course-note{background:#eef5f9;color:#315c80;border:1px solid #d7e6ef;border-radius:10px;padding:10px 12px;font-size:11px;margin-bottom:12px}.auto-course-hidden{display:none!important}';
+  document.head.appendChild(style);
+  function deriveCourses(selector){
+    const ids=[...document.querySelectorAll(selector+':checked')].map(x=>Number(x.value));
+    const set=new Set();ids.forEach(id=>(db.groups.find(g=>Number(g.id)===id)?.courses||[]).forEach(c=>set.add(c)));
+    return set;
+  }
+  function syncCourses(selector,adsId,edcId){
+    const courses=deriveCourses(selector);
+    const ads=document.getElementById(adsId),edc=document.getElementById(edcId);
+    if(ads)ads.checked=courses.has('ADS');if(edc)edc.checked=courses.has('EDC');
+    return courses;
+  }
+  function hideCourseField(){
+    document.querySelectorAll('.field').forEach(field=>{
+      const label=field.querySelector('label');
+      if(!label||!label.textContent.includes('Curso(s) desta aula'))return;
+      field.classList.add('auto-course-hidden');
+      if(!field.nextElementSibling||!field.nextElementSibling.classList.contains('auto-course-note')){
+        const note=document.createElement('div');note.className='auto-course-note';note.textContent='O curso será identificado automaticamente pelas turmas atendidas selecionadas abaixo.';field.after(note);
+      }
+    });
+  }
+  const oldSaveClass=saveClass;
+  saveClass=async function(){syncCourses('.group-opt','class-ads','class-edc');return oldSaveClass()};
+  if(typeof saveEditedClass==='function'){
+    const oldSaveEditedClass=saveEditedClass;
+    saveEditedClass=async function(){syncCourses('.edit-group-opt','edit-class-ads','edit-class-edc');return oldSaveEditedClass()};
+  }
+  const oldBind=bind;
+  bind=function(){
+    oldBind();
+    hideCourseField();
+    document.querySelectorAll('.group-opt,.edit-group-opt').forEach(input=>input.addEventListener('change',()=>syncCourses(input.classList.contains('edit-group-opt')?'.edit-group-opt':'.group-opt',input.classList.contains('edit-group-opt')?'edit-class-ads':'class-ads',input.classList.contains('edit-group-opt')?'edit-class-edc':'class-edc')));
+  };
+})();
+</script>
+<script>
 /* Máscaras dos campos do Estágio: mantém os documentos no padrão brasileiro. */
 (function(){
   function onlyDigits(value){return String(value||'').replace(/\D/g,'');}
