@@ -307,6 +307,52 @@ async function saveEvaluationRoom(){
 const bindBeforeTeacherEvalRoom=bind;
 bind=function(){bindBeforeTeacherEvalRoom();document.querySelectorAll('[data-editevalroom]').forEach(b=>b.onclick=()=>{state.modal={type:'editevalroom',id:b.dataset.editevalroom};render()});document.getElementById('save-eval-room')?.addEventListener('click',saveEvaluationRoom)};
 bind();
+</script><script>
+/* Organização visual das turmas (coordenação). A coluna ordem é criada por
+   supabase_turmas_ordem.sql; sem ela, a interface continua funcionando. */
+(function(){
+  const style=document.createElement('style');
+  style.textContent='.group-sections{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.group-section{background:#f8fbfa;border:1px solid #dce9e4;border-radius:12px;padding:12px}.group-section h3{font-size:12px;color:var(--g2);margin:0 0 9px}.group-section-list{display:grid;gap:7px}.group-chip[draggable=true]{cursor:grab;justify-content:space-between}.group-chip.dragging{opacity:.45}.group-chip .drag-mark{color:#91a19d;font-size:14px;line-height:1}.group-order-hint{font-size:11px;color:var(--mut);margin:0 0 12px}@media(max-width:900px){.group-sections{grid-template-columns:1fr}}';
+  document.head.appendChild(style);
+  const previousLoadData=loadData;
+  async function loadOrderedGroups(){
+    try{
+      const result=await banco.from('turmas').select('id,ordem').eq('ativa',true);
+      const order=new Map((result.data||[]).map(x=>[String(x.id),x.ordem==null?Number.MAX_SAFE_INTEGER:Number(x.ordem)]));
+      db.groups.sort((a,b)=>(order.get(String(a.id))-order.get(String(b.id)))||a.name.localeCompare(b.name,'pt-BR'));
+    }catch(e){db.groups.sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'))}
+  }
+  loadData=async function(){await previousLoadData();await loadOrderedGroups()};
+  async function saveGroupOrder(){
+    const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Boolean);
+    if(!ids.length)return;
+    const results=await Promise.all(ids.map((id,index)=>banco.from('turmas').update({ordem:index+1}).eq('id',id)));
+    const failed=results.find(x=>x.error);if(failed)return toast('Não foi possível salvar a ordem das turmas: '+failed.error.message);
+    await loadData();render();toast('Ordem das turmas atualizada.');
+  }
+  function groupSection(title,items){
+    if(!items.length)return '';
+    return '<section class="group-section"><h3>'+title+'</h3><div class="group-section-list">'+items.map(g=>'<span class="group-chip" draggable="true" data-group-drag="'+g.id+'"><span><span class="drag-mark" aria-hidden="true">⋮⋮</span> '+g.name+' <small>'+g.courses.join(' + ')+'</small></span><button class="chip-delete" title="Excluir turma" data-delgroup="'+g.id+'">×</button></span>').join('')+'</div></section>';
+  }
+  classes=function(){
+    const ads=db.groups.filter(g=>g.courses.includes('ADS')&&!g.courses.includes('EDC'));
+    const edc=db.groups.filter(g=>g.courses.includes('EDC')&&!g.courses.includes('ADS'));
+    const both=db.groups.filter(g=>g.courses.includes('ADS')&&g.courses.includes('EDC'));
+    const groups='<div class="group-panel"><div class="group-panel-head"><h2>Turmas cadastradas</h2><span>'+db.groups.length+' turma(s) disponíveis nos formulários e filtros</span></div><p class="group-order-hint">Arraste as turmas para ajustar a ordem exibida nos filtros e formulários.</p><div class="group-sections">'+groupSection('Turmas de ADS',ads)+groupSection('Turmas de EDC',edc)+groupSection('Turmas compartilhadas · ADS e EDC',both)+'</div></div>';
+    const actions='<div class="head-actions"><button class="btn soft" data-newgroup>＋ Nova turma</button><button class="btn primary" data-newclass>＋ Nova aula</button></div>';
+    return layout(head('Configuração acadêmica','Turmas e disciplinas','Cadastre as turmas uma vez e reutilize-as em toda a grade.',actions)+groups+'<div class="card"><div class="cardhead"><h2>Grade semanal</h2></div>'+table(list(true),true,true)+'</div>','Turmas e disciplinas');
+  };
+  const previousBind=bind;
+  bind=function(){
+    previousBind();
+    document.querySelectorAll('[data-group-drag]').forEach(item=>{
+      item.addEventListener('dragstart',()=>item.classList.add('dragging'));
+      item.addEventListener('dragend',()=>{item.classList.remove('dragging');saveGroupOrder()});
+      item.addEventListener('dragover',e=>{e.preventDefault();const dragging=document.querySelector('.group-chip.dragging');if(!dragging||dragging===item)return;const box=item.getBoundingClientRect();const after=e.clientY>box.top+box.height/2;if(after)item.after(dragging);else item.before(dragging)});
+    });
+  };
+  setTimeout(()=>{if(typeof auth!=='undefined'&&auth&&state.role==='coord'){loadData().then(render)},250);
+})();
 </script>
 <script>
 /* Máscaras dos campos do Estágio: mantém os documentos no padrão brasileiro. */
@@ -324,5 +370,19 @@ bind();
   const bindBeforeStageMasks=bind;
   bind=function(){bindBeforeStageMasks();bindStageMasks();};
   bindStageMasks();
+})();
+</script>
+<script>
+/* Reaplica o comportamento de arrastar após os demais módulos da página. */
+(function(){
+  const priorBind=bind;
+  bind=function(){
+    priorBind();
+    document.querySelectorAll('[data-group-drag]').forEach(item=>{
+      item.addEventListener('dragstart',()=>item.classList.add('dragging'));
+      item.addEventListener('dragend',()=>{item.classList.remove('dragging');const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Boolean);Promise.all(ids.map((id,index)=>banco.from('turmas').update({ordem:index+1}).eq('id',id))).then(()=>{loadData().then(render)})});
+      item.addEventListener('dragover',e=>{e.preventDefault();const dragging=document.querySelector('.group-chip.dragging');if(!dragging||dragging===item)return;const box=item.getBoundingClientRect();if(e.clientY>box.top+box.height/2)item.after(dragging);else item.before(dragging)});
+    });
+  };
 })();
 </script>
