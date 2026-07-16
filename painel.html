@@ -208,7 +208,12 @@ saveCurriculum=async function(){let course=reqVal('mc-course'),semester=+reqVal(
 const bindBeforeMatrixEdit=bind;bind=function(){bindBeforeMatrixEdit();document.querySelectorAll('[data-editcurriculum]').forEach(b=>b.onclick=()=>{state.modal={type:'editcurriculum',id:b.dataset.editcurriculum};render()});document.getElementById('savecurriculum')?.addEventListener('click',saveCurriculum)}
 function saveTheme(){theme.brand=document.getElementById('theme-brand').value.trim()||'SalaCerta';theme.primary=document.getElementById('theme-primary').value;theme.accent=document.getElementById('theme-accent').value;theme.background=document.getElementById('theme-bg').value;if(state.pendingLogo)theme.logo=state.pendingLogo;localStorage.setItem('salacerta-theme',JSON.stringify(theme));applyTheme();state.pendingLogo=null;render();toast('Aparência atualizada.')}
 function resetTheme(){theme={...AEMS_THEME};localStorage.setItem('salacerta-theme',JSON.stringify(theme));applyTheme();state.pendingLogo=null;render();toast('Aparência restaurada.')}
-boot();
+applyShortcutRoute();
+const __baseRenderBeforeBoot=render;
+let __bootReady=false;
+render=function(){if(__bootReady)__baseRenderBeforeBoot()};
+document.getElementById('root').innerHTML='<div style="min-height:100vh;display:grid;place-items:center;font-family:Arial,sans-serif;color:#0b4f8f">Carregando...</div>';
+boot().finally(()=>{__bootReady=true;render()});
 </script></body></html><script>
 const modalWithEdit=modal;
 modal=function(){
