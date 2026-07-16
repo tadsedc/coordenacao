@@ -349,6 +349,7 @@ bind();
     // A ordenação é tratada pelo controlador final por ponteiro/RPC.
   };
   setTimeout(()=>{if(typeof auth!=='undefined'&&auth&&state.role==='coord'){loadData().then(render)},250);
+render();
 })();
 </script>
 <script>
