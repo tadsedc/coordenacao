@@ -349,6 +349,7 @@ bind();
     // A ordenação é tratada pelo controlador final por ponteiro/RPC.
   };
   setTimeout(()=>{if(typeof auth!=='undefined'&&auth&&state.role==='coord'){loadData().then(render)},250);
+const __baseNav=nav;nav=function(){let html=__baseNav();if(state.role==='coord')html=html.replace(/<button data-page="mine"[\s\S]*?<\/button>/,'');return html};
 function ensureSaturday(){document.querySelectorAll('select#cd,select#ecd').forEach(s=>{if(!s.querySelector('option[value="6"]'))s.insertAdjacentHTML('beforeend','<option value="6">Sábado</option>')});document.querySelectorAll('.weekday-picker').forEach(w=>{if(!w.querySelector('[data-weekday="6"]'))w.insertAdjacentHTML('beforeend','<button data-weekday="6">Sáb</button>')})}
 const __renderWithSaturday=render;render=function(){__renderWithSaturday();ensureSaturday()};
 new MutationObserver(ensureSaturday).observe(document.body,{childList:true,subtree:true});
