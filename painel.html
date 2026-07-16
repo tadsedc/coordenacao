@@ -522,6 +522,19 @@ render();
     document.querySelectorAll('[data-group-drag]').forEach(item=>{item.draggable=false;item.onpointerdown=e=>{if(e.target.closest('.chip-move,.chip-delete'))return;window.__activeGroupDrag=item;item.classList.add('dragging');e.preventDefault()};});
     document.querySelectorAll('[data-movegroup]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();moveGroup(b.dataset.movegroup,Number(b.dataset.move))});
   };
+  async function persistOrderIds(ids){
+    ids=ids.map(Number).filter(Number.isFinite);
+    if(!ids.length)return;
+    const temporary=ids.map((id,i)=>banco.from('turmas').update({ordem:-1000000-i}).eq('id',id).eq('ativa',true));
+    const first=await Promise.all(temporary);const firstError=first.find(x=>x.error)?.error;
+    if(firstError)return toast('NÃ£o foi possÃ­vel preparar a ordem: '+firstError.message);
+    const final=ids.map((id,i)=>banco.from('turmas').update({ordem:i+1}).eq('id',id).eq('ativa',true));
+    const second=await Promise.all(final);const secondError=second.find(x=>x.error)?.error;
+    if(secondError)return toast('NÃ£o foi possÃ­vel salvar a ordem: '+secondError.message);
+    await loadData();render();toast('Ordem das turmas atualizada.');
+  }
+  moveGroup=function(id,delta){const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Number.isFinite),index=ids.indexOf(Number(id)),target=index+delta;if(index<0||target<0||target>=ids.length)return;[ids[index],ids[target]]=[ids[target],ids[index]];persistOrderIds(ids).catch(e=>toast('NÃ£o foi possÃ­vel salvar a ordem: '+e.message))};
+  persistDraggedOrder=function(target){const ids=[...document.querySelectorAll('[data-group-drag]')].map(x=>Number(x.dataset.groupDrag)).filter(Number.isFinite);target?.classList.remove('dragging');persistOrderIds(ids).catch(e=>toast('NÃ£o foi possÃ­vel salvar a ordem: '+e.message))};
   if(!window.__groupPointerEvents){
     window.__groupPointerEvents=true;
     document.addEventListener('pointermove',e=>{const active=window.__activeGroupDrag;if(!active)return;const target=document.elementFromPoint(e.clientX,e.clientY)?.closest?.('[data-group-drag]');if(!target||target===active)return;const r=target.getBoundingClientRect();if(e.clientY>r.top+r.height/2)target.after(active);else target.before(active);e.preventDefault()},{passive:false});
