@@ -366,6 +366,28 @@ new MutationObserver(ensureSaturday).observe(document.body,{childList:true,subtr
 render();
 })();
 </script>
+<style>
+.prof-activity{margin:20px 0}.prof-activity-list{display:grid;gap:10px;margin-top:15px}.prof-activity-row{display:grid;grid-template-columns:minmax(220px,1.25fr) minmax(175px,.9fr) minmax(230px,1.15fr);gap:18px;align-items:center;padding:15px 16px;border:1px solid #d9e5e1;border-radius:14px;background:#fbfdfc}.prof-activity-person{display:flex;align-items:center;gap:11px;min-width:0}.prof-activity-initials{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#e4eff8;color:#075c9f;font-weight:900;flex:0 0 auto}.prof-activity-person strong,.prof-activity-person small,.prof-activity-event span,.prof-activity-event b,.prof-activity-event small{display:block}.prof-activity-person small,.prof-activity-event span,.prof-activity-event small{color:#687773;font-size:.78rem;margin-top:3px}.prof-activity-event b{font-size:.9rem;color:#172320}@media(max-width:820px){.prof-activity-row{grid-template-columns:1fr}.prof-activity-event{padding-left:53px}}
+</style>
+<script>
+db.teacherActivity=[];
+const loadDataBeforeTeacherActivity=loadData;
+loadData=async function(){
+  await loadDataBeforeTeacherActivity();
+  db.teacherActivity=[];
+  if(state.role==='coord'){
+    const result=await banco.rpc('listar_atividade_professores');
+    if(!result.error)db.teacherActivity=result.data||[];
+  }
+};
+function teacherActivityDate(value){return value?new Date(value).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Ainda não registrado'}
+function teacherActivityPanel(){
+  if(state.role!=='coord')return'';
+  const rows=(db.teacherActivity||[]).map(item=>{const letters=(item.nome||'Professor').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();return '<article class="prof-activity-row"><div class="prof-activity-person"><span class="prof-activity-initials">'+letters+'</span><div><strong>'+item.nome+'</strong><small>'+item.email+'</small></div></div><div class="prof-activity-event"><span>Último acesso</span><b>'+teacherActivityDate(item.ultimo_login_em)+'</b></div><div class="prof-activity-event"><span>Última alteração de sala</span><b>'+teacherActivityDate(item.ultima_alteracao_sala_em)+'</b>'+(item.ultima_alteracao_sala_em?'<small>'+(item.disciplina||'Aula')+(item.sala?' · '+item.sala:'')+'</small>':'')+'</div></article>'}).join('');
+  return '<section class="card prof-activity"><div class="cardhead"><div><h2>Atividade dos professores</h2><small>Últimos acessos e alterações de sala registrados no portal</small></div></div><div class="prof-activity-list">'+(rows||'<div class="empty">Os registros aparecerão após a ativação no Supabase.</div>')+'</div></section>';
+}
+dash=function(){let first=(state.userName||'Coordenador').split(' ')[0];return layout(head(dayNames[state.weekday],'Olá, '+first+'!','Acompanhe a grade recorrente e as salas atualmente definidas.','<button class="btn primary" data-newclass>＋ Nova aula</button>')+stats()+teacherActivityPanel()+toolbar()+'<div class="card"><div class="cardhead"><div><h2>Aulas de '+dayNames[state.weekday]+'</h2><small>As salas permanecem até uma nova alteração</small></div></div>'+table(list(),true)+'</div>','Visão geral')};
+</script>
 <script>
 /* Gestão dos acessos temporários de estágio pela coordenação. */
 (function(){
