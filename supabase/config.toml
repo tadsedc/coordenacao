@@ -1,0 +1,2 @@
+[functions.maintenance-usage]
+verify_jwt = true
