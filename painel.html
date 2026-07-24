@@ -63,7 +63,9 @@ article.tile:has([data-delroom]) .roomline .status{display:none!important}
 .maintenance-note{margin-top:18px}.maintenance-note code{overflow-wrap:anywhere}.maintenance-loading{padding:48px;text-align:center;color:var(--mut)}
 @media(max-width:1000px){.maintenance-summary{grid-template-columns:repeat(2,1fr)}}@media(max-width:720px){.maintenance-summary,.usage-grid{grid-template-columns:1fr}.maintenance-card strong{font-size:20px}}
 </style><style id="course-gate-refresh">
-.public-main.gate-main:has(.course-options) .portal-gate{padding-top:54px!important}
+.public-shell:has(.gate-main) .public-header{min-height:178px;padding:16px 24px 15px;gap:10px}
+.public-shell:has(.gate-main) .public-header .brand-logo-front{width:min(380px,76vw)!important}
+.public-main.gate-main:has(.course-options) .portal-gate{padding-top:38px!important}
 .course-gate-intro{max-width:820px;margin:0 auto;text-align:center}
 .course-gate-kicker{display:inline-flex;align-items:center;gap:9px;margin:0 0 16px;color:#0868b2;font-size:12px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
 .course-gate-kicker:before,.course-gate-kicker:after{content:"";width:30px;height:2px;border-radius:2px;background:#f4b41f}
@@ -81,7 +83,7 @@ article.tile:has([data-delroom]) .roomline .status{display:none!important}
 .public-main.gate-main .course-option>span:last-of-type{display:block;max-width:82%;font-size:13px;line-height:1.55}
 .public-main.gate-main .course-symbol{display:grid;width:42px;height:42px;place-items:center;border:1px solid #ffffff35;border-radius:13px;background:#ffffff12;font-size:20px}
 @media(max-width:900px){.public-main.gate-main .course-options{grid-template-columns:1fr 1fr}.public-main.gate-main .course-option.professor{grid-column:1/-1;min-height:180px}}
-@media(max-width:700px){.public-main.gate-main:has(.course-options) .portal-gate{padding-top:38px!important}.course-gate-kicker{font-size:10px;letter-spacing:.11em}.course-gate-kicker:before,.course-gate-kicker:after{width:18px}.public-main.gate-main:has(.course-options) .course-gate-title{font-size:clamp(36px,11vw,52px)}.course-gate-copy{font-size:15px;margin-top:16px}.course-gate-meta{margin-top:18px}.public-main.gate-main .course-options{grid-template-columns:1fr;margin-top:28px}.public-main.gate-main .course-option.professor{grid-column:auto}.public-main.gate-main .course-option{min-height:190px;padding:24px}}
+@media(max-width:700px){.public-shell:has(.gate-main) .public-header{min-height:152px;padding:12px 14px 12px;gap:8px}.public-shell:has(.gate-main) .public-header .brand-logo-front{width:min(270px,76vw)!important}.public-main.gate-main:has(.course-options) .portal-gate{padding-top:28px!important}.course-gate-kicker{font-size:10px;letter-spacing:.11em}.course-gate-kicker:before,.course-gate-kicker:after{width:18px}.public-main.gate-main:has(.course-options) .course-gate-title{font-size:clamp(36px,11vw,52px)}.course-gate-copy{font-size:15px;margin-top:16px}.course-gate-meta{margin-top:18px}.public-main.gate-main .course-options{grid-template-columns:1fr;margin-top:28px}.public-main.gate-main .course-option.professor{grid-column:auto}.public-main.gate-main .course-option{min-height:190px;padding:24px}}
 </style></head><body><div id="root"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.min.js"></script><script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.48.0/build/docxtemplater.js"></script><script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script><script>
 const SUPABASE_URL='https://uvdnejmdqgwdcipctyur.supabase.co';
 const SUPABASE_KEY='sb_publishable_Afn5llFEgcHD4Uhmt8N4pA_W0T_NHZk';
