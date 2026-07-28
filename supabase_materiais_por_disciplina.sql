@@ -85,6 +85,49 @@ create policy "Matriz ativa publica para materiais"
 
 grant select on public.matriz_disciplinas to anon, authenticated;
 
+-- Sincroniza automaticamente o tipo do link com "Materiais de aula" do
+-- perfil. O professor só pode alterar o próprio perfil; a coordenação
+-- pode sincronizar qualquer docente.
+create or replace function public.sincronizar_material_professor(
+  professor_alvo uuid,
+  material_novo text
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is null
+     or (
+       auth.uid() <> professor_alvo
+       and not public.e_coordenador()
+     ) then
+    raise exception 'Sem permissão para atualizar os materiais deste professor';
+  end if;
+
+  if material_novo not in ('Google Classroom', 'GitHub', 'GrupoAU') then
+    return;
+  end if;
+
+  update public.perfis
+     set materiais = array(
+       select distinct valor
+       from unnest(
+         coalesce(materiais, array[]::text[])
+         || array[material_novo]
+       ) as itens(valor)
+     )
+   where id = professor_alvo
+     and ativo = true;
+end;
+$$;
+
+revoke all on function public.sincronizar_material_professor(uuid, text)
+  from public;
+grant execute on function public.sincronizar_material_professor(uuid, text)
+  to authenticated;
+
 commit;
 
 -- Solicita ao PostgREST a atualização imediata do cache do esquema.

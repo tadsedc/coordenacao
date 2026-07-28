@@ -555,10 +555,15 @@ render();
     if(id)result=await banco.from('professor_materiais').update(payload).eq('id',id);
     else result=await banco.from('professor_materiais').insert({...payload,criado_por:auth});
     if(result.error)return toast('Não foi possível salvar o material: '+result.error.message);
+    let syncWarning='';
+    if(type!=='Outro'){
+      const sync=await banco.rpc('sincronizar_material_professor',{professor_alvo:teacherId,material_novo:type});
+      if(sync.error)syncWarning='Link salvo, mas os Materiais de aula não foram sincronizados: '+sync.error.message;
+    }
     const returnTeacher=teacherId;
     await loadData();
     state.modal=state.role==='coord'?{type:'teachermateriallist',teacherId:returnTeacher}:null;
-    render();toast('Material salvo com sucesso.');
+    render();toast(syncWarning||'Material salvo e Materiais de aula atualizados.');
   }
   async function deleteTeacherMaterial(id){
     if(!confirm('Excluir este material? O link deixará de aparecer para os estudantes.'))return;
