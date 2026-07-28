@@ -50,21 +50,32 @@
   .side .brand { padding-bottom:22px }
   .brand-wordmark-modern {
     display:flex!important;flex-direction:column;align-items:flex-start;justify-content:center;
-    width:max-content;max-width:100%;line-height:1;color:#fff;text-align:left;
+    width:max-content;max-width:100%;gap:0;line-height:1!important;color:#fff;text-align:left;
     filter:drop-shadow(0 10px 24px rgba(0,0,0,.16));
   }
   .brand-wordmark-modern .np-brand-overline {
-    color:var(--np-gold);font-size:11px;font-weight:900;letter-spacing:.24em;margin:0 0 4px;
+    display:flex;align-items:center;gap:8px;color:#9cecf2;font-size:10px;font-weight:900;
+    letter-spacing:.28em;margin:0 0 6px;white-space:nowrap;
+  }
+  .brand-wordmark-modern .np-brand-overline:before {
+    content:"";width:24px;height:2px;border-radius:99px;background:linear-gradient(90deg,var(--np-gold),#ffdf87);
   }
   .brand-wordmark-modern .np-brand-title {
-    color:#fff;font-size:31px;font-weight:950;line-height:.88;letter-spacing:-.055em;
+    display:block;color:#fff;font-family:Inter,ui-sans-serif,system-ui,sans-serif;
+    font-size:31px;font-weight:950;line-height:.88;letter-spacing:-.06em;
+    text-shadow:0 4px 18px rgba(0,0,0,.16);
   }
   .brand-wordmark-modern .np-brand-courses {
-    color:var(--np-gold);font-size:20px;font-weight:900;letter-spacing:.07em;margin-top:7px;
+    display:block;color:var(--np-gold);font-size:20px;font-weight:950;letter-spacing:.07em;margin-top:8px;
   }
-  .brand-wordmark-modern .np-brand-courses i { color:#9cecf2;font-style:normal;font-weight:700 }
+  .brand-wordmark-modern .np-brand-courses i {
+    display:inline-grid;place-items:center;width:22px;height:22px;margin:0 3px;border-radius:50%;
+    color:#b8f4f7;background:rgba(156,236,242,.1);border:1px solid rgba(156,236,242,.25);
+    font-size:.62em;font-style:normal;font-weight:900;vertical-align:3px;
+  }
   .brand-wordmark-modern .np-brand-place {
-    color:#dcecf7;font-size:10px;font-weight:800;letter-spacing:.12em;margin-top:6px;
+    display:block;color:#dcecf7;font-size:10px;font-weight:800;letter-spacing:.13em;margin-top:7px;
+    padding-top:6px;border-top:1px solid rgba(255,255,255,.19);
   }
   .side .brand-wordmark-modern { padding:6px 7px 2px }
   .side .brand-wordmark-modern .np-brand-title { font-size:29px }
@@ -146,8 +157,11 @@
   .public-header {
     background:linear-gradient(120deg,#061b33,#07599e 55%,#0b7ab4);box-shadow:0 18px 50px rgba(4,42,75,.2);
   }
+  .public-shell:not(:has(.gate-main)) .public-header {
+    height:auto;min-height:112px;padding-top:13px;padding-bottom:13px;
+  }
   .public-header .brand-wordmark-modern { flex:0 0 auto }
-  .public-header .brand-wordmark-modern .np-brand-title { font-size:27px }
+  .public-header .brand-wordmark-modern .np-brand-title { font-size:30px }
   .public-header .brand-wordmark-modern .np-brand-overline { font-size:9px }
   .public-header .brand-wordmark-modern .np-brand-courses { font-size:17px;margin-top:5px }
   .public-header .brand-wordmark-modern .np-brand-place { font-size:8px;margin-top:4px }
@@ -169,6 +183,9 @@
   .public-shell:has(.gate-main) .public-header { background:linear-gradient(125deg,#051a32,#075ba1 58%,#0b86b9) }
   .public-shell:has(.gate-main) .public-header .brand-wordmark-modern {
     align-items:center;text-align:center;margin-inline:auto;
+  }
+  .public-shell:has(.gate-main) .public-header .brand-wordmark-modern .np-brand-overline:after {
+    content:"";width:24px;height:2px;border-radius:99px;background:linear-gradient(90deg,#ffdf87,var(--np-gold));
   }
   .public-shell:has(.gate-main) .public-header .brand-wordmark-modern .np-brand-overline { font-size:12px }
   .public-shell:has(.gate-main) .public-header .brand-wordmark-modern .np-brand-title {
