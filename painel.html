@@ -426,7 +426,7 @@ render();
 .subject-material-head h3{margin:0;font-size:18px}.subject-material-head p{margin:4px 0 0;color:#687578;font-size:13px}
 .subject-material-groups{display:grid;gap:12px}.subject-material-group{padding:14px;border:1px solid #dbe5e7;border-radius:14px;background:#fff}
 .subject-material-group h4{margin:0 0 10px;color:#075d99;font-size:15px}.subject-material-list{display:grid;gap:8px}
-.subject-material-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#f3f7f8}
+.subject-material-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#f3f7f8}
 .subject-material-row strong{display:block;font-size:13px}.subject-material-row small{display:block;margin-top:2px;color:#6d7779;font-size:11px}
 .material-type{display:inline-flex;align-items:center;justify-content:center;min-width:78px;padding:5px 8px;border-radius:999px;background:#e5f0f9;color:#075d99;font-size:10px;font-weight:900}
 .material-type.github{background:#e9e9ee;color:#292a31}.material-type.grupoau{background:#fff0d2;color:#8a5800}.material-type.outro{background:#e8f3ed;color:#286b5b}
@@ -436,23 +436,24 @@ render();
 .material-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.material-form-grid .wide{grid-column:1/-1}
 .material-course-picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.material-course-picks label{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid #d9e2e3;border-radius:11px;font-weight:800}
 .public-teacher-materials{margin-top:16px}.public-teacher-materials>h4{margin:0 0 9px;color:#5f6d70;font-size:12px}
-.public-teacher-materials .subject-material-row{grid-template-columns:minmax(0,1fr) auto}.material-direct-link{min-width:0;color:#075d99;font-size:13px;font-weight:800;overflow-wrap:anywhere}
-@media(max-width:680px){.subject-material-head{align-items:flex-start;flex-direction:column}.subject-material-head .btn{width:100%}.subject-material-row,.public-teacher-materials .subject-material-row{grid-template-columns:1fr}.material-actions{grid-column:1}.material-form-grid{grid-template-columns:1fr}.material-form-grid .wide{grid-column:auto}}
+.public-teacher-materials .subject-material-row{grid-template-columns:auto minmax(0,1fr)}.material-direct-link{min-width:0;color:#075d99;font-size:13px;font-weight:800;overflow-wrap:anywhere}
+@media(max-width:680px){.subject-material-head{align-items:flex-start;flex-direction:column}.subject-material-head .btn{width:100%}.subject-material-row,.public-teacher-materials .subject-material-row{grid-template-columns:auto minmax(0,1fr)}.material-actions{grid-column:1/-1}.material-form-grid{grid-template-columns:1fr}.material-form-grid .wide{grid-column:auto}}
 </style>
 <script>
 (()=>{
   const materialEsc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const teacherMaterials=teacherId=>(db.materialLinks||[]).filter(item=>String(item.teacherId)===String(teacherId));
   const inferMaterialType=url=>{let value=String(url||'').toLowerCase();return value.includes('classroom.google')?'Google Classroom':value.includes('github.com')?'GitHub':value.includes('grupoau')?'GrupoAU':'Outro'};
+  const materialTypeLabel=type=>type==='Google Classroom'?'Classroom':type==='Outro'?'Link':type;
+  const materialTypeClass=type=>type==='GitHub'?'github':type==='GrupoAU'?'grupoau':type==='Outro'?'outro':'';
   function renderTeacherMaterials(items,manage=false){
     if(!items.length)return '<div class="material-empty">Nenhum link específico por disciplina cadastrado.</div>';
-    const grouped={};
-    items.forEach(item=>(grouped[item.subject]||(grouped[item.subject]=[])).push(item));
-    return '<div class="subject-material-groups">'+Object.entries(grouped).sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).map(([subject,links])=>
-      '<section class="subject-material-group"><h4>'+materialEsc(subject)+'</h4><div class="subject-material-list">'+links.map(item=>
-        '<div class="subject-material-row"><a class="material-direct-link" href="'+materialEsc(item.url)+'" target="_blank" rel="noopener">'+materialEsc(item.url)+' ↗</a>'+
+    return '<div class="subject-material-groups">'+[...items].sort((a,b)=>a.subject.localeCompare(b.subject,'pt-BR')||a.url.localeCompare(b.url)).map(item=>
+      '<section class="subject-material-group"><div class="subject-material-row">'+
+        '<span class="material-type '+materialTypeClass(item.type)+'">'+materialEsc(materialTypeLabel(item.type))+'</span>'+
+        '<a class="material-direct-link" href="'+materialEsc(item.url)+'" target="_blank" rel="noopener">'+materialEsc(item.subject)+' ↗</a>'+
         (manage?'<div class="material-actions"><button class="material-icon-btn" data-edit-teacher-material="'+item.id+'">Editar</button><button class="material-icon-btn danger" data-delete-teacher-material="'+item.id+'">Excluir</button></div>':'')+
-        '</div>').join('')+'</div></section>'
+        '</div></section>'
     ).join('')+'</div>';
   }
   function curriculumOptions(selected){
