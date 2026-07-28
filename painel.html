@@ -485,6 +485,13 @@ render();
       id:item.id,teacherId:item.professor_id,curriculumId:item.matriz_disciplina_id,groupId:item.turma_id,subject:item.disciplina,
       courses:item.cursos||[],type:item.tipo,title:item.titulo,url:item.url,active:item.ativo
     }));
+    db.teachers.forEach(teacher=>{
+      const linkedTypes=db.materialLinks
+        .filter(item=>String(item.teacherId)===String(teacher.id))
+        .map(item=>item.type&&item.type!=='Outro'?item.type:inferMaterialType(item.url))
+        .filter(type=>type!=='Outro');
+      teacher.materials=mergeList(teacher.materials,linkedTypes);
+    });
     if(result.error&&!/professor_materiais|schema cache|does not exist/i.test(result.error.message||''))console.warn('Materiais por disciplina:',result.error.message);
   };
   profile=function(){
