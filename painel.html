@@ -471,7 +471,7 @@ render();
     const teacherField=state.role==='coord'
       ?'<div class="field wide"><label>Professor</label><select id="pm-teacher">'+db.teachers.map(t=>'<option value="'+t.id+'" '+(String(t.id)===String(teacherId)?'selected':'')+'>'+materialEsc(t.name)+'</option>').join('')+'</select></div>'
       :'<div class="field wide"><label>Professor</label><input value="'+materialEsc(teacher?.name||'')+'" disabled><input id="pm-teacher" type="hidden" value="'+materialEsc(teacherId)+'"></div>';
-    return '<div class="modal" style="width:min(720px,100%)"><div class="modal-head"><div><h2>'+(item.id?'Editar material':'Novo material por disciplina')+'</h2><p>Cadastre quantos links forem necessários para cada disciplina.</p></div><button class="x" id="close-modal">×</button></div>'+
+    return '<div class="modal" style="width:min(720px,100%)" onclick="event.stopPropagation()"><div class="modaltop"><div><h2>'+(item.id?'Editar material':'Novo material por disciplina')+'</h2><p>Cadastre quantos links forem necessários para cada disciplina.</p></div><button class="close" data-close>×</button></div>'+
       '<div class="material-form-grid">'+teacherField+
       '<div class="field wide"><label>Disciplina da matriz</label><select id="pm-discipline">'+curriculumOptions(item.curriculumId)+'</select></div>'+
       '<div class="field wide"><label>Curso(s)</label><div class="material-course-picks"><label><input type="checkbox" class="pm-course" value="ADS" '+(selectedCourses.includes('ADS')?'checked':'')+'> ADS</label><label><input type="checkbox" class="pm-course" value="EDC" '+(selectedCourses.includes('EDC')?'checked':'')+'> EDC</label></div></div>'+
@@ -479,13 +479,13 @@ render();
       '<div class="field"><label>Tipo</label><select id="pm-type">'+['Google Classroom','GitHub','GrupoAU','Outro'].map(type=>'<option '+(item.type===type?'selected':'')+'>'+type+'</option>').join('')+'</select></div>'+
       '<div class="field wide"><label>Título do link</label><input id="pm-title" maxlength="100" value="'+materialEsc(item.title||'')+'" placeholder="Ex.: Classroom — Turma 2026-1"></div>'+
       '<div class="field wide"><label>Endereço do material</label><input id="pm-url" type="url" value="'+materialEsc(item.url||'')+'" placeholder="https://..."></div></div>'+
-      '<div class="modal-actions"><button class="btn soft" id="close-modal-2">Cancelar</button><button class="btn primary" data-save-teacher-material="'+(item.id||'')+'">Salvar material</button></div></div>';
+      '<div class="actions"><button class="btn soft" data-close>Cancelar</button><button class="btn primary" data-save-teacher-material="'+(item.id||'')+'">Salvar material</button></div></div>';
   }
   function materialListModal(teacherId){
     const teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
-    return '<div class="modal" style="width:min(820px,100%)"><div class="modal-head"><div><h2>Materiais de '+materialEsc(teacher?.name||'professor')+'</h2><p>Links organizados por disciplina e, opcionalmente, por turma.</p></div><button class="x" id="close-modal">×</button></div>'+
+    return '<div class="modal" style="width:min(820px,100%)" onclick="event.stopPropagation()"><div class="modaltop"><div><h2>Materiais de '+materialEsc(teacher?.name||'professor')+'</h2><p>Links organizados por disciplina e, opcionalmente, por turma.</p></div><button class="close" data-close>×</button></div>'+
       renderTeacherMaterials(teacherMaterials(teacherId),true)+
-      '<div class="modal-actions"><button class="btn soft" id="close-modal-2">Fechar</button><button class="btn primary" data-new-teacher-material="'+materialEsc(teacherId)+'">+ Novo material</button></div></div>';
+      '<div class="actions"><button class="btn soft" data-close>Fechar</button><button class="btn primary" data-new-teacher-material="'+materialEsc(teacherId)+'">+ Novo material</button></div></div>';
   }
   const previousLoadData=loadData;
   loadData=async function(){
@@ -549,9 +549,9 @@ render();
   modal=function(){
     if(state.modal?.type==='teachermaterial'){
       const item=(db.materialLinks||[]).find(x=>String(x.id)===String(state.modal.id));
-      return '<div class="overlay">'+materialForm(item||{teacherId:state.modal.teacherId})+'</div>';
+      return '<div class="modalbg" data-close>'+materialForm(item||{teacherId:state.modal.teacherId})+'</div>';
     }
-    if(state.modal?.type==='teachermateriallist')return '<div class="overlay">'+materialListModal(state.modal.teacherId)+'</div>';
+    if(state.modal?.type==='teachermateriallist')return '<div class="modalbg" data-close>'+materialListModal(state.modal.teacherId)+'</div>';
     return previousModal();
   };
   async function saveTeacherMaterial(id){
