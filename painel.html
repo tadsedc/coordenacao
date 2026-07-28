@@ -418,6 +418,184 @@ new MutationObserver(ensureSaturday).observe(document.body,{childList:true,subtr
 render();
 })();
 </script>
+
+<style>
+.subject-material-panel{margin-top:18px;padding:20px;border:1px solid #d8e4e8;border-radius:18px;background:#f8fbfc}
+.subject-material-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.subject-material-head h3{margin:0;font-size:18px}.subject-material-head p{margin:4px 0 0;color:#687578;font-size:13px}
+.subject-material-groups{display:grid;gap:12px}.subject-material-group{padding:14px;border:1px solid #dbe5e7;border-radius:14px;background:#fff}
+.subject-material-group h4{margin:0 0 10px;color:#075d99;font-size:15px}.subject-material-list{display:grid;gap:8px}
+.subject-material-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:#f3f7f8}
+.subject-material-row strong{display:block;font-size:13px}.subject-material-row small{display:block;margin-top:2px;color:#6d7779;font-size:11px}
+.material-type{display:inline-flex;align-items:center;justify-content:center;min-width:78px;padding:5px 8px;border-radius:999px;background:#e5f0f9;color:#075d99;font-size:10px;font-weight:900}
+.material-type.github{background:#e9e9ee;color:#292a31}.material-type.grupoau{background:#fff0d2;color:#8a5800}.material-type.outro{background:#e8f3ed;color:#286b5b}
+.material-actions{display:flex;gap:5px}.material-icon-btn{border:1px solid #d1e0e3;background:#fff;color:#075d99;border-radius:8px;padding:6px 8px;font-size:11px;font-weight:800;cursor:pointer}
+.material-icon-btn.danger{color:#a53b31}.material-empty{padding:13px;border:1px dashed #cbdadd;border-radius:12px;color:#6b777a;font-size:13px;text-align:center}
+.teacher-material-summary{margin-top:12px;padding-top:12px;border-top:1px solid #e1e7e9;display:flex;align-items:center;justify-content:space-between;gap:8px;color:#657274;font-size:12px}
+.material-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.material-form-grid .wide{grid-column:1/-1}
+.material-course-picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.material-course-picks label{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid #d9e2e3;border-radius:11px;font-weight:800}
+.public-teacher-materials{margin-top:16px}.public-teacher-materials>h4{margin:0 0 9px;color:#5f6d70;font-size:12px}
+.public-teacher-materials .subject-material-row{grid-template-columns:auto minmax(0,1fr) auto}
+@media(max-width:680px){.subject-material-head{align-items:flex-start;flex-direction:column}.subject-material-head .btn{width:100%}.subject-material-row,.public-teacher-materials .subject-material-row{grid-template-columns:1fr auto}.material-type{justify-self:start}.subject-material-row>div:nth-child(2){grid-column:1/-1;grid-row:2}.material-actions{grid-column:1/-1}.material-form-grid{grid-template-columns:1fr}.material-form-grid .wide{grid-column:auto}}
+</style>
+<script>
+(()=>{
+  const materialEsc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const materialTypeClass=type=>type==='GitHub'?'github':type==='GrupoAU'?'grupoau':type==='Outro'?'outro':'';
+  const teacherMaterials=(teacherId,course='')=>(db.materialLinks||[]).filter(item=>String(item.teacherId)===String(teacherId)&&(!course||course==='Todos'||item.courses.includes(course)));
+  const materialGroupName=item=>item.groupName?item.groupName+(item.groupCourses?.length?' '+item.groupCourses.join(' + '):''):'Todas as turmas selecionadas';
+  function renderTeacherMaterials(items,manage=false){
+    if(!items.length)return '<div class="material-empty">Nenhum link específico por disciplina cadastrado.</div>';
+    const grouped={};
+    items.forEach(item=>(grouped[item.subject]||(grouped[item.subject]=[])).push(item));
+    return '<div class="subject-material-groups">'+Object.entries(grouped).sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).map(([subject,links])=>
+      '<section class="subject-material-group"><h4>'+materialEsc(subject)+'</h4><div class="subject-material-list">'+links.map(item=>
+        '<div class="subject-material-row"><span class="material-type '+materialTypeClass(item.type)+'">'+materialEsc(item.type)+'</span>'+
+        '<div><strong>'+materialEsc(item.title)+'</strong><small>'+materialEsc(item.courses.join(' + '))+' · '+materialEsc(materialGroupName(item))+'</small></div>'+
+        '<a class="material-icon-btn" href="'+materialEsc(item.url)+'" target="_blank" rel="noopener">Abrir ↗</a>'+
+        (manage?'<div class="material-actions"><button class="material-icon-btn" data-edit-teacher-material="'+item.id+'">Editar</button><button class="material-icon-btn danger" data-delete-teacher-material="'+item.id+'">Excluir</button></div>':'')+
+        '</div>').join('')+'</div></section>'
+    ).join('')+'</div>';
+  }
+  function curriculumOptions(selected){
+    const rows=[...(db.curriculum||[])].sort((a,b)=>a.course.localeCompare(b.course)||Number(a.semester)-Number(b.semester)||a.subject.localeCompare(b.subject,'pt-BR'));
+    let html='<option value="">Selecione uma disciplina da matriz</option>',key='';
+    rows.forEach(item=>{const next=item.course+'-'+item.semester;if(next!==key){if(key)html+='</optgroup>';key=next;html+='<optgroup label="'+materialEsc(item.course+' · '+item.semester+'º semestre')+'">'}html+='<option value="'+item.id+'" data-course="'+materialEsc(item.course)+'" '+(String(selected)===String(item.id)?'selected':'')+'>'+materialEsc(item.subject)+'</option>'});
+    return html+(key?'</optgroup>':'');
+  }
+  function materialForm(item={}){
+    const teacherId=item.teacherId||state.modal?.teacherId||auth;
+    const selectedCourses=item.courses||[];
+    const teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
+    const teacherField=state.role==='coord'
+      ?'<div class="field wide"><label>Professor</label><select id="pm-teacher">'+db.teachers.map(t=>'<option value="'+t.id+'" '+(String(t.id)===String(teacherId)?'selected':'')+'>'+materialEsc(t.name)+'</option>').join('')+'</select></div>'
+      :'<div class="field wide"><label>Professor</label><input value="'+materialEsc(teacher?.name||'')+'" disabled><input id="pm-teacher" type="hidden" value="'+materialEsc(teacherId)+'"></div>';
+    return '<div class="modal" style="width:min(720px,100%)"><div class="modal-head"><div><h2>'+(item.id?'Editar material':'Novo material por disciplina')+'</h2><p>Cadastre quantos links forem necessários para cada disciplina.</p></div><button class="x" id="close-modal">×</button></div>'+
+      '<div class="material-form-grid">'+teacherField+
+      '<div class="field wide"><label>Disciplina da matriz</label><select id="pm-discipline">'+curriculumOptions(item.curriculumId)+'</select></div>'+
+      '<div class="field wide"><label>Curso(s)</label><div class="material-course-picks"><label><input type="checkbox" class="pm-course" value="ADS" '+(selectedCourses.includes('ADS')?'checked':'')+'> ADS</label><label><input type="checkbox" class="pm-course" value="EDC" '+(selectedCourses.includes('EDC')?'checked':'')+'> EDC</label></div></div>'+
+      '<div class="field"><label>Turma (opcional)</label><select id="pm-group"><option value="">Todas as turmas selecionadas</option>'+db.groups.map(g=>'<option value="'+g.id+'" '+(String(item.groupId||'')===String(g.id)?'selected':'')+'>'+materialEsc(g.name+' · '+g.courses.join(' + '))+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Tipo</label><select id="pm-type">'+['Google Classroom','GitHub','GrupoAU','Outro'].map(type=>'<option '+(item.type===type?'selected':'')+'>'+type+'</option>').join('')+'</select></div>'+
+      '<div class="field wide"><label>Título do link</label><input id="pm-title" maxlength="100" value="'+materialEsc(item.title||'')+'" placeholder="Ex.: Classroom — Turma 2026-1"></div>'+
+      '<div class="field wide"><label>Endereço do material</label><input id="pm-url" type="url" value="'+materialEsc(item.url||'')+'" placeholder="https://..."></div></div>'+
+      '<div class="modal-actions"><button class="btn soft" id="close-modal-2">Cancelar</button><button class="btn primary" data-save-teacher-material="'+(item.id||'')+'">Salvar material</button></div></div>';
+  }
+  function materialListModal(teacherId){
+    const teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
+    return '<div class="modal" style="width:min(820px,100%)"><div class="modal-head"><div><h2>Materiais de '+materialEsc(teacher?.name||'professor')+'</h2><p>Links organizados por disciplina e, opcionalmente, por turma.</p></div><button class="x" id="close-modal">×</button></div>'+
+      renderTeacherMaterials(teacherMaterials(teacherId),true)+
+      '<div class="modal-actions"><button class="btn soft" id="close-modal-2">Fechar</button><button class="btn primary" data-new-teacher-material="'+materialEsc(teacherId)+'">+ Novo material</button></div></div>';
+  }
+  const previousLoadData=loadData;
+  loadData=async function(){
+    await previousLoadData();
+    const result=await banco.from('professor_materiais').select('*,turmas(nome,cursos)').eq('ativo',true).order('disciplina').order('titulo');
+    db.materialFeatureReady=!result.error;
+    db.materialLinks=(result.data||[]).map(item=>({
+      id:item.id,teacherId:item.professor_id,curriculumId:item.matriz_disciplina_id,groupId:item.turma_id,
+      groupName:item.turmas?.nome||'',groupCourses:item.turmas?.cursos||[],subject:item.disciplina,
+      courses:item.cursos||[],type:item.tipo,title:item.titulo,url:item.url,active:item.ativo
+    }));
+    if(result.error&&!/professor_materiais|schema cache|does not exist/i.test(result.error.message||''))console.warn('Materiais por disciplina:',result.error.message);
+  };
+  profile=function(){
+    const teacher=db.teachers.find(x=>String(x.id)===String(state.teacherId));
+    if(!teacher)return layout(head('Perfil docente','Meu perfil','Complete suas preferências para que os estudantes saibam como falar com você.')+'<div class="empty">Perfil não encontrado.</div>','Meu perfil');
+    const items=teacherMaterials(teacher.id);
+    const panel='<section class="subject-material-panel"><div class="subject-material-head"><div><h3>Links e materiais por disciplina</h3><p>Adicione Classroom, GitHub, GrupoAU ou outros recursos para cada matéria.</p></div><button class="btn primary" data-new-teacher-material="'+materialEsc(auth)+'">+ Adicionar material</button></div>'+
+      (!db.materialFeatureReady?'<div class="notice warn">A estrutura de materiais ainda precisa ser ativada no Supabase pelo coordenador.</div>':'')+
+      renderTeacherMaterials(items,true)+'</section>';
+    const general='<div class="settings-card profile-card"><div class="profile-summary">'+teacherAvatar(teacher,'avatar')+'<div><h2>'+teacher.name+'</h2><div class="muted">'+teacher.email+'</div></div></div>'+
+      '<div class="pref-section"><small>Formas de contato</small>'+chips(teacher.contacts)+'</div>'+
+      '<div class="pref-section"><small>Links gerais</small>'+chips(teacher.materials,'material')+'</div>'+
+      (teacher.classroomUrl?'<div class="pref-section"><small>Google Classroom geral</small><a href="'+teacher.classroomUrl+'" target="_blank" rel="noopener">Abrir turma no Classroom ↗</a></div>':'')+
+      (teacher.githubUrl?'<div class="pref-section"><small>GitHub geral</small><a href="'+teacher.githubUrl+'" target="_blank" rel="noopener">Abrir repositório no GitHub ↗</a></div>':'')+
+      (teacher.whatsapp?'<div class="pref-section"><small>WhatsApp</small><b>'+teacher.whatsapp+'</b></div>':'')+'</div>';
+    return layout(head('Perfil docente','Meu perfil','Estas informações aparecem no portal dos estudantes.','<div class="head-actions"><button class="btn soft" data-accesssettings>Acesso e senha</button><button class="btn primary" data-editteacher="'+teacher.id+'">Editar informações</button></div>')+general+panel,'Meu perfil');
+  };
+  const previousPeople=people;
+  people=function(){
+    let html=previousPeople();
+    db.teachers.forEach(teacher=>{
+      const count=teacherMaterials(teacher.id).length;
+      const needle='data-editteacher="'+teacher.id+'"';
+      const pos=html.indexOf(needle);
+      if(pos<0)return;
+      const cardEnd=html.indexOf('</article>',pos);
+      if(cardEnd<0)return;
+      const summary='<div class="teacher-material-summary"><span><strong>'+count+'</strong> link'+(count===1?'':'s')+' por disciplina</span><button class="material-icon-btn" data-manage-teacher-materials="'+teacher.id+'">Gerenciar materiais</button></div>';
+      html=html.slice(0,cardEnd)+summary+html.slice(cardEnd);
+    });
+    return html;
+  };
+  const previousPortalTeachers=portalTeachers;
+  portalTeachers=function(){
+    let html=previousPortalTeachers(),course=state.course;
+    db.teachers.filter(t=>{const assigned=[...new Set(db.classes.filter(c=>String(c.teacherId)===String(t.id)).flatMap(c=>c.courses||[]))];return !course||course==='Todos'||assigned.length===0||assigned.includes(course)}).forEach(teacher=>{
+      const items=teacherMaterials(teacher.id,course);
+      if(!items.length)return;
+      const email=teacher.email||'';
+      const anchor=email?html.indexOf('href="mailto:'+email+'"'):html.indexOf(teacher.name);
+      if(anchor<0)return;
+      const cardEnd=html.indexOf('</article>',anchor);
+      if(cardEnd<0)return;
+      const section='<div class="public-teacher-materials"><h4>Materiais por disciplina</h4>'+renderTeacherMaterials(items,false)+'</div>';
+      html=html.slice(0,cardEnd)+section+html.slice(cardEnd);
+    });
+    return html;
+  };
+  const previousModal=modal;
+  modal=function(){
+    if(state.modal?.type==='teachermaterial'){
+      const item=(db.materialLinks||[]).find(x=>String(x.id)===String(state.modal.id));
+      return '<div class="overlay">'+materialForm(item||{teacherId:state.modal.teacherId})+'</div>';
+    }
+    if(state.modal?.type==='teachermateriallist')return '<div class="overlay">'+materialListModal(state.modal.teacherId)+'</div>';
+    return previousModal();
+  };
+  async function saveTeacherMaterial(id){
+    const teacherId=document.getElementById('pm-teacher')?.value;
+    const curriculumId=document.getElementById('pm-discipline')?.value;
+    const curriculum=(db.curriculum||[]).find(x=>String(x.id)===String(curriculumId));
+    const courses=[...document.querySelectorAll('.pm-course:checked')].map(x=>x.value);
+    const groupId=document.getElementById('pm-group')?.value||null;
+    const group=db.groups.find(x=>String(x.id)===String(groupId));
+    const type=document.getElementById('pm-type')?.value;
+    const title=document.getElementById('pm-title')?.value.trim();
+    const url=document.getElementById('pm-url')?.value.trim();
+    if(!teacherId||!curriculum||!courses.length||!title||!url)return toast('Preencha professor, disciplina, curso, título e endereço.');
+    if(!/^https?:\/\/\S+$/i.test(url))return toast('Informe um endereço completo iniciado por http:// ou https://.');
+    if(group&&!group.courses.some(course=>courses.includes(course)))return toast('A turma selecionada não pertence aos cursos marcados.');
+    const payload={professor_id:teacherId,matriz_disciplina_id:curriculum.id,turma_id:groupId,disciplina:curriculum.subject,cursos:courses,tipo:type,titulo:title,url,ativo:true,atualizado_em:new Date().toISOString()};
+    let result;
+    if(id)result=await banco.from('professor_materiais').update(payload).eq('id',id);
+    else result=await banco.from('professor_materiais').insert({...payload,criado_por:auth});
+    if(result.error)return toast('Não foi possível salvar o material: '+result.error.message);
+    const returnTeacher=teacherId;
+    await loadData();
+    state.modal=state.role==='coord'?{type:'teachermateriallist',teacherId:returnTeacher}:null;
+    render();toast('Material salvo com sucesso.');
+  }
+  async function deleteTeacherMaterial(id){
+    if(!confirm('Excluir este material? O link deixará de aparecer para os estudantes.'))return;
+    const result=await banco.from('professor_materiais').update({ativo:false,atualizado_em:new Date().toISOString()}).eq('id',id);
+    if(result.error)return toast('Não foi possível excluir: '+result.error.message);
+    await loadData();render();toast('Material excluído.');
+  }
+  const previousBind=bind;
+  bind=function(){
+    previousBind();
+    document.querySelectorAll('[data-new-teacher-material]').forEach(button=>button.onclick=()=>{state.modal={type:'teachermaterial',teacherId:button.dataset.newTeacherMaterial};render()});
+    document.querySelectorAll('[data-manage-teacher-materials]').forEach(button=>button.onclick=()=>{state.modal={type:'teachermateriallist',teacherId:button.dataset.manageTeacherMaterials};render()});
+    document.querySelectorAll('[data-edit-teacher-material]').forEach(button=>button.onclick=()=>{state.modal={type:'teachermaterial',id:button.dataset.editTeacherMaterial};render()});
+    document.querySelectorAll('[data-delete-teacher-material]').forEach(button=>button.onclick=()=>deleteTeacherMaterial(button.dataset.deleteTeacherMaterial));
+    document.querySelectorAll('[data-save-teacher-material]').forEach(button=>button.onclick=()=>saveTeacherMaterial(button.dataset.saveTeacherMaterial));
+    const discipline=document.getElementById('pm-discipline');
+    if(discipline)discipline.onchange=()=>{const course=discipline.selectedOptions[0]?.dataset.course;if(course&&!document.querySelector('.pm-course:checked')){const checkbox=document.querySelector('.pm-course[value="'+course+'"]');if(checkbox)checkbox.checked=true}};
+  };
+  setTimeout(()=>{if(auth&&auth!=='public')loadData().then(()=>render()).catch(console.warn)},400);
+})();
+</script>
 <style>
 .prof-activity{margin:20px 0}.prof-activity-list{display:grid;gap:10px;margin-top:15px}.prof-activity-row{display:grid;grid-template-columns:minmax(220px,1.25fr) minmax(175px,.9fr) minmax(230px,1.15fr);gap:18px;align-items:center;padding:15px 16px;border:1px solid #d9e5e1;border-radius:14px;background:#fbfdfc}.prof-activity-person{display:flex;align-items:center;gap:11px;min-width:0}.prof-activity-initials{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#e4eff8;color:#075c9f;font-weight:900;flex:0 0 auto}.prof-activity-person strong,.prof-activity-person small,.prof-activity-event span,.prof-activity-event b,.prof-activity-event small{display:block}.prof-activity-person small,.prof-activity-event span,.prof-activity-event small{color:#687773;font-size:.78rem;margin-top:3px}.prof-activity-event b{font-size:.9rem;color:#172320}@media(max-width:820px){.prof-activity-row{grid-template-columns:1fr}.prof-activity-event{padding-left:53px}}
 </style>
