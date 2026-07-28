@@ -533,19 +533,19 @@ render();
   };
   const previousPortalTeachers=portalTeachers;
   portalTeachers=function(){
-    let html=previousPortalTeachers(),course=state.course;
-    db.teachers.filter(t=>{const assigned=[...new Set(db.classes.filter(c=>String(c.teacherId)===String(t.id)).flatMap(c=>c.courses||[]))];return !course||course==='Todos'||assigned.length===0||assigned.includes(course)}).forEach(teacher=>{
-      const items=teacherMaterials(teacher.id);
-      if(!items.length)return;
-      const email=teacher.email||'';
-      const anchor=email?html.indexOf('href="mailto:'+email+'"'):html.indexOf(teacher.name);
-      if(anchor<0)return;
-      const cardEnd=html.indexOf('</article>',anchor);
-      if(cardEnd<0)return;
-      const section='<div class="public-teacher-materials"><h4>Materiais por disciplina</h4>'+renderTeacherMaterials(items,false)+'</div>';
-      html=html.slice(0,cardEnd)+section+html.slice(cardEnd);
-    });
-    return html;
+    const teachers=db.teachers.filter(t=>teacherMatchesCourse(t,state.course));
+    return '<div class="results-head"><h2>Professores</h2><span>'+teachers.length+' docente(s)</span></div><div class="teacher-public-grid">'+
+      (teachers.length?teachers.map(teacher=>{
+        const items=teacherMaterials(teacher.id);
+        const general=(teacher.materials||[]).filter(type=>['Área do Aluno AEMS','Portal do Aluno','GrupoAU'].includes(type));
+        const materialContent=(general.length?chips(general,'material'):'')+
+          (items.length?'<div class="public-teacher-materials">'+renderTeacherMaterials(items,false)+'</div>':'')+
+          (!general.length&&!items.length?'<span class="muted">Não informado</span>':'');
+        return '<article class="teacher-public-card">'+teacherAvatar(teacher)+'<h3>'+teacher.name+'</h3>'+
+          '<div class="teacher-email-box"><small>E-mail</small><a href="mailto:'+teacher.email+'">'+teacher.email+'</a></div>'+
+          '<div class="pref-section"><small>Como entrar em contato</small>'+chips(teacher.contacts)+(teacher.whatsapp?'<div class="muted" style="margin-top:7px">'+teacher.whatsapp+'</div>':'')+'</div>'+
+          '<div class="pref-section"><small>Materiais de aula</small>'+materialContent+'</div></article>';
+      }).join(''):'<div class="empty">Nenhum professor cadastrado.</div>')+'</div>';
   };
   const previousModal=modal;
   modal=function(){
@@ -598,7 +598,7 @@ render();
     const periodFilter=document.getElementById('period');
     if(periodFilter)periodFilter.onchange=event=>{state.selectedGroupId=null;state.period=event.target.value;render()};
   };
-  setTimeout(()=>{if(auth&&auth!=='public')loadData().then(()=>render()).catch(console.warn)},400);
+  setTimeout(()=>{loadData().then(()=>render()).catch(console.warn)},400);
 })();
 </script>
 <style>
