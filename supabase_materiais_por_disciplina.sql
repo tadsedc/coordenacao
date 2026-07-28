@@ -71,7 +71,24 @@ grant select on public.professor_materiais to anon, authenticated;
 grant insert, update, delete on public.professor_materiais to authenticated;
 grant usage, select on sequence public.professor_materiais_id_seq to authenticated;
 
+-- Garante que as disciplinas ativas da matriz estejam disponíveis nos
+-- formulários públicos e autenticados, sem liberar edição anônima.
+alter table public.matriz_disciplinas enable row level security;
+
+drop policy if exists "Matriz ativa publica para materiais"
+  on public.matriz_disciplinas;
+create policy "Matriz ativa publica para materiais"
+  on public.matriz_disciplinas
+  for select
+  to anon, authenticated
+  using (ativa = true);
+
+grant select on public.matriz_disciplinas to anon, authenticated;
+
 commit;
+
+-- Solicita ao PostgREST a atualização imediata do cache do esquema.
+notify pgrst, 'reload schema';
 
 select
   tablename,

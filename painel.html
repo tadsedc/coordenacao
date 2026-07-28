@@ -426,7 +426,7 @@ render();
 .subject-material-head h3{margin:0;font-size:18px}.subject-material-head p{margin:4px 0 0;color:#687578;font-size:13px}
 .subject-material-groups{display:grid;gap:12px}.subject-material-group{padding:14px;border:1px solid #dbe5e7;border-radius:14px;background:#fff}
 .subject-material-group h4{margin:0 0 10px;color:#075d99;font-size:15px}.subject-material-list{display:grid;gap:8px}
-.subject-material-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:#f3f7f8}
+.subject-material-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:#f3f7f8}
 .subject-material-row strong{display:block;font-size:13px}.subject-material-row small{display:block;margin-top:2px;color:#6d7779;font-size:11px}
 .material-type{display:inline-flex;align-items:center;justify-content:center;min-width:78px;padding:5px 8px;border-radius:999px;background:#e5f0f9;color:#075d99;font-size:10px;font-weight:900}
 .material-type.github{background:#e9e9ee;color:#292a31}.material-type.grupoau{background:#fff0d2;color:#8a5800}.material-type.outro{background:#e8f3ed;color:#286b5b}
@@ -436,24 +436,21 @@ render();
 .material-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.material-form-grid .wide{grid-column:1/-1}
 .material-course-picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.material-course-picks label{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid #d9e2e3;border-radius:11px;font-weight:800}
 .public-teacher-materials{margin-top:16px}.public-teacher-materials>h4{margin:0 0 9px;color:#5f6d70;font-size:12px}
-.public-teacher-materials .subject-material-row{grid-template-columns:auto minmax(0,1fr) auto}
-@media(max-width:680px){.subject-material-head{align-items:flex-start;flex-direction:column}.subject-material-head .btn{width:100%}.subject-material-row,.public-teacher-materials .subject-material-row{grid-template-columns:1fr auto}.material-type{justify-self:start}.subject-material-row>div:nth-child(2){grid-column:1/-1;grid-row:2}.material-actions{grid-column:1/-1}.material-form-grid{grid-template-columns:1fr}.material-form-grid .wide{grid-column:auto}}
+.public-teacher-materials .subject-material-row{grid-template-columns:minmax(0,1fr) auto}.material-direct-link{min-width:0;color:#075d99;font-size:13px;font-weight:800;overflow-wrap:anywhere}
+@media(max-width:680px){.subject-material-head{align-items:flex-start;flex-direction:column}.subject-material-head .btn{width:100%}.subject-material-row,.public-teacher-materials .subject-material-row{grid-template-columns:1fr}.material-actions{grid-column:1}.material-form-grid{grid-template-columns:1fr}.material-form-grid .wide{grid-column:auto}}
 </style>
 <script>
 (()=>{
   const materialEsc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-  const materialTypeClass=type=>type==='GitHub'?'github':type==='GrupoAU'?'grupoau':type==='Outro'?'outro':'';
-  const teacherMaterials=(teacherId,course='')=>(db.materialLinks||[]).filter(item=>String(item.teacherId)===String(teacherId)&&(!course||course==='Todos'||item.courses.includes(course)));
-  const materialGroupName=item=>item.groupName?item.groupName+(item.groupCourses?.length?' '+item.groupCourses.join(' + '):''):'Todas as turmas selecionadas';
+  const teacherMaterials=teacherId=>(db.materialLinks||[]).filter(item=>String(item.teacherId)===String(teacherId));
+  const inferMaterialType=url=>{let value=String(url||'').toLowerCase();return value.includes('classroom.google')?'Google Classroom':value.includes('github.com')?'GitHub':value.includes('grupoau')?'GrupoAU':'Outro'};
   function renderTeacherMaterials(items,manage=false){
     if(!items.length)return '<div class="material-empty">Nenhum link específico por disciplina cadastrado.</div>';
     const grouped={};
     items.forEach(item=>(grouped[item.subject]||(grouped[item.subject]=[])).push(item));
     return '<div class="subject-material-groups">'+Object.entries(grouped).sort((a,b)=>a[0].localeCompare(b[0],'pt-BR')).map(([subject,links])=>
       '<section class="subject-material-group"><h4>'+materialEsc(subject)+'</h4><div class="subject-material-list">'+links.map(item=>
-        '<div class="subject-material-row"><span class="material-type '+materialTypeClass(item.type)+'">'+materialEsc(item.type)+'</span>'+
-        '<div><strong>'+materialEsc(item.title)+'</strong><small>'+materialEsc(item.courses.join(' + '))+' · '+materialEsc(materialGroupName(item))+'</small></div>'+
-        '<a class="material-icon-btn" href="'+materialEsc(item.url)+'" target="_blank" rel="noopener">Abrir ↗</a>'+
+        '<div class="subject-material-row"><a class="material-direct-link" href="'+materialEsc(item.url)+'" target="_blank" rel="noopener">'+materialEsc(item.url)+' ↗</a>'+
         (manage?'<div class="material-actions"><button class="material-icon-btn" data-edit-teacher-material="'+item.id+'">Editar</button><button class="material-icon-btn danger" data-delete-teacher-material="'+item.id+'">Excluir</button></div>':'')+
         '</div>').join('')+'</div></section>'
     ).join('')+'</div>';
@@ -466,35 +463,25 @@ render();
   }
   function materialForm(item={}){
     const teacherId=item.teacherId||state.modal?.teacherId||auth;
-    const selectedCourses=item.courses||[];
-    const teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
-    const teacherField=state.role==='coord'
-      ?'<div class="field wide"><label>Professor</label><select id="pm-teacher">'+db.teachers.map(t=>'<option value="'+t.id+'" '+(String(t.id)===String(teacherId)?'selected':'')+'>'+materialEsc(t.name)+'</option>').join('')+'</select></div>'
-      :'<div class="field wide"><label>Professor</label><input value="'+materialEsc(teacher?.name||'')+'" disabled><input id="pm-teacher" type="hidden" value="'+materialEsc(teacherId)+'"></div>';
     return '<div class="modal" style="width:min(720px,100%)" onclick="event.stopPropagation()"><div class="modaltop"><div><h2>'+(item.id?'Editar material':'Novo material por disciplina')+'</h2><p>Cadastre quantos links forem necessários para cada disciplina.</p></div><button class="close" data-close>×</button></div>'+
-      '<div class="material-form-grid">'+teacherField+
+      '<div class="material-form-grid"><input id="pm-teacher" type="hidden" value="'+materialEsc(teacherId)+'">'+
       '<div class="field wide"><label>Disciplina da matriz</label><select id="pm-discipline">'+curriculumOptions(item.curriculumId)+'</select></div>'+
-      '<div class="field wide"><label>Curso(s)</label><div class="material-course-picks"><label><input type="checkbox" class="pm-course" value="ADS" '+(selectedCourses.includes('ADS')?'checked':'')+'> ADS</label><label><input type="checkbox" class="pm-course" value="EDC" '+(selectedCourses.includes('EDC')?'checked':'')+'> EDC</label></div></div>'+
-      '<div class="field"><label>Turma (opcional)</label><select id="pm-group"><option value="">Todas as turmas selecionadas</option>'+db.groups.map(g=>'<option value="'+g.id+'" '+(String(item.groupId||'')===String(g.id)?'selected':'')+'>'+materialEsc(g.name+' · '+g.courses.join(' + '))+'</option>').join('')+'</select></div>'+
-      '<div class="field"><label>Tipo</label><select id="pm-type">'+['Google Classroom','GitHub','GrupoAU','Outro'].map(type=>'<option '+(item.type===type?'selected':'')+'>'+type+'</option>').join('')+'</select></div>'+
-      '<div class="field wide"><label>Título do link</label><input id="pm-title" maxlength="100" value="'+materialEsc(item.title||'')+'" placeholder="Ex.: Classroom — Turma 2026-1"></div>'+
-      '<div class="field wide"><label>Endereço do material</label><input id="pm-url" type="url" value="'+materialEsc(item.url||'')+'" placeholder="https://..."></div></div>'+
+      '<div class="field wide"><label>Link do material</label><input id="pm-url" type="url" value="'+materialEsc(item.url||'')+'" placeholder="https://..."></div></div>'+
       '<div class="actions"><button class="btn soft" data-close>Cancelar</button><button class="btn primary" data-save-teacher-material="'+(item.id||'')+'">Salvar material</button></div></div>';
   }
   function materialListModal(teacherId){
     const teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
-    return '<div class="modal" style="width:min(820px,100%)" onclick="event.stopPropagation()"><div class="modaltop"><div><h2>Materiais de '+materialEsc(teacher?.name||'professor')+'</h2><p>Links organizados por disciplina e, opcionalmente, por turma.</p></div><button class="close" data-close>×</button></div>'+
+    return '<div class="modal" style="width:min(820px,100%)" onclick="event.stopPropagation()"><div class="modaltop"><div><h2>Materiais de '+materialEsc(teacher?.name||'professor')+'</h2><p>Disciplina da matriz e link disponibilizado pelo professor.</p></div><button class="close" data-close>×</button></div>'+
       renderTeacherMaterials(teacherMaterials(teacherId),true)+
       '<div class="actions"><button class="btn soft" data-close>Fechar</button><button class="btn primary" data-new-teacher-material="'+materialEsc(teacherId)+'">+ Novo material</button></div></div>';
   }
   const previousLoadData=loadData;
   loadData=async function(){
     await previousLoadData();
-    const result=await banco.from('professor_materiais').select('*,turmas(nome,cursos)').eq('ativo',true).order('disciplina').order('titulo');
+    const result=await banco.from('professor_materiais').select('*').eq('ativo',true).order('disciplina').order('url');
     db.materialFeatureReady=!result.error;
     db.materialLinks=(result.data||[]).map(item=>({
-      id:item.id,teacherId:item.professor_id,curriculumId:item.matriz_disciplina_id,groupId:item.turma_id,
-      groupName:item.turmas?.nome||'',groupCourses:item.turmas?.cursos||[],subject:item.disciplina,
+      id:item.id,teacherId:item.professor_id,curriculumId:item.matriz_disciplina_id,groupId:item.turma_id,subject:item.disciplina,
       courses:item.cursos||[],type:item.tipo,title:item.titulo,url:item.url,active:item.ativo
     }));
     if(result.error&&!/professor_materiais|schema cache|does not exist/i.test(result.error.message||''))console.warn('Materiais por disciplina:',result.error.message);
@@ -533,7 +520,7 @@ render();
   portalTeachers=function(){
     let html=previousPortalTeachers(),course=state.course;
     db.teachers.filter(t=>{const assigned=[...new Set(db.classes.filter(c=>String(c.teacherId)===String(t.id)).flatMap(c=>c.courses||[]))];return !course||course==='Todos'||assigned.length===0||assigned.includes(course)}).forEach(teacher=>{
-      const items=teacherMaterials(teacher.id,course);
+      const items=teacherMaterials(teacher.id);
       if(!items.length)return;
       const email=teacher.email||'';
       const anchor=email?html.indexOf('href="mailto:'+email+'"'):html.indexOf(teacher.name);
@@ -558,16 +545,11 @@ render();
     const teacherId=document.getElementById('pm-teacher')?.value;
     const curriculumId=document.getElementById('pm-discipline')?.value;
     const curriculum=(db.curriculum||[]).find(x=>String(x.id)===String(curriculumId));
-    const courses=[...document.querySelectorAll('.pm-course:checked')].map(x=>x.value);
-    const groupId=document.getElementById('pm-group')?.value||null;
-    const group=db.groups.find(x=>String(x.id)===String(groupId));
-    const type=document.getElementById('pm-type')?.value;
-    const title=document.getElementById('pm-title')?.value.trim();
     const url=document.getElementById('pm-url')?.value.trim();
-    if(!teacherId||!curriculum||!courses.length||!title||!url)return toast('Preencha professor, disciplina, curso, título e endereço.');
+    if(!db.materialFeatureReady)return toast('Ative primeiro a estrutura de materiais no Supabase usando o script disponibilizado pela coordenação.');
+    if(!teacherId||!curriculum||!url)return toast('Selecione a disciplina da matriz e informe o link.');
     if(!/^https?:\/\/\S+$/i.test(url))return toast('Informe um endereço completo iniciado por http:// ou https://.');
-    if(group&&!group.courses.some(course=>courses.includes(course)))return toast('A turma selecionada não pertence aos cursos marcados.');
-    const payload={professor_id:teacherId,matriz_disciplina_id:curriculum.id,turma_id:groupId,disciplina:curriculum.subject,cursos:courses,tipo:type,titulo:title,url,ativo:true,atualizado_em:new Date().toISOString()};
+    const type=inferMaterialType(url),payload={professor_id:teacherId,matriz_disciplina_id:curriculum.id,turma_id:null,disciplina:curriculum.subject,cursos:[curriculum.course],tipo:type,titulo:type,url,ativo:true,atualizado_em:new Date().toISOString()};
     let result;
     if(id)result=await banco.from('professor_materiais').update(payload).eq('id',id);
     else result=await banco.from('professor_materiais').insert({...payload,criado_por:auth});
@@ -595,8 +577,6 @@ render();
     if(courseFilter)courseFilter.onchange=event=>{state.selectedGroupId=null;state.course=event.target.value;state.period='Todos';render()};
     const periodFilter=document.getElementById('period');
     if(periodFilter)periodFilter.onchange=event=>{state.selectedGroupId=null;state.period=event.target.value;render()};
-    const discipline=document.getElementById('pm-discipline');
-    if(discipline)discipline.onchange=()=>{const course=discipline.selectedOptions[0]?.dataset.course;if(course&&!document.querySelector('.pm-course:checked')){const checkbox=document.querySelector('.pm-course[value="'+course+'"]');if(checkbox)checkbox.checked=true}};
   };
   setTimeout(()=>{if(auth&&auth!=='public')loadData().then(()=>render()).catch(console.warn)},400);
 })();
