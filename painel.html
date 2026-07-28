@@ -437,7 +437,9 @@ render();
 .material-course-picks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.material-course-picks label{display:flex;align-items:center;gap:8px;padding:11px;border:1px solid #d9e2e3;border-radius:11px;font-weight:800}
 .public-teacher-materials{margin-top:16px}.public-teacher-materials>h4{margin:0 0 9px;color:#5f6d70;font-size:12px}
 .public-teacher-materials .subject-material-row{grid-template-columns:auto minmax(0,1fr)}.material-direct-link{min-width:0;color:#075d99;font-size:13px;font-weight:800;overflow-wrap:anywhere}
+.inline-profile-panel{margin-bottom:18px}.inline-profile-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}.inline-profile-head>div:first-child{display:flex;align-items:center;gap:14px}.inline-profile-head h3{margin:0 0 4px;font-size:20px}.inline-profile-head p{margin:0;color:var(--mut);font-size:13px}.inline-profile-form{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.inline-profile-form>.field:first-child,.inline-profile-form>.field:nth-child(2),.inline-profile-form>.actions{grid-column:1/-1}.inline-profile-form>.actions{margin-top:4px}
 @media(max-width:680px){.subject-material-head{align-items:flex-start;flex-direction:column}.subject-material-head .btn{width:100%}.subject-material-row,.public-teacher-materials .subject-material-row{grid-template-columns:auto minmax(0,1fr)}.material-actions{grid-column:1/-1}.material-form-grid{grid-template-columns:1fr}.material-form-grid .wide{grid-column:auto}}
+@media(max-width:680px){.inline-profile-head{align-items:flex-start;flex-direction:column}.inline-profile-head .btn{width:100%}.inline-profile-form{grid-template-columns:1fr}.inline-profile-form>.field,.inline-profile-form>.actions{grid-column:auto}.inline-profile-form>.actions .btn{width:100%}}
 </style>
 <script>
 (()=>{
@@ -494,6 +496,11 @@ render();
     });
     if(result.error&&!/professor_materiais|schema cache|does not exist/i.test(result.error.message||''))console.warn('Materiais por disciplina:',result.error.message);
   };
+  const saveProfileFromModal=saveProfile;
+  saveProfile=async function(){
+    if(!state.modal)state.modal={type:'editteacher',id:state.teacherId,inline:true};
+    return saveProfileFromModal();
+  };
   profile=function(){
     const teacher=db.teachers.find(x=>String(x.id)===String(state.teacherId));
     if(!teacher)return layout(head('Perfil docente','Meu perfil','Complete suas preferências para que os estudantes saibam como falar com você.')+'<div class="empty">Perfil não encontrado.</div>','Meu perfil');
@@ -501,13 +508,12 @@ render();
     const panel='<section class="subject-material-panel"><div class="subject-material-head"><div><h3>Links e materiais por disciplina</h3><p>Adicione Classroom, GitHub, GrupoAU ou outros recursos para cada matéria.</p></div><button class="btn primary" data-new-teacher-material="'+materialEsc(auth)+'">+ Adicionar material</button></div>'+
       (!db.materialFeatureReady?'<div class="notice warn">A estrutura de materiais ainda precisa ser ativada no Supabase pelo coordenador.</div>':'')+
       renderTeacherMaterials(items,true)+'</section>';
-    const general='<div class="settings-card profile-card"><div class="profile-summary">'+teacherAvatar(teacher,'avatar')+'<div><h2>'+teacher.name+'</h2><div class="muted">'+teacher.email+'</div></div></div>'+
-      '<div class="pref-section"><small>Formas de contato</small>'+chips(teacher.contacts)+'</div>'+
-      '<div class="pref-section"><small>Links gerais</small>'+chips(teacher.materials,'material')+'</div>'+
-      (teacher.classroomUrl?'<div class="pref-section"><small>Google Classroom geral</small><a href="'+teacher.classroomUrl+'" target="_blank" rel="noopener">Abrir turma no Classroom ↗</a></div>':'')+
-      (teacher.githubUrl?'<div class="pref-section"><small>GitHub geral</small><a href="'+teacher.githubUrl+'" target="_blank" rel="noopener">Abrir repositório no GitHub ↗</a></div>':'')+
-      (teacher.whatsapp?'<div class="pref-section"><small>WhatsApp</small><b>'+teacher.whatsapp+'</b></div>':'')+'</div>';
-    return layout(head('Perfil docente','Meu perfil','Estas informações aparecem no portal dos estudantes.','<div class="head-actions"><button class="btn soft" data-accesssettings>Acesso e senha</button><button class="btn primary" data-editteacher="'+teacher.id+'">Editar informações</button></div>')+general+panel,'Meu perfil');
+    const general='<section class="settings-card inline-profile-panel"><div class="inline-profile-head"><div>'+teacherAvatar(teacher,'avatar')+'<div><h3>Informações públicas</h3><p>Edite aqui os dados exibidos aos estudantes.</p></div></div><button class="btn soft" data-accesssettings>Acesso e senha</button></div>'+
+      '<div class="inline-profile-form"><div class="field"><label>Nome completo</label><input id="tn" value="'+materialEsc(teacher.name)+'"></div>'+
+      '<div class="field"><label>E-mail institucional</label><input value="'+materialEsc(teacher.email)+'" readonly></div>'+
+      prefFields(teacher)+
+      '<div class="actions"><button class="btn primary" id="saveprofile">Salvar informações</button></div></div></section>';
+    return layout(head('Perfil docente','Meu perfil','Gerencie suas informações públicas e os materiais das disciplinas.')+general+panel,'Meu perfil');
   };
   const previousPeople=people;
   people=function(){
