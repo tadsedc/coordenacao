@@ -51,8 +51,23 @@ function addRipple(button, event) {
   setTimeout(() => ripple.remove(), 600);
 }
 
+let publicEntrancePlayed = false;
+function playPublicEntrance(root = document) {
+  if (publicEntrancePlayed) return;
+  const publicMain = root.matches?.('.public-main')
+    ? root
+    : root.querySelector?.('.public-main') || document.querySelector('.public-main');
+  if (!publicMain || publicMain.querySelector('.portal-loading')) return;
+  publicEntrancePlayed = true;
+  requestAnimationFrame(() => {
+    document.body.classList.add('np-public-enter');
+    setTimeout(() => document.body.classList.remove('np-public-enter'), 950);
+  });
+}
+
 function enhance(root = document) {
   modernizeRoutes(root);
+  playPublicEntrance(root);
   root.querySelectorAll('button,.btn,.mini,.course-option').forEach(button => {
     if (button.dataset.npEnhanced) return;
     button.dataset.npEnhanced = 'true';
