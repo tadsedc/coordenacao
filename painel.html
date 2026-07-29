@@ -121,7 +121,7 @@ function semiLocation(){return 'Online no grupoau.com.br'}
 function classStart(c){return isSemi(c)?'Semipresencial':c.start}
 function classUntil(c){return isSemi(c)?'Online':('até '+c.end)}function classTimeLabel(c){return isSemi(c)?'Semipresencial':String(c.start).replace(':','h')+' às '+String(c.end).replace(':','h')}
 function classTeacher(c){return isSemi(c)?'Mediador Pedagógico':c.teacher}
-function classRoomLabel(c){let r=room(c);return isSemi(c)?semiLocation():(r?r.name+' · '+r.building:'Sala não definida')}
+function classRoomLabel(c){let r=room(c);return isSemi(c)?semiLocation():(r?r.name+' · '+r.building:'Sala ainda não informada pelo professor')}
 function classRoomDetail(c){let r=room(c);return isSemi(c)?'Grupo AU':(r?r.floor:'Consulte novamente em breve')}
 function classConfirmed(c){return isSemi(c)||!!room(c)}
 function isProvao(e){return (e.type||'').includes('Provão')}
