@@ -198,13 +198,16 @@
     font-size:11px;margin-top:7px;
   }
   .public-main.gate-main { max-width:1320px!important }
-  .professor-login-gate .gate-inner { text-align:center }
-  .professor-login-gate .sub {
+  .professor-login-gate .gate-inner,
+  .student-login-gate .gate-inner { text-align:center }
+  .professor-login-gate .sub,
+  .student-login-gate .sub {
     max-width:760px;
     margin:12px auto 0;
     text-align:center;
   }
-  .professor-login-gate .loginform { text-align:left }
+  .professor-login-gate .loginform,
+  .student-login-gate .loginform { text-align:left }
   .course-gate-title { text-wrap:balance }
   .course-gate-title span {
     background:linear-gradient(90deg,#0876c9,#15b5c9,#705ee9);background-clip:text;-webkit-background-clip:text;color:transparent;
