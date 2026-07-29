@@ -52,8 +52,9 @@ function addRipple(button, event) {
 }
 
 let publicEntrancePlayed = false;
+let publicDataReady = false;
 function playPublicEntrance(root = document) {
-  if (publicEntrancePlayed) return;
+  if (publicEntrancePlayed || !publicDataReady) return;
   const publicMain = root.matches?.('.public-main')
     ? root
     : root.querySelector?.('.public-main') || document.querySelector('.public-main');
@@ -65,6 +66,11 @@ function playPublicEntrance(root = document) {
     setTimeout(() => document.body.classList.remove('np-public-enter'), 950);
   });
 }
+
+document.addEventListener('portal-data-ready', () => {
+  publicDataReady = true;
+  playPublicEntrance(document);
+}, { once: true });
 
 function enhance(root = document) {
   modernizeRoutes(root);
