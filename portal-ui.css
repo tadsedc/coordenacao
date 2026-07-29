@@ -252,9 +252,53 @@
   @keyframes np-modal-in { from{opacity:0;transform:translateY(14px) scale(.975)} to{opacity:1;transform:none} }
   @keyframes np-ripple { to{transform:translate(-50%,-50%) scale(9);opacity:0} }
   @keyframes np-rise { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
-  .content>.head,.content>.stats,.content>.toolbar,.content>.card,.content>.grid,.public-main>* { animation:np-rise .45s both }
-  .content>.stats,.content>.toolbar,.public-main>*:nth-child(2) { animation-delay:.05s }
-  .content>.card,.content>.grid,.public-main>*:nth-child(3) { animation-delay:.1s }
+  .content>.head,.content>.stats,.content>.toolbar,.content>.card,.content>.grid { animation:np-rise .38s both }
+  .content>.stats,.content>.toolbar { animation-delay:.04s }
+  .content>.card,.content>.grid { animation-delay:.08s }
+
+  /* O painel público é reconstruído ao trocar filtros e abas. Não repetir a
+     animação de entrada evita piscadas e movimentos inesperados. */
+  .public-main>* { animation:none }
+
+  .portal-loading {
+    min-height:100dvh;display:grid;place-items:center;padding:28px;
+    color:#0b4f8f;background:
+      radial-gradient(circle at 50% 42%,rgba(15,142,200,.11),transparent 20rem),
+      linear-gradient(180deg,#f8fbff,#eef4f9);
+    font-family:Arial,sans-serif;
+  }
+  .portal-loading-box {
+    display:grid;justify-items:center;gap:16px;text-align:center;
+  }
+  .portal-loading-mark {
+    position:relative;width:58px;height:58px;border-radius:50%;
+    border:4px solid rgba(11,79,143,.13);
+    border-top-color:#087dcc;border-right-color:#f3ad20;
+    animation:portal-loading-spin .82s linear infinite;
+    box-shadow:0 14px 36px rgba(8,75,129,.12);
+  }
+  .portal-loading-mark:after {
+    content:"";position:absolute;inset:13px;border-radius:50%;
+    background:linear-gradient(135deg,#087dcc,#16a9bc);
+    box-shadow:inset 0 0 0 5px #f7fbff;
+  }
+  .portal-loading-box strong {
+    color:#14324c;font-size:14px;letter-spacing:.02em;
+  }
+  .portal-loading-dots {
+    display:flex;gap:6px;
+  }
+  .portal-loading-dots i {
+    width:6px;height:6px;border-radius:50%;background:#0b79bd;
+    animation:portal-loading-pulse 1.05s ease-in-out infinite;
+  }
+  .portal-loading-dots i:nth-child(2){animation-delay:.14s}
+  .portal-loading-dots i:nth-child(3){animation-delay:.28s}
+  @keyframes portal-loading-spin { to{transform:rotate(360deg)} }
+  @keyframes portal-loading-pulse {
+    0%,70%,100%{opacity:.25;transform:translateY(0)}
+    35%{opacity:1;transform:translateY(-4px)}
+  }
 
   @media(max-width:1000px) {
     .app { grid-template-columns:238px 1fr }.side{width:238px}
