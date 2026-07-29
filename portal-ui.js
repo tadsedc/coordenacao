@@ -1,4 +1,10 @@
 const PORTAL_ROOT = '/';
+const directRoutes = new Map([
+  ['/ads/', '/painel.html?acesso=ads'],
+  ['/edc/', '/painel.html?acesso=edc'],
+  ['/professor/', '/painel.html?acesso=professor'],
+  ['/estagio/', '/painel.html?acesso=estagio']
+]);
 
 class PortalModernDock extends HTMLElement {
   connectedCallback() {
@@ -23,6 +29,12 @@ function modernizeRoutes(root = document) {
     let url;
     try { url = new URL(link.href, location.href); } catch { return; }
     if (url.origin !== location.origin) return;
+    for (const [ending, destination] of directRoutes) {
+      if (url.pathname.endsWith(ending)) {
+        link.href = destination;
+        break;
+      }
+    }
     if (link.classList.contains('loginbrand') || link.classList.contains('side-brand-link')) link.href = PORTAL_ROOT;
     link.dataset.npRouteReady = 'true';
   });
