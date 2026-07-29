@@ -325,8 +325,49 @@ modal=function(){
 };
 const bindBeforeMatrixForm=bind;
 bind=function(){bindBeforeMatrixForm();document.querySelectorAll('.class-day').forEach(x=>x.addEventListener('change',()=>{document.getElementById('cd').value=x.value}));document.querySelectorAll('.edit-class-day').forEach(x=>x.addEventListener('change',()=>{document.getElementById('ecd').value=x.value}));document.querySelectorAll('input[name="edit-class-mode"]').forEach(x=>x.addEventListener('change',()=>{let semi=x.value==='semipresencial'&&x.checked;document.querySelectorAll('.edit-presencial-only').forEach(el=>el.classList.toggle('hidden',semi));document.getElementById('edit-semi-note')?.classList.toggle('hidden',!semi)}))};
-bind();
-</script><script>
+ bind();
+</script>
+<style>
+@media (min-width: 901px){
+  .modal:has(.class-group-sections){
+    width:min(980px,calc(100vw - 96px));
+    max-height:calc(100dvh - 64px);
+    padding:26px 28px;
+  }
+  .modal:has(.class-group-sections) .class-group-sections{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    align-items:start;
+    gap:16px;
+  }
+  .modal:has(.class-group-sections) .class-group-section{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    padding:14px;
+  }
+  .modal:has(.class-group-sections) .class-group-section h4{
+    grid-column:1/-1;
+    margin-bottom:2px;
+  }
+  .modal:has(.class-group-sections) .class-group-card{
+    min-width:0;
+    margin:0;
+    padding:10px 11px;
+  }
+  .modal:has(.class-group-sections) .class-day-picks{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+  }
+  .modal:has(.class-group-sections) .class-block-picks{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .modal:has(.class-group-sections) .actions{
+    margin-top:20px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+  }
+}
+</style>
+<script>
 const bindWithIntegralFilters=bind;
 bind=function(){
   bindWithIntegralFilters();
