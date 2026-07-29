@@ -234,6 +234,7 @@
   }
   portal-modern-dock button:hover { transform:translateY(-2px);background:rgba(22,197,215,.27) }
   portal-modern-dock span { color:#b9d7e9;font-size:10px;font-weight:800;padding:0 7px }
+  body:not(:has(.side)) portal-modern-dock [data-np-focus] { display:none }
   body.np-focus-mode .side { transform:translateX(-100%) }
   body.np-focus-mode .app { grid-template-columns:1fr }
   body.np-focus-mode .main { grid-column:1 }
