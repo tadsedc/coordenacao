@@ -259,37 +259,29 @@
   /* O painel público é reconstruído ao trocar filtros e abas. Não repetir a
      animação de entrada evita piscadas e movimentos inesperados. */
   .public-main>* { animation:none }
-  /* Animações individuais, sem animar o shell ou o contêiner-pai. Assim a
-     página mantém suas dimensões enquanto os elementos entram suavemente. */
-  .np-public-enter .public-header .loginbrand {
-    animation:np-public-element-in .46s cubic-bezier(.2,.8,.2,1) both;
+  /* Apenas blocos visuais recebem animação. Cabeçalho, título, estrutura da
+     página e contêineres de grade permanecem totalmente estáticos. */
+  .np-public-enter :is(
+    .course-option,.portal-disclaimer,.portal-hero,.portal-tabs,
+    .student-filter,.tile,.schedule-card,.notice-card,
+    .teacher-public-card,.exam-card,.empty
+  ){
+    animation:np-public-card-in .5s .1s cubic-bezier(.2,.8,.2,1) both;
   }
-  .np-public-enter .public-header .action-stack {
-    animation:np-public-element-in .46s .06s cubic-bezier(.2,.8,.2,1) both;
-  }
-  .np-public-enter .public-main:not(.gate-main)>* {
-    animation:np-public-element-in .5s .11s cubic-bezier(.2,.8,.2,1) both;
-  }
-  .np-public-enter .public-main:not(.gate-main)>*:nth-child(2){animation-delay:.16s}
-  .np-public-enter .public-main:not(.gate-main)>*:nth-child(3){animation-delay:.21s}
-  .np-public-enter .public-main:not(.gate-main)>*:nth-child(n+4){animation-delay:.26s}
-  .np-public-enter .public-main.gate-main .course-gate-intro {
-    animation:np-public-element-in .48s .1s cubic-bezier(.2,.8,.2,1) both;
-  }
-  .np-public-enter .public-main.gate-main .course-option {
-    animation:np-public-card-in .52s .18s cubic-bezier(.2,.8,.2,1) both;
-  }
-  .np-public-enter .public-main.gate-main .course-option:nth-child(2){animation-delay:.24s}
-  .np-public-enter .public-main.gate-main .course-option:nth-child(3){animation-delay:.3s}
-  .np-public-enter .public-main.gate-main .portal-disclaimer {
-    animation:np-public-element-in .5s .36s cubic-bezier(.2,.8,.2,1) both;
-  }
-  @keyframes np-public-element-in {
-    from{opacity:0;transform:translateY(11px)}
-    to{opacity:1;transform:none}
-  }
+  .np-public-enter :is(
+    .course-options,.grid,.mobile-schedule,.notice-grid,
+    .teacher-public-grid,.exam-grid
+  )>*:nth-child(2){animation-delay:.16s}
+  .np-public-enter :is(
+    .course-options,.grid,.mobile-schedule,.notice-grid,
+    .teacher-public-grid,.exam-grid
+  )>*:nth-child(3){animation-delay:.22s}
+  .np-public-enter :is(
+    .course-options,.grid,.mobile-schedule,.notice-grid,
+    .teacher-public-grid,.exam-grid
+  )>*:nth-child(n+4){animation-delay:.28s}
   @keyframes np-public-card-in {
-    from{opacity:0;transform:translateY(15px)}
+    from{opacity:0;transform:translateY(13px)}
     to{opacity:1;transform:none}
   }
 
