@@ -60,6 +60,7 @@ function playPublicEntrance(root = document) {
   if (!publicMain || publicMain.querySelector('.portal-loading')) return;
   publicEntrancePlayed = true;
   requestAnimationFrame(() => {
+    document.body.classList.remove('np-public-pending');
     document.body.classList.add('np-public-enter');
     setTimeout(() => document.body.classList.remove('np-public-enter'), 950);
   });
