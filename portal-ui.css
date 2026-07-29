@@ -259,13 +259,37 @@
   /* O painel público é reconstruído ao trocar filtros e abas. Não repetir a
      animação de entrada evita piscadas e movimentos inesperados. */
   .public-main>* { animation:none }
-  /* Uma única animação no shell evita que pai e filhos se movimentem ao
-     mesmo tempo. Os filtros posteriores apenas atualizam o conteúdo. */
-  .np-public-enter .public-shell {
-    animation:np-public-shell-in .58s cubic-bezier(.2,.8,.2,1) both;
+  /* Animações individuais, sem animar o shell ou o contêiner-pai. Assim a
+     página mantém suas dimensões enquanto os elementos entram suavemente. */
+  .np-public-enter .public-header .loginbrand {
+    animation:np-public-element-in .46s cubic-bezier(.2,.8,.2,1) both;
   }
-  @keyframes np-public-shell-in {
-    from{opacity:0;transform:translateY(12px) scale(.995)}
+  .np-public-enter .public-header .action-stack {
+    animation:np-public-element-in .46s .06s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .np-public-enter .public-main:not(.gate-main)>* {
+    animation:np-public-element-in .5s .11s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .np-public-enter .public-main:not(.gate-main)>*:nth-child(2){animation-delay:.16s}
+  .np-public-enter .public-main:not(.gate-main)>*:nth-child(3){animation-delay:.21s}
+  .np-public-enter .public-main:not(.gate-main)>*:nth-child(n+4){animation-delay:.26s}
+  .np-public-enter .public-main.gate-main .course-gate-intro {
+    animation:np-public-element-in .48s .1s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .np-public-enter .public-main.gate-main .course-option {
+    animation:np-public-card-in .52s .18s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .np-public-enter .public-main.gate-main .course-option:nth-child(2){animation-delay:.24s}
+  .np-public-enter .public-main.gate-main .course-option:nth-child(3){animation-delay:.3s}
+  .np-public-enter .public-main.gate-main .portal-disclaimer {
+    animation:np-public-element-in .5s .36s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes np-public-element-in {
+    from{opacity:0;transform:translateY(11px)}
+    to{opacity:1;transform:none}
+  }
+  @keyframes np-public-card-in {
+    from{opacity:0;transform:translateY(15px)}
     to{opacity:1;transform:none}
   }
 
