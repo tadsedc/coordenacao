@@ -422,6 +422,99 @@ new MutationObserver(ensureSaturday).observe(document.body,{childList:true,subtr
 render();
 })();
 </script>
+<script>
+/* Gestão completa da matriz: cadastrar, editar e excluir sem romper históricos. */
+(function(){
+  const normalizeMatrixText=value=>(value||'').trim().toLocaleUpperCase('pt-BR');
+
+  saveCurriculum=async function(){
+    const button=document.getElementById('savecurriculum');
+    const course=reqVal('mc-course');
+    const semester=Number(reqVal('mc-semester'));
+    const subject=normalizeMatrixText(reqVal('mc-subject'));
+    const code=normalizeMatrixText(reqVal('mc-code'));
+    const hours=Number(reqVal('mc-hours'))||null;
+    if(!course||!semester||!subject)return toast('Informe curso, semestre e disciplina.');
+    const editingId=state.modal?.type==='editcurriculum'?String(state.modal.id):'';
+    const duplicated=(db.curriculum||[]).some(item=>
+      String(item.id)!==editingId&&item.course===course&&
+      normalizeMatrixText(item.subject)===subject
+    );
+    if(duplicated)return toast('Esta disciplina já está cadastrada na matriz de '+course+'.');
+    const payload={curso:course,semestre:semester,codigo:code,disciplina:subject,carga_horaria:hours,ativa:true};
+    try{
+      if(button){button.disabled=true;button.textContent='Salvando...'}
+      const query=editingId
+        ?banco.from('matriz_disciplinas').update(payload).eq('id',editingId)
+        :banco.from('matriz_disciplinas').insert(payload);
+      const {error}=await query;
+      if(error)throw error;
+      state.integralCourse=course;
+      await loadData();
+      state.modal=null;
+      render();
+      toast(editingId?'Disciplina atualizada.':'Disciplina cadastrada na matriz.');
+    }catch(error){
+      toast('Não foi possível salvar a disciplina: '+error.message);
+      if(button){button.disabled=false;button.textContent='Salvar disciplina'}
+    }
+  };
+
+  async function deleteCurriculum(id){
+    const item=(db.curriculum||[]).find(row=>String(row.id)===String(id));
+    if(!item)return toast('Disciplina não encontrada.');
+    const confirmed=confirm(
+      'Excluir "'+item.subject+'" da matriz de '+item.course+'?\n\n'+
+      'Ela deixará de aparecer nos novos cadastros e seletores. Aulas, avaliações e históricos já registrados serão preservados.'
+    );
+    if(!confirmed)return;
+    try{
+      const {error}=await banco.from('matriz_disciplinas').update({ativa:false}).eq('id',id);
+      if(error)throw error;
+      await loadData();
+      render();
+      toast('Disciplina excluída da matriz.');
+    }catch(error){
+      toast('Não foi possível excluir a disciplina: '+error.message);
+    }
+  }
+
+  function addDeleteButtons(){
+    document.querySelectorAll('[data-editcurriculum]').forEach(edit=>{
+      const actions=edit.closest('.action-stack');
+      if(!actions||actions.querySelector('[data-delcurriculum]'))return;
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='mini danger';
+      button.dataset.delcurriculum=edit.dataset.editcurriculum;
+      button.textContent='Excluir';
+      actions.appendChild(button);
+    });
+  }
+
+  function bindCurriculumManager(){
+    document.querySelectorAll('[data-newcurriculum]').forEach(button=>{
+      button.onclick=()=>{state.modal={type:'curriculum'};render()};
+    });
+    document.querySelectorAll('[data-editcurriculum]').forEach(button=>{
+      button.onclick=()=>{state.modal={type:'editcurriculum',id:button.dataset.editcurriculum};render()};
+    });
+    addDeleteButtons();
+    document.querySelectorAll('[data-delcurriculum]').forEach(button=>{
+      button.onclick=()=>deleteCurriculum(button.dataset.delcurriculum);
+    });
+    const save=document.getElementById('savecurriculum');
+    if(save)save.onclick=saveCurriculum;
+  }
+
+  const bindBeforeCurriculumManager=bind;
+  bind=function(){
+    bindBeforeCurriculumManager();
+    bindCurriculumManager();
+  };
+  bindCurriculumManager();
+})();
+</script>
 <script type="module" src="./portal-ui.js?v=20260729b"></script>
 
 <style>
