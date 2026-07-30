@@ -36,8 +36,8 @@
     const rows=events.map(event=>'<w:tr>'
       +cell(formatDate(event.date),widths[0])
       +cell(weekday(event.date),widths[1])
-      +cell(event.type||'Data importante',widths[2])
-      +cell(event.subject||'Não se aplica',widths[3])
+      +cell(displayText(event.type)||'Data importante',widths[2])
+      +cell(displayText(event.subject)||'Não se aplica',widths[3])
       +cell(professor(event),widths[4])
       +cell(location(event),widths[5])
       +cell(event.notes||'',widths[6])
@@ -63,6 +63,10 @@
   function professor(event){
     if(String(event.type||'').includes('Provão'))return 'Não se aplica';
     return event.teacher||'Não informado';
+  }
+
+  function displayText(value){
+    return String(value||'').replace(/Avaliação Institucional - Provão/gi,'AVALIAÇÃO INSTITUCIONAL - PROVÃO');
   }
 
   function location(event){
