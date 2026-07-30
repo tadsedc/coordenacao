@@ -571,17 +571,17 @@ bind=function(){bindBeforeMatrixForm();document.querySelectorAll('.class-day').f
     try{
       let payload;
       if(provao){
-        payload={tipo:type,data:date,disciplina:'Avaliação Institucional - Provão',professor_id:null,professor_nome:'Avaliação online',sala_id:null,cursos,observacoes:notes||null,criado_por:auth};
+        payload={tipo:type,data:date,disciplina:'Avaliação Institucional - Provão',professor_id:null,professor_nome:'Avaliação online',sala_id:null,cursos:courses,observacoes:notes||null,criado_por:auth};
       }else{
         let subject=document.getElementById('esubject').value.trim(),teacherId=document.getElementById('eteacher').value,roomId=+document.getElementById('eroom').value;
         let teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
         if(other){
           let label=document.getElementById('eother').value.trim();
           if(!label)return toast('Informe o nome da data importante.');
-          payload={tipo:'Outro - '+label,data:date,disciplina:subject||label,professor_id:teacher?.id||null,professor_nome:teacher?.name||'',sala_id:roomId||null,cursos,observacoes:notes||null,criado_por:auth};
+          payload={tipo:'Outro - '+label,data:date,disciplina:subject||label,professor_id:teacher?.id||null,professor_nome:teacher?.name||'',sala_id:roomId||null,cursos:courses,observacoes:notes||null,criado_por:auth};
         }else{
           if(!subject||!teacher||!roomId)return toast('Preencha disciplina, professor e sala.');
-          payload={tipo:type,data:date,disciplina:subject,professor_id:teacher.id,professor_nome:teacher.name,sala_id:roomId,cursos,observacoes:notes||null,criado_por:auth};
+          payload={tipo:type,data:date,disciplina:subject,professor_id:teacher.id,professor_nome:teacher.name,sala_id:roomId,cursos:courses,observacoes:notes||null,criado_por:auth};
         }
       }
       let created=await banco.from('avaliacoes').insert(payload).select('id').single();
