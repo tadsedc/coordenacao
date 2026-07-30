@@ -873,3 +873,5 @@ dash=function(){let first=(state.userName||'Coordenador').split(' ')[0];return l
   modal=function(){let html=modalWithSaturday();if(state.modal?.type==='class'||state.modal?.type==='editclass'){let id=state.modal.type==='editclass'?'edit-class-day':'class-day',value=state.modal.type==='editclass'?'6':'6';let sat='<label class="class-day-pick"><input type="radio" class="'+id+'" name="'+(state.modal.type==='editclass'?'edit-day':'class-day')+'" value="6">Sábado</label>';html=html.replace('</div><input type="hidden" id="'+(state.modal.type==='editclass'?'ecd':'cd')+'"',sat+'</div><input type="hidden" id="'+(state.modal.type==='editclass'?'ecd':'cd')+'"')}return html};
 })();
 </script>
+<link rel="stylesheet" href="../batch-exams.css">
+<script src="../batch-exams.js"></script>
