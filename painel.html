@@ -499,6 +499,10 @@ bind=function(){bindBeforeMatrixForm();document.querySelectorAll('.class-day').f
     if(groupId&&!groups.some(g=>String(g.id)===groupId)){groupId='';state.importantDateGroupId=''}
     return '<div class="important-date-filters"><div class="field"><label>Curso</label><select id="important-date-course"><option value="Todos">Todos</option><option value="ADS" '+(course==='ADS'?'selected':'')+'>ADS</option><option value="EDC" '+(course==='EDC'?'selected':'')+'>EDC</option></select></div><div class="field"><label>Turma</label><select id="important-date-group"><option value="">Todas as turmas</option>'+groups.map(g=>'<option value="'+g.id+'" '+(String(g.id)===groupId?'selected':'')+'>'+g.name+' · '+(g.courses||[]).join(' + ')+'</option>').join('')+'</select></div></div>';
   }
+  function publicImportantDateFilter(){
+    let groups=(db.groups||[]).filter(g=>(g.courses||[]).includes(state.course));
+    return '<div class="student-filter"><div class="field"><label>Qual é a sua turma?</label><select id="period"><option value="Todos">Todas as turmas</option>'+groups.map(g=>'<option value="'+g.name+'" '+(g.name===state.period?'selected':'')+'>'+g.name+' · '+state.course+'</option>').join('')+'</select></div></div>';
+  }
 
   examCalendar=function(items,admin=false){
     if(!items.length)return '<div class="empty">Nenhuma data importante cadastrada para este filtro.</div>';
@@ -525,7 +529,7 @@ bind=function(){bindBeforeMatrixForm();document.querySelectorAll('.class-day').f
   };
   portalExams=function(){
     let items=(db.exams||[]).filter(importantDateMatchesPublicFilter);
-    return '<div class="results-head"><h2>Datas importantes</h2><span>'+items.length+' registro(s)</span></div>'+examCalendar(items);
+    return publicImportantDateFilter()+'<div class="results-head"><h2>Datas importantes</h2><span>'+items.length+' registro(s)</span></div>'+examCalendar(items);
   };
 
   const modalBeforeImportantDateGroups=modal;
