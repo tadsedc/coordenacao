@@ -270,7 +270,7 @@ const __baseRenderBeforeBoot=render;
 let __bootReady=false;
 render=function(){if(__bootReady)__baseRenderBeforeBoot()};
 document.getElementById('root').innerHTML='<div class="portal-loading" role="status" aria-live="polite" aria-label="Carregando o Portal da Coordenação"><div class="portal-loading-box"><span class="portal-loading-mark" aria-hidden="true"></span><strong>Preparando o portal</strong><span class="portal-loading-dots" aria-hidden="true"><i></i><i></i><i></i></span></div></div>';
-boot().finally(()=>{__bootReady=true;render()});
+boot().finally(async()=>{__bootReady=true;if(typeof loadImportantDateGroups==='function')await loadImportantDateGroups();render()});
 </script></body></html><script>
 const modalWithEdit=modal;
 modal=function(){
@@ -326,6 +326,279 @@ modal=function(){
 const bindBeforeMatrixForm=bind;
 bind=function(){bindBeforeMatrixForm();document.querySelectorAll('.class-day').forEach(x=>x.addEventListener('change',()=>{document.getElementById('cd').value=x.value}));document.querySelectorAll('.edit-class-day').forEach(x=>x.addEventListener('change',()=>{document.getElementById('ecd').value=x.value}));document.querySelectorAll('input[name="edit-class-mode"]').forEach(x=>x.addEventListener('change',()=>{let semi=x.value==='semipresencial'&&x.checked;document.querySelectorAll('.edit-presencial-only').forEach(el=>el.classList.toggle('hidden',semi));document.getElementById('edit-semi-note')?.classList.toggle('hidden',!semi)}))};
  bind();
+</script>
+<style id="important-dates-style">
+.exam-card.outro{background:#f0ecff;border-left-color:#7858c8}
+.exam-other-note{margin:0 0 14px;padding:11px 13px;border:1px solid #d8cdf8;border-radius:11px;background:#f7f4ff;color:#55447e;font-size:13px;line-height:1.45}
+.important-date-filters{display:flex;flex-wrap:wrap;gap:12px;align-items:end;margin:0 0 20px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.important-date-filters .field{margin:0;min-width:190px}
+.important-date-groups{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 2px}
+.important-date-group{display:inline-flex;align-items:center;padding:6px 10px;border:1px solid #cbddec;border-radius:999px;background:#edf6ff;color:#075a95;font-size:12px;font-weight:800}
+.important-date-group.edc{border-color:#eed09a;background:#fff5e2;color:#9a5b00}
+@media(max-width:700px){.important-date-filters{display:grid;grid-template-columns:1fr}.important-date-filters .field{min-width:0}.important-date-filters select{width:100%}}
+</style>
+<script>
+/* Datas importantes: avaliações continuam categorizadas e a coordenação pode cadastrar outros eventos. */
+(function(){
+  const navBeforeImportantDates=nav;
+  nav=function(){return navBeforeImportantDates().replaceAll('Calendário de Avaliações','Datas importantes')};
+
+  const portalTabsBeforeImportantDates=portalTabs;
+  portalTabs=function(){return portalTabsBeforeImportantDates().replace('Calendário de Avaliações','Datas importantes')};
+
+  function isOtherImportantDate(e){return String(e?.type||'').startsWith('Outro')}
+  function otherImportantDateLabel(e){return String(e?.type||'').replace(/^Outro\s*(?:-|–|:)?\s*/i,'').trim()}
+
+  examTone=function(type){
+    type=String(type||'');
+    if(type.startsWith('Outro'))return'outro';
+    if(type.includes('P1')||type.includes('P2'))return'bimestral';
+    if(type.includes('Substitutiva'))return'substitutiva';
+    if(type.includes('Exame'))return'exame';
+    return'institucional';
+  };
+
+  examCalendar=function(items,admin=false){
+    if(!items.length)return '<div class="empty">Nenhuma data importante cadastrada.</div>';
+    let sorted=[...items].sort((a,b)=>a.date.localeCompare(b.date)),groups={};
+    sorted.forEach(e=>{let key=new Date(e.date+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});(groups[key]??=[]).push(e)});
+    return '<div class="exam-calendar">'+Object.entries(groups).map(([month,events])=>'<section class="exam-month"><h3>'+month[0].toUpperCase()+month.slice(1)+'</h3><div class="exam-grid">'+events.map(e=>{
+      let other=isOtherImportantDate(e),custom=otherImportantDateLabel(e),title=other?(custom||e.subject||'Data importante'):e.subject,badge=other?'Outro':e.type;
+      let teacherCanEdit=state.role==='teacher'&&String(e.teacherId)===String(state.teacherId)&&!isProvao(e);
+      let subjectLine=other&&e.subject&&e.subject!==custom?'<p><b>Disciplina:</b> '+e.subject+'</p>':'';
+      let teacherLine=e.teacher?'<p>'+e.teacher+'</p>':'';
+      let roomLine=isProvao(e)||e.roomId?'<div class="exam-room">Local: '+examRoomLabel(e)+'</div>':(other?'<div class="exam-room">Local: a definir</div>':'');
+      return '<article class="exam-card '+examTone(e.type)+'"><div class="exam-date">'+fmtDate(e.date)+'</div><span class="exam-type">'+badge+'</span><h4>'+title+'</h4>'+subjectLine+teacherLine+roomLine+'<div class="course-tags">'+e.courses.map(c=>'<span class="course-tag">'+c+'</span>').join('')+'</div>'+(e.notes?'<small>'+e.notes+'</small>':'')+(teacherCanEdit?'<button class="mini" data-editevalroom="'+e.id+'">Alterar sala</button>':'')+(admin?'<button class="mini danger" data-delexam="'+e.id+'">Excluir data</button>':'')+'</article>';
+    }).join('')+'</div></section>').join('')+'</div>';
+  };
+
+  exams=function(){
+    let action=state.role==='coord'?'<button class="btn primary" data-newexam>＋ Nova data importante</button>':'';
+    let subtitle=state.role==='coord'?'Cadastre avaliações, simulados, eventos e outras datas importantes do semestre.':'Consulte as datas importantes cadastradas pela coordenação.';
+    return layout(head('Agenda acadêmica','Datas importantes',subtitle,action)+examCalendar(db.exams,state.role==='coord'),'Datas importantes');
+  };
+  portalExams=function(){
+    let items=db.exams.filter(e=>e.courses.includes(state.course));
+    return '<div class="results-head"><h2>Datas importantes</h2><span>'+items.length+' registro(s)</span></div>'+examCalendar(items);
+  };
+
+  const modalBeforeImportantDates=modal;
+  modal=function(){
+    if(!state.modal||state.modal.type!=='exam')return modalBeforeImportantDates();
+    let shell=body=>'<div class="modalbg" data-close><div class="modal" onclick="event.stopPropagation()">'+body+'</div></div>';
+    let top=(title,sub='')=>'<div class="modaltop"><div><h2>'+title+'</h2>'+(sub?'<p>'+sub+'</p>':'')+'</div><button class="close" data-close>×</button></div>';
+    return shell(top('Nova data importante','Cadastre uma avaliação ou outro evento acadêmico para os estudantes.')
+      +'<div class="field"><label>Categoria</label><select id="etype"><option>Avaliação Bimestral - P1</option><option>Avaliação Bimestral - P2</option><option>Avaliação Substitutiva</option><option>Avaliação de Exame</option><option>Avaliação Institucional - Provão</option><option>Outro</option></select></div>'
+      +'<div class="field exam-other hidden"><label>Nome da data importante</label><input id="eother" placeholder="Ex.: Simulado, evento, palestra ou visita técnica"></div>'
+      +'<div class="two"><div class="field"><label>Data</label><input id="edate" type="date"></div><div class="field exam-presencial"><label id="exam-subject-label">Disciplina</label><select id="esubject"><option value="">Selecione uma disciplina</option>'+examSubjectOptions()+'</select></div></div>'
+      +'<div class="two exam-presencial"><div class="field"><label id="exam-teacher-label">Professor</label><select id="eteacher"><option value="">Selecione</option>'+db.teachers.map(t=>'<option value="'+t.id+'">'+t.name+'</option>').join('')+'</select></div><div class="field"><label id="exam-room-label">Sala</label><select id="eroom"><option value="">Selecione</option>'+db.rooms.map(r=>'<option value="'+r.id+'">'+r.name+' · '+r.building+'</option>').join('')+'</select></div></div>'
+      +'<div class="exam-online-note hidden" id="provao-note">O Provão será exibido como avaliação online no grupoau.com.br. Informe apenas a data e os cursos.</div>'
+      +'<div class="exam-other-note hidden" id="other-date-note">Para a categoria “Outro”, disciplina, professor e sala são opcionais.</div>'
+      +'<div class="field"><label>Curso(s)</label><div class="course-picks"><label class="course-pick"><input type="checkbox" id="exam-ads" checked> ADS</label><label class="course-pick"><input type="checkbox" id="exam-edc"> EDC</label></div></div>'
+      +'<div class="field"><label>Observações (opcional)</label><input id="enotes" placeholder="Informações adicionais"></div>'
+      +'<div class="actions"><button class="btn soft" data-close>Cancelar</button><button class="btn primary" id="saveexam">Cadastrar data</button></div>');
+  };
+
+  toggleExamFields=function(){
+    let value=document.getElementById('etype')?.value||'',provao=value.includes('Provão'),other=value==='Outro';
+    document.querySelectorAll('.exam-presencial').forEach(el=>el.classList.toggle('hidden',provao));
+    document.querySelectorAll('.exam-other').forEach(el=>el.classList.toggle('hidden',!other));
+    document.getElementById('provao-note')?.classList.toggle('hidden',!provao);
+    document.getElementById('other-date-note')?.classList.toggle('hidden',!other);
+    let subject=document.getElementById('exam-subject-label'),teacher=document.getElementById('exam-teacher-label'),room=document.getElementById('exam-room-label');
+    if(subject)subject.textContent=other?'Disciplina (opcional)':'Disciplina';
+    if(teacher)teacher.textContent=other?'Professor (opcional)':'Professor';
+    if(room)room.textContent=other?'Sala (opcional)':'Sala';
+  };
+
+  saveExam=async function(){
+    let selectedType=document.getElementById('etype').value,date=document.getElementById('edate').value,notes=document.getElementById('enotes').value.trim(),courses=[];
+    if(document.getElementById('exam-ads').checked)courses.push('ADS');
+    if(document.getElementById('exam-edc').checked)courses.push('EDC');
+    let provao=selectedType.includes('Provão'),other=selectedType==='Outro';
+    if(!selectedType||!date||!courses.length)return toast('Informe categoria, data e ao menos um curso.');
+    try{
+      let payload;
+      if(provao){
+        payload={tipo:selectedType,data:date,disciplina:'Avaliação Institucional - Provão',professor_id:null,professor_nome:'Avaliação online',sala_id:null,cursos:courses,observacoes:notes||null,criado_por:auth};
+      }else{
+        let subject=document.getElementById('esubject').value.trim(),teacherId=document.getElementById('eteacher').value,roomId=+document.getElementById('eroom').value,teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
+        if(other){
+          let otherLabel=document.getElementById('eother').value.trim();
+          if(!otherLabel)return toast('Informe o nome da data importante.');
+          payload={tipo:'Outro - '+otherLabel,data:date,disciplina:subject||otherLabel,professor_id:teacher?.id||null,professor_nome:teacher?.name||'',sala_id:roomId||null,cursos:courses,observacoes:notes||null,criado_por:auth};
+        }else{
+          if(!subject||!teacher||!roomId)return toast('Preencha disciplina, professor e sala.');
+          payload={tipo:selectedType,data:date,disciplina:subject,professor_id:teacher.id,professor_nome:teacher.name,sala_id:roomId,cursos:courses,observacoes:notes||null,criado_por:auth};
+        }
+      }
+      let {error}=await banco.from('avaliacoes').insert(payload);
+      if(error)throw error;
+      await loadData();state.modal=null;render();toast('Data importante cadastrada com sucesso.');
+    }catch(error){console.error(error);toast('Não foi possível cadastrar a data importante: '+error.message)}
+  };
+
+  deleteExam=async function(id){
+    let item=db.exams.find(e=>e.id===id);
+    if(!item||!confirm('Excluir esta data importante: '+(isOtherImportantDate(item)?otherImportantDateLabel(item):item.type)+'?'))return;
+    let {error}=await banco.from('avaliacoes').delete().eq('id',id);
+    if(error)return toast('Erro ao excluir data importante: '+error.message);
+    await loadData();render();toast('Data importante excluída.');
+  };
+})();
+</script>
+<script>
+/* Datas importantes vinculadas às turmas cadastradas. */
+(function(){
+  window.loadImportantDateGroups=async function(){
+    if(!(db.exams||[]).length)return;
+    let result=await banco.from('avaliacao_turmas').select('avaliacao_id,turma_id,turmas(id,nome,cursos)');
+    if(result.error){
+      console.warn('Vínculos de datas importantes indisponíveis:',result.error.message);
+      db.exams.forEach(e=>{e.groups=[];e.groupIds=[]});
+      db.importantDateGroupsAvailable=false;
+      return;
+    }
+    let byExam={};
+    (result.data||[]).forEach(link=>{
+      let group={id:link.turma_id,name:link.turmas?.nome||'',courses:link.turmas?.cursos||[]};
+      (byExam[link.avaliacao_id]??=[]).push(group);
+    });
+    db.exams.forEach(e=>{e.groups=byExam[e.id]||[];e.groupIds=e.groups.map(g=>g.id)});
+    db.importantDateGroupsAvailable=true;
+  };
+
+  const loadDataBeforeImportantDateGroups=loadData;
+  loadData=async function(){
+    await loadDataBeforeImportantDateGroups();
+    await loadImportantDateGroups();
+  };
+
+  function importantDateGroups(e){
+    return (e.groups||[]).map(g=>{
+      let course=(g.courses||[])[0]||'',label=g.name+(course?' '+course:'');
+      return '<span class="important-date-group '+course.toLowerCase()+'">'+label+'</span>';
+    }).join('');
+  }
+  function importantDateMatchesPublicFilter(e){
+    if(!(e.courses||[]).includes(state.course))return false;
+    if(state.period==='Todos'||!(e.groupIds||[]).length)return true;
+    return (e.groups||[]).some(g=>g.name===state.period&&(g.courses||[]).includes(state.course));
+  }
+  function importantDateMatchesAdminFilter(e){
+    let course=state.importantDateCourse||'Todos',groupId=String(state.importantDateGroupId||'');
+    if(course!=='Todos'&&!(e.courses||[]).includes(course))return false;
+    if(!groupId)return true;
+    if(!(e.groupIds||[]).length)return true;
+    return (e.groupIds||[]).map(String).includes(groupId);
+  }
+  function importantDateFilterBar(){
+    let course=state.importantDateCourse||'Todos';
+    let groups=(db.groups||[]).filter(g=>course==='Todos'||(g.courses||[]).includes(course));
+    let groupId=String(state.importantDateGroupId||'');
+    if(groupId&&!groups.some(g=>String(g.id)===groupId)){groupId='';state.importantDateGroupId=''}
+    return '<div class="important-date-filters"><div class="field"><label>Curso</label><select id="important-date-course"><option value="Todos">Todos</option><option value="ADS" '+(course==='ADS'?'selected':'')+'>ADS</option><option value="EDC" '+(course==='EDC'?'selected':'')+'>EDC</option></select></div><div class="field"><label>Turma</label><select id="important-date-group"><option value="">Todas as turmas</option>'+groups.map(g=>'<option value="'+g.id+'" '+(String(g.id)===groupId?'selected':'')+'>'+g.name+' · '+(g.courses||[]).join(' + ')+'</option>').join('')+'</select></div></div>';
+  }
+
+  examCalendar=function(items,admin=false){
+    if(!items.length)return '<div class="empty">Nenhuma data importante cadastrada para este filtro.</div>';
+    let sorted=[...items].sort((a,b)=>a.date.localeCompare(b.date)),months={};
+    sorted.forEach(e=>{let key=new Date(e.date+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});(months[key]??=[]).push(e)});
+    return '<div class="exam-calendar">'+Object.entries(months).map(([month,events])=>'<section class="exam-month"><h3>'+month[0].toUpperCase()+month.slice(1)+'</h3><div class="exam-grid">'+events.map(e=>{
+      let other=String(e.type||'').startsWith('Outro'),custom=String(e.type||'').replace(/^Outro\s*(?:-|–|:)?\s*/i,'').trim();
+      let title=other?(custom||e.subject||'Data importante'):e.subject,badge=other?'Outro':e.type;
+      let teacherCanEdit=state.role==='teacher'&&String(e.teacherId)===String(state.teacherId)&&!isProvao(e);
+      let subjectLine=other&&e.subject&&e.subject!==custom?'<p><b>Disciplina:</b> '+e.subject+'</p>':'';
+      let teacherLine=e.teacher?'<p>'+e.teacher+'</p>':'';
+      let roomLine=isProvao(e)||e.roomId?'<div class="exam-room">Local: '+examRoomLabel(e)+'</div>':(other?'<div class="exam-room">Local: a definir</div>':'');
+      let groupLine=(e.groups||[]).length?'<div class="important-date-groups">'+importantDateGroups(e)+'</div>':'<div class="course-tags">'+(e.courses||[]).map(c=>'<span class="course-tag">'+c+'</span>').join('')+'</div>';
+      return '<article class="exam-card '+examTone(e.type)+'"><div class="exam-date">'+fmtDate(e.date)+'</div><span class="exam-type">'+badge+'</span><h4>'+title+'</h4>'+subjectLine+teacherLine+roomLine+groupLine+(e.notes?'<small>'+e.notes+'</small>':'')+(teacherCanEdit?'<button class="mini" data-editevalroom="'+e.id+'">Alterar sala</button>':'')+(admin?'<button class="mini danger" data-delexam="'+e.id+'">Excluir data</button>':'')+'</article>';
+    }).join('')+'</div></section>').join('')+'</div>';
+  };
+
+  exams=function(){
+    let action=state.role==='coord'?'<button class="btn primary" data-newexam>＋ Nova data importante</button>':'';
+    let subtitle=state.role==='coord'?'Cadastre avaliações, simulados, eventos e outras datas importantes para turmas específicas.':'Consulte as datas importantes cadastradas pela coordenação.';
+    let items=(db.exams||[]).filter(importantDateMatchesAdminFilter);
+    let filters=state.role==='coord'?importantDateFilterBar():'';
+    return layout(head('Agenda acadêmica','Datas importantes',subtitle,action)+filters+examCalendar(items,state.role==='coord'),'Datas importantes');
+  };
+  portalExams=function(){
+    let items=(db.exams||[]).filter(importantDateMatchesPublicFilter);
+    return '<div class="results-head"><h2>Datas importantes</h2><span>'+items.length+' registro(s)</span></div>'+examCalendar(items);
+  };
+
+  const modalBeforeImportantDateGroups=modal;
+  modal=function(){
+    if(!state.modal||state.modal.type!=='exam')return modalBeforeImportantDateGroups();
+    let shell=body=>'<div class="modalbg" data-close><div class="modal" onclick="event.stopPropagation()">'+body+'</div></div>';
+    let top=(title,sub='')=>'<div class="modaltop"><div><h2>'+title+'</h2>'+(sub?'<p>'+sub+'</p>':'')+'</div><button class="close" data-close>×</button></div>';
+    return shell(top('Nova data importante','Selecione uma ou mais turmas. O curso será identificado automaticamente.')
+      +'<div class="field"><label>Categoria</label><select id="etype"><option>Avaliação Bimestral - P1</option><option>Avaliação Bimestral - P2</option><option>Avaliação Substitutiva</option><option>Avaliação de Exame</option><option>Avaliação Institucional - Provão</option><option>Outro</option></select></div>'
+      +'<div class="field exam-other hidden"><label>Nome da data importante</label><input id="eother" placeholder="Ex.: Simulado, evento, palestra ou visita técnica"></div>'
+      +'<div class="two"><div class="field"><label>Data</label><input id="edate" type="date"></div><div class="field exam-presencial"><label id="exam-subject-label">Disciplina</label><select id="esubject"><option value="">Selecione uma disciplina</option>'+examSubjectOptions()+'</select></div></div>'
+      +'<div class="two exam-presencial"><div class="field"><label id="exam-teacher-label">Professor</label><select id="eteacher"><option value="">Selecione</option>'+db.teachers.map(t=>'<option value="'+t.id+'">'+t.name+'</option>').join('')+'</select></div><div class="field"><label id="exam-room-label">Sala</label><select id="eroom"><option value="">Selecione</option>'+db.rooms.map(r=>'<option value="'+r.id+'">'+r.name+' · '+r.building+'</option>').join('')+'</select></div></div>'
+      +'<div class="exam-online-note hidden" id="provao-note">O Provão será exibido como avaliação online no grupoau.com.br.</div>'
+      +'<div class="exam-other-note hidden" id="other-date-note">Para a categoria “Outro”, disciplina, professor e sala são opcionais.</div>'
+      +'<div class="field"><label>Turmas</label>'+classGroupChecks('exam-group-opt',[])+'</div>'
+      +'<div class="field"><label>Observações (opcional)</label><input id="enotes" placeholder="Informações adicionais"></div>'
+      +'<div class="actions"><button class="btn soft" data-close>Cancelar</button><button class="btn primary" id="saveexam">Cadastrar data</button></div>');
+  };
+
+  toggleExamFields=function(){
+    let value=document.getElementById('etype')?.value||'',provao=value.includes('Provão'),other=value==='Outro';
+    document.querySelectorAll('.exam-presencial').forEach(el=>el.classList.toggle('hidden',provao));
+    document.querySelectorAll('.exam-other').forEach(el=>el.classList.toggle('hidden',!other));
+    document.getElementById('provao-note')?.classList.toggle('hidden',!provao);
+    document.getElementById('other-date-note')?.classList.toggle('hidden',!other);
+    let subject=document.getElementById('exam-subject-label'),teacher=document.getElementById('exam-teacher-label'),roomLabel=document.getElementById('exam-room-label');
+    if(subject)subject.textContent=other?'Disciplina (opcional)':'Disciplina';
+    if(teacher)teacher.textContent=other?'Professor (opcional)':'Professor';
+    if(roomLabel)roomLabel.textContent=other?'Sala (opcional)':'Sala';
+  };
+
+  saveExam=async function(){
+    let type=document.getElementById('etype').value,date=document.getElementById('edate').value,notes=document.getElementById('enotes').value.trim();
+    let groupIds=[...document.querySelectorAll('.exam-group-opt:checked')].map(x=>+x.value);
+    let selectedGroups=(db.groups||[]).filter(g=>groupIds.includes(+g.id));
+    let courses=[...new Set(selectedGroups.flatMap(g=>g.courses||[]))];
+    let provao=type.includes('Provão'),other=type==='Outro';
+    if(!type||!date||!groupIds.length)return toast('Informe categoria, data e ao menos uma turma.');
+    try{
+      let payload;
+      if(provao){
+        payload={tipo:type,data:date,disciplina:'Avaliação Institucional - Provão',professor_id:null,professor_nome:'Avaliação online',sala_id:null,cursos,observacoes:notes||null,criado_por:auth};
+      }else{
+        let subject=document.getElementById('esubject').value.trim(),teacherId=document.getElementById('eteacher').value,roomId=+document.getElementById('eroom').value;
+        let teacher=db.teachers.find(t=>String(t.id)===String(teacherId));
+        if(other){
+          let label=document.getElementById('eother').value.trim();
+          if(!label)return toast('Informe o nome da data importante.');
+          payload={tipo:'Outro - '+label,data:date,disciplina:subject||label,professor_id:teacher?.id||null,professor_nome:teacher?.name||'',sala_id:roomId||null,cursos,observacoes:notes||null,criado_por:auth};
+        }else{
+          if(!subject||!teacher||!roomId)return toast('Preencha disciplina, professor e sala.');
+          payload={tipo:type,data:date,disciplina:subject,professor_id:teacher.id,professor_nome:teacher.name,sala_id:roomId,cursos,observacoes:notes||null,criado_por:auth};
+        }
+      }
+      let created=await banco.from('avaliacoes').insert(payload).select('id').single();
+      if(created.error)throw created.error;
+      let links=groupIds.map(groupId=>({avaliacao_id:created.data.id,turma_id:groupId}));
+      let linked=await banco.from('avaliacao_turmas').insert(links);
+      if(linked.error){
+        await banco.from('avaliacoes').delete().eq('id',created.data.id);
+        throw linked.error;
+      }
+      await loadData();state.modal=null;render();toast('Data importante cadastrada para as turmas selecionadas.');
+    }catch(error){console.error(error);toast('Não foi possível cadastrar a data importante: '+error.message)}
+  };
+
+  const bindBeforeImportantDateGroups=bind;
+  bind=function(){
+    bindBeforeImportantDateGroups();
+    document.getElementById('important-date-course')?.addEventListener('change',e=>{state.importantDateCourse=e.target.value;state.importantDateGroupId='';render()});
+    document.getElementById('important-date-group')?.addEventListener('change',e=>{state.importantDateGroupId=e.target.value;render()});
+  };
+})();
 </script>
 <style>
 @media (min-width: 901px){
@@ -388,12 +661,6 @@ bind=function(){
 bind();
 </script><script>
 const examCalendarBeforeTeacherRoom=examCalendar;
-examCalendar=function(items,admin=false){
-  if(!items.length)return '<div class="empty">Nenhuma avaliação cadastrada.</div>';
-  let sorted=[...items].sort((a,b)=>a.date.localeCompare(b.date)),groups={};
-  sorted.forEach(e=>{let key=new Date(e.date+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'});(groups[key]??=[]).push(e)});
-  return '<div class="exam-calendar">'+Object.entries(groups).map(([month,events])=>'<section class="exam-month"><h3>'+month[0].toUpperCase()+month.slice(1)+'</h3><div class="exam-grid">'+events.map(e=>{let teacherCanEdit=state.role==='teacher'&&String(e.teacherId)===String(state.teacherId)&&!(e.type||'').includes('Provão');return '<article class="exam-card '+examTone(e.type)+'"><div class="exam-date">'+fmtDate(e.date)+'</div><span class="exam-type">'+e.type+'</span><h4>'+e.subject+'</h4><p>'+e.teacher+'</p><div class="exam-room">Local: '+examRoomLabel(e)+'</div><div class="course-tags">'+e.courses.map(c=>'<span class="course-tag">'+c+'</span>').join('')+'</div>'+(e.notes?'<small>'+e.notes+'</small>':'')+(teacherCanEdit?'<button class="mini" data-editevalroom="'+e.id+'">Alterar sala</button>':'')+(admin?'<button class="mini danger" data-delexam="'+e.id+'">Excluir avaliação</button>':'')+'</article>'}).join('')+'</div></section>').join('')+'</div>';
-};
 const modalBeforeTeacherEvalRoom=modal;
 modal=function(){
   if(!state.modal||state.modal.type!=='editevalroom')return modalBeforeTeacherEvalRoom();
