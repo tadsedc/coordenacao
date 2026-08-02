@@ -3,24 +3,31 @@
   const previousLoadData=loadData;
   loadData=async function(){
     await previousLoadData();
-    const result=await banco.from('aulas').select('id,sala_base_id,sala_padrao_id').eq('ativa',true);
+    const [result,changes]=await Promise.all([
+      banco.from('aulas').select('id,sala_base_id,sala_padrao_id').eq('ativa',true),
+      banco.rpc('listar_ultimas_alteracoes_publicas_sala')
+    ]);
     if(result.error){
       console.warn('Sala padrão da disciplina ainda não está disponível:',result.error.message);
       return;
     }
     const roomsByClass=new Map((result.data||[]).map(item=>[String(item.id),item]));
+    const changesByClass=new Map((changes.error?[]:changes.data||[]).map(item=>[String(item.aula_id),item.alterado_em]));
+    if(changes.error)console.warn('Datas das alterações de sala ainda não estão disponíveis:',changes.error.message);
     db.classes.forEach(item=>{
       const stored=roomsByClass.get(String(item.id));
       if(!stored)return;
       item.baseRoomId=stored.sala_base_id;
       item.overrideRoomId=stored.sala_padrao_id;
       item.roomId=stored.sala_padrao_id||stored.sala_base_id;
+      item.roomChangedAt=changesByClass.get(String(item.id))||null;
     });
   };
 
   function roomById(id){return db.rooms.find(item=>String(item.id)===String(id))}
   function baseRoom(item){return roomById(item?.baseRoomId)}
   function overrideRoom(item){return roomById(item?.overrideRoomId)}
+  function changedDate(value){return new Date(value).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'America/Campo_Grande'})}
   function roomOptions(selectedId,emptyLabel){
     return '<option value="">'+emptyLabel+'</option>'+db.rooms.map(item=>'<option value="'+item.id+'" '+(String(item.id)===String(selectedId)?'selected':'')+'>'+item.name+' — '+item.building+(item.floor?', '+item.floor:'')+'</option>').join('');
   }
@@ -32,10 +39,9 @@
   };
   classRoomDetail=function(item){
     if(isSemi(item))return 'Grupo AU';
-    const current=room(item),standard=baseRoom(item),changed=overrideRoom(item);
-    if(changed&&standard)return 'Alteração vigente · padrão: '+standard.name;
-    if(changed)return (current?.floor?current.floor+' · ':'')+'Sala alterada pelo professor ou coordenação';
-    if(standard)return (standard.floor?standard.floor+' · ':'')+'Sala padrão da disciplina';
+    const current=room(item),standard=baseRoom(item),changed=overrideRoom(item),floor=current?.floor||'';
+    if(changed&&item.roomChangedAt)return (floor?floor+' · ':'')+'Professor atualizou em '+changedDate(item.roomChangedAt);
+    if(changed||standard)return floor;
     return 'Coordenação ainda não definiu a sala padrão';
   };
 
