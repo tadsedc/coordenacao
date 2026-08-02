@@ -211,7 +211,7 @@
   .course-gate-title { text-wrap:balance }
   .course-gate-title span {
     background:linear-gradient(90deg,#0876c9,#15b5c9,#705ee9);background-clip:text;-webkit-background-clip:text;color:transparent;
-    padding-inline:.06em;margin-inline:-.06em;
+    padding-left:4px;padding-right:4px;margin-left:-4px;margin-right:-4px;
   }
   .course-option { min-height:250px;border:1px solid rgba(255,255,255,.24);border-radius:28px;box-shadow:0 25px 65px rgba(7,56,96,.18);position:relative;overflow:hidden }
   .course-option:before { content:"";position:absolute;width:220px;height:220px;border:1px solid rgba(255,255,255,.16);border-radius:50%;right:-85px;top:-95px;transition:transform .35s ease }
