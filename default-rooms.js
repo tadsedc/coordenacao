@@ -119,5 +119,12 @@
   style.textContent='.default-room-reference,.default-room-editor{margin:14px 0;padding:14px;border:1px solid #cfe2dc;border-radius:12px;background:#f4faf7}.default-room-reference small,.default-room-reference b{display:block}.default-room-reference small{margin-bottom:5px;color:var(--mut);font-weight:800;text-transform:uppercase;letter-spacing:.4px}.default-room-editor .field{margin:0 0 10px}.default-room-editor>.btn{width:100%}';
   document.head.appendChild(style);
 
-  if(typeof auth!=='undefined'&&auth)loadData().then(render).catch(error=>console.error(error));
+  let bootRefreshStarted=false;
+  function refreshRoomsAfterBoot(){
+    if(bootRefreshStarted)return;
+    bootRefreshStarted=true;
+    loadData().then(render).catch(error=>console.error(error));
+  }
+  if(typeof __bootReady!=='undefined'&&__bootReady)refreshRoomsAfterBoot();
+  else document.addEventListener('portal-boot-ready',refreshRoomsAfterBoot,{once:true});
 })();
