@@ -60,7 +60,7 @@
     let html=previousModal();
     if(state.role==='coord'&&state.modal?.type==='editclass'){
       const item=db.classes.find(entry=>String(entry.id)===String(state.modal.id));
-      const field='<div class="default-room-editor"><div class="field"><label>Sala padrão da disciplina</label><select id="base-roomsel">'+roomOptions(item?.baseRoomId,'Sem sala padrão definida')+'</select><small>Esta sala vale para todas as turmas vinculadas a esta oferta.</small></div><button class="btn soft" id="save-base-room">Salvar sala padrão</button></div>';
+      const field='<div class="default-room-editor"><div class="field"><label>Sala padrão da disciplina</label><select id="base-roomsel">'+roomOptions(item?.baseRoomId,'Sem sala padrão definida')+'</select><small>Esta sala vale para todas as turmas vinculadas a esta oferta.</small></div><button type="button" class="btn soft" id="save-base-room" onclick="window.saveBaseRoom(event)">Salvar sala padrão</button></div>';
       html=html.replace('<div class="actions"><button class="btn soft" data-close>Cancelar</button>',field+'<div class="actions"><button class="btn soft" data-close>Cancelar</button>');
     }
     return html;
@@ -93,22 +93,27 @@
     await loadData();state.modal=null;render();toast('Sala padrão restaurada com sucesso.');
   }
 
-  async function saveBaseRoom(){
-    const item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),roomId=+document.getElementById('base-roomsel')?.value||null;
-    if(!item)return;
+  async function saveBaseRoom(event){
+    event?.preventDefault();event?.stopPropagation();
+    const button=document.getElementById('save-base-room'),item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),roomId=+document.getElementById('base-roomsel')?.value||null;
+    if(!item)return toast('Não foi possível identificar a aula. Feche a janela e tente novamente.');
     if(roomId&&!item.overrideRoomId&&conflictFor(item,roomId))return toast('Esta sala já está ocupada por outra turma nesse horário.');
     const payload={sala_base_id:roomId};
     if(roomId&&String(roomId)===String(item.overrideRoomId))payload.sala_padrao_id=null;
-    const result=await banco.from('aulas').update(payload).eq('id',item.id);
-    if(result.error)return toast('Não foi possível salvar a sala padrão: '+result.error.message);
-    await loadData();state.modal=null;render();toast(roomId?'Sala padrão da disciplina atualizada.':'Sala padrão removida.');
+    if(button){button.disabled=true;button.textContent='Salvando...'}
+    try{
+      const result=await banco.from('aulas').update(payload).eq('id',item.id).select('id').single();
+      if(result.error)throw result.error;
+      await loadData();state.modal=null;render();toast(roomId?'Sala padrão da disciplina atualizada.':'Sala padrão removida.');
+    }catch(error){console.error(error);toast('Não foi possível salvar a sala padrão: '+(error?.message||error))}
+    finally{const current=document.getElementById('save-base-room');if(current){current.disabled=false;current.textContent='Salvar sala padrão'}}
   }
+  window.saveBaseRoom=saveBaseRoom;
 
   const previousBind=bind;
   bind=function(){
     previousBind();
     document.getElementById('restore-default-room')?.addEventListener('click',restoreDefaultRoom);
-    document.getElementById('save-base-room')?.addEventListener('click',saveBaseRoom);
   };
 
   const style=document.createElement('style');
