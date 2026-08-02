@@ -97,14 +97,13 @@
     event?.preventDefault();event?.stopPropagation();
     const button=document.getElementById('save-base-room'),item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),roomId=+document.getElementById('base-roomsel')?.value||null;
     if(!item)return toast('Não foi possível identificar a aula. Feche a janela e tente novamente.');
-    if(roomId&&!item.overrideRoomId&&conflictFor(item,roomId))return toast('Esta sala já está ocupada por outra turma nesse horário.');
-    const payload={sala_base_id:roomId};
-    if(roomId&&String(roomId)===String(item.overrideRoomId))payload.sala_padrao_id=null;
+    if(roomId&&conflictFor(item,roomId))return toast('Esta sala já está ocupada por outra turma nesse horário.');
+    const payload={sala_base_id:roomId,sala_padrao_id:null};
     if(button){button.disabled=true;button.textContent='Salvando...'}
     try{
       const result=await banco.from('aulas').update(payload).eq('id',item.id).select('id').single();
       if(result.error)throw result.error;
-      await loadData();state.modal=null;render();toast(roomId?'Sala padrão da disciplina atualizada.':'Sala padrão removida.');
+      await loadData();state.modal=null;render();toast(roomId?'Sala padrão atualizada e substituição anterior encerrada.':'Sala padrão removida.');
     }catch(error){console.error(error);toast('Não foi possível salvar a sala padrão: '+(error?.message||error))}
     finally{const current=document.getElementById('save-base-room');if(current){current.disabled=false;current.textContent='Salvar sala padrão'}}
   }
