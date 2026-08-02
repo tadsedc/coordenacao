@@ -2,6 +2,8 @@
 (function(){
   const defaultWelcome={active:false,title:'Bem-vindos ao novo semestre',message:'Que seja um período de aprendizado, encontros e novas conquistas.'};
   const seenKey='semester-welcome-seen';
+  const duration=5000;
+  let startedAt=0;
   function safe(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
   function config(){return db.semesterWelcome||defaultWelcome}
 
@@ -14,17 +16,20 @@
   const previousLoadData=loadData;
   loadData=async function(){await previousLoadData();await loadWelcome()};
 
-  function welcomeBanner(extraClass=''){
+  function welcomeBanner(extraClass='',elapsed=0){
     const item=config();
-    return '<section class="semester-welcome '+extraClass+'" role="status"><span class="semester-welcome-spark">✦</span><div><h2>'+safe(item.title)+'</h2><p>'+safe(item.message)+'</p></div></section>';
+    const timing=extraClass.includes('semester-welcome-playing')?' style="--semester-welcome-delay:-'+Math.min(elapsed,duration)+'ms"':'';
+    return '<section class="semester-welcome '+extraClass+'" role="status"'+timing+'><span class="semester-welcome-spark">✦</span><div><h2>'+safe(item.title)+'</h2><p>'+safe(item.message)+'</p></div></section>';
   }
 
   const previousCourseGate=courseGate;
   courseGate=function(){
     let html=previousCourseGate();
     if(state.role!=='student'||!config().active||sessionStorage.getItem(seenKey))return html;
-    sessionStorage.setItem(seenKey,'1');
-    return html.replace('<div class="course-gate-intro">',welcomeBanner('semester-welcome-playing')+'<div class="course-gate-intro">');
+    if(!startedAt)startedAt=Date.now();
+    const elapsed=Date.now()-startedAt;
+    if(elapsed>=duration){sessionStorage.setItem(seenKey,'1');return html}
+    return html.replace('<div class="course-gate-intro">',welcomeBanner('semester-welcome-playing',elapsed)+'<div class="course-gate-intro">');
   };
 
   const previousSettings=settings;
@@ -54,7 +59,7 @@
   }
 
   const previousBind=bind;
-  bind=function(){previousBind();document.getElementById('preview-semester-welcome')?.addEventListener('click',previewWelcome);document.getElementById('save-semester-welcome')?.addEventListener('click',saveWelcome)};
+  bind=function(){previousBind();document.getElementById('preview-semester-welcome')?.addEventListener('click',previewWelcome);document.getElementById('save-semester-welcome')?.addEventListener('click',saveWelcome);document.querySelector('.semester-welcome-playing')?.addEventListener('animationend',event=>{if(event.animationName!=='semester-welcome-life'&&event.animationName!=='semester-welcome-reduced')return;sessionStorage.setItem(seenKey,'1');event.currentTarget.remove()},{once:true})};
 
   loadWelcome().then(()=>{if(typeof auth!=='undefined'&&auth)render()}).catch(error=>console.warn(error));
 })();
