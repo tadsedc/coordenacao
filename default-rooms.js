@@ -70,6 +70,8 @@
     return db.classes.find(entry=>String(entry.id)!==String(item.id)&&!isSemi(entry)&&Number(entry.day)===Number(item.day)&&String(entry.roomId)===String(roomId)&&timesOverlap(entry.start,entry.end,item.start,item.end));
   }
 
+  function refreshedClass(id){return db.classes.find(entry=>String(entry.id)===String(id))}
+
   saveRoom=async function(){
     const button=document.getElementById('saveroom'),item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),roomId=+document.getElementById('roomsel')?.value;
     if(!item||!roomId)return toast('Selecione uma sala diferente da sala padrão.');
@@ -77,20 +79,31 @@
     if(conflictFor(item,roomId))return toast('Este ambiente já está reservado por outra turma no mesmo horário.');
     if(button){button.disabled=true;button.textContent='Salvando...'}
     try{
-      const result=await banco.from('aulas').update({sala_padrao_id:roomId}).eq('id',item.id);
+      const result=await banco.from('aulas').update({sala_padrao_id:roomId}).eq('id',item.id).select('id,sala_padrao_id').single();
       if(result.error)throw result.error;
-      await loadData();state.modal=null;render();toast('Sala substituta atualizada com sucesso.');
+      if(String(result.data?.sala_padrao_id)!==String(roomId))throw new Error('O Supabase não confirmou a nova sala.');
+      await loadData();
+      if(String(refreshedClass(item.id)?.overrideRoomId)!==String(roomId))throw new Error('A nova sala não foi confirmada após a releitura.');
+      state.modal=null;render();toast('Sala substituta atualizada com sucesso.');
     }catch(error){console.error(error);toast('Erro ao atualizar: '+(error?.message||error))}
     finally{const current=document.getElementById('saveroom');if(current){current.disabled=false;current.textContent='Confirmar alteração'}}
   };
 
   async function restoreDefaultRoom(){
-    const item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),standard=baseRoom(item);
+    const button=document.getElementById('restore-default-room'),item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),standard=baseRoom(item);
     if(!item||!standard)return toast('A coordenação ainda não definiu uma sala padrão.');
     if(conflictFor(item,standard.id))return toast('A sala padrão está ocupada por outra turma nesse horário.');
-    const result=await banco.from('aulas').update({sala_padrao_id:null}).eq('id',item.id);
-    if(result.error)return toast('Não foi possível restaurar: '+result.error.message);
-    await loadData();state.modal=null;render();toast('Sala padrão restaurada com sucesso.');
+    if(button){button.disabled=true;button.textContent='Restaurando...'}
+    try{
+      const result=await banco.from('aulas').update({sala_padrao_id:null}).eq('id',item.id).select('id,sala_padrao_id').single();
+      if(result.error)throw result.error;
+      if(result.data?.sala_padrao_id!==null)throw new Error('O Supabase não confirmou a restauração.');
+      await loadData();
+      const refreshed=refreshedClass(item.id);
+      if(refreshed?.overrideRoomId||String(refreshed?.roomId)!==String(standard.id))throw new Error('A sala padrão não foi confirmada após a releitura.');
+      state.modal=null;render();toast('Sala padrão restaurada com sucesso.');
+    }catch(error){console.error(error);toast('Não foi possível restaurar: '+(error?.message||error))}
+    finally{const current=document.getElementById('restore-default-room');if(current){current.disabled=false;current.textContent='Restaurar sala padrão'}}
   }
 
   async function saveBaseRoom(event){
@@ -101,9 +114,13 @@
     const payload={sala_base_id:roomId,sala_padrao_id:null};
     if(button){button.disabled=true;button.textContent='Salvando...'}
     try{
-      const result=await banco.from('aulas').update(payload).eq('id',item.id).select('id').single();
+      const result=await banco.from('aulas').update(payload).eq('id',item.id).select('id,sala_base_id,sala_padrao_id').single();
       if(result.error)throw result.error;
-      await loadData();state.modal=null;render();toast(roomId?'Sala padrão atualizada e substituição anterior encerrada.':'Sala padrão removida.');
+      if(String(result.data?.sala_base_id||'')!==String(roomId||'')||result.data?.sala_padrao_id!==null)throw new Error('O Supabase não confirmou a sala padrão.');
+      await loadData();
+      const refreshed=refreshedClass(item.id);
+      if(String(refreshed?.baseRoomId||'')!==String(roomId||'')||refreshed?.overrideRoomId)throw new Error('A sala padrão não foi confirmada após a releitura.');
+      state.modal=null;render();toast(roomId?'Sala padrão atualizada e substituição anterior encerrada.':'Sala padrão removida.');
     }catch(error){console.error(error);toast('Não foi possível salvar a sala padrão: '+(error?.message||error))}
     finally{const current=document.getElementById('save-base-room');if(current){current.disabled=false;current.textContent='Salvar sala padrão'}}
   }
