@@ -52,10 +52,10 @@
       if(!item)return previousModal();
       const standard=baseRoom(item),changed=overrideRoom(item);
       const shell=body=>'<div class="modalbg" data-close><div class="modal" onclick="event.stopPropagation()">'+body+'</div></div>';
-      const top='<div class="modaltop"><div><h2>Alterar sala da aula</h2><p>A alteração permanecerá até ser trocada ou restaurada para o padrão.</p></div><button class="close" data-close>×</button></div>';
+      const top='<div class="modaltop"><div><h2>Alterar local da aula</h2><p>O novo local permanecerá até ser trocado ou até a volta para a sala padrão.</p></div><button class="close" data-close>×</button></div>';
       const standardInfo='<div class="default-room-reference"><small>Sala padrão da disciplina</small><b>'+(standard?standard.name+' — '+standard.building+(standard.floor?', '+standard.floor:''):'Ainda não definida pela coordenação')+'</b></div>';
-      const restore=changed&&standard?'<button class="btn soft" id="restore-default-room">Restaurar sala padrão</button>':'';
-      return shell(top+'<div class="summary"><b>'+item.subject+'</b><br>'+item.group+' · '+item.start+'–'+item.end+'</div>'+standardInfo+'<div class="field"><label>Sala substituta</label><select id="roomsel">'+roomOptions(item.overrideRoomId,'Selecione outra sala ou laboratório')+'</select><small>Use esta opção apenas quando a aula sair da sala padrão.</small></div><div class="actions"><button class="btn soft" data-close>Cancelar</button>'+restore+'<button class="btn primary" id="saveroom">Confirmar alteração</button></div>');
+      const restore=changed&&standard?'<button class="btn soft" id="restore-default-room">Voltar para a sala padrão</button>':'';
+      return shell(top+'<div class="summary"><b>'+item.subject+'</b><br>'+item.group+' · '+item.start+'–'+item.end+'</div>'+standardInfo+'<div class="field"><label>Novo local da aula</label><select id="roomsel">'+roomOptions(item.overrideRoomId,'Selecione uma sala ou laboratório')+'</select><small>Escolha o ambiente em que esta aula será realizada.</small></div><div class="actions"><button class="btn soft" data-close>Cancelar</button>'+restore+'<button class="btn primary" id="saveroom">Confirmar novo local</button></div>');
     }
     let html=previousModal();
     if(state.role==='coord'&&state.modal?.type==='editclass'){
@@ -75,7 +75,7 @@
   saveRoom=async function(){
     const button=document.getElementById('saveroom'),item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),roomId=+document.getElementById('roomsel')?.value;
     if(!item||!roomId)return toast('Selecione uma sala diferente da sala padrão.');
-    if(String(roomId)===String(item.baseRoomId))return toast('Essa já é a sala padrão. Use “Restaurar sala padrão”.');
+    if(String(roomId)===String(item.baseRoomId))return toast('Essa já é a sala padrão. Use “Voltar para a sala padrão”.');
     if(conflictFor(item,roomId))return toast('Este ambiente já está reservado por outra turma no mesmo horário.');
     if(button){button.disabled=true;button.textContent='Salvando...'}
     try{
@@ -84,9 +84,9 @@
       if(String(result.data?.sala_padrao_id)!==String(roomId))throw new Error('O Supabase não confirmou a nova sala.');
       await loadData();
       if(String(refreshedClass(item.id)?.overrideRoomId)!==String(roomId))throw new Error('A nova sala não foi confirmada após a releitura.');
-      state.modal=null;render();toast('Sala substituta atualizada com sucesso.');
+      state.modal=null;render();toast('Local da aula atualizado com sucesso.');
     }catch(error){console.error(error);toast('Erro ao atualizar: '+(error?.message||error))}
-    finally{const current=document.getElementById('saveroom');if(current){current.disabled=false;current.textContent='Confirmar alteração'}}
+    finally{const current=document.getElementById('saveroom');if(current){current.disabled=false;current.textContent='Confirmar novo local'}}
   };
 
   async function restoreDefaultRoom(){
@@ -103,7 +103,7 @@
       if(refreshed?.overrideRoomId||String(refreshed?.roomId)!==String(standard.id))throw new Error('A sala padrão não foi confirmada após a releitura.');
       state.modal=null;render();toast('Sala padrão restaurada com sucesso.');
     }catch(error){console.error(error);toast('Não foi possível restaurar: '+(error?.message||error))}
-    finally{const current=document.getElementById('restore-default-room');if(current){current.disabled=false;current.textContent='Restaurar sala padrão'}}
+    finally{const current=document.getElementById('restore-default-room');if(current){current.disabled=false;current.textContent='Voltar para a sala padrão'}}
   }
 
   async function saveBaseRoom(event){
