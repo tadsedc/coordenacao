@@ -45,7 +45,7 @@
     if(!b||b.disabled)return;
     const original=b.textContent;b.disabled=true;b.textContent='Cadastrando...';
     try{
-      const {error}=await banco.from('formularios').insert({titulo:title,categoria:'dependencias',descricao:description||null,cursos,ativo:!!document.getElementById('form-active')?.checked}).select('id').single();
+      const {error}=await banco.from('formularios').insert({titulo:title,categoria:'dependencias',descricao:description||null,cursos:courses,ativo:!!document.getElementById('form-active')?.checked}).select('id').single();
       if(error)throw error;
       state.formsModal=null;await loadForms();render();toast('Formulário cadastrado.');
     }catch(error){console.error('Cadastro de formulário:',error);toast('Não foi possível cadastrar o formulário: '+(error?.message||error));}
