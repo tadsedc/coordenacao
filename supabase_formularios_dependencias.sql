@@ -41,6 +41,29 @@ alter table public.formularios enable row level security;
 alter table public.formulario_respostas enable row level security;
 alter table public.formulario_resposta_disciplinas enable row level security;
 
+-- Padroniza o nome do estudante na origem, independentemente da tela usada.
+create or replace function public.normalizar_nome_formulario_resposta()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  new.nome_estudante := upper(trim(new.nome_estudante));
+  return new;
+end;
+$$;
+
+drop trigger if exists normalizar_nome_formulario_resposta_trigger
+on public.formulario_respostas;
+create trigger normalizar_nome_formulario_resposta_trigger
+before insert or update of nome_estudante on public.formulario_respostas
+for each row execute function public.normalizar_nome_formulario_resposta();
+
+-- Também corrige os registros recebidos antes desta atualização.
+update public.formulario_respostas
+set nome_estudante = upper(trim(nome_estudante))
+where nome_estudante is distinct from upper(trim(nome_estudante));
+
 drop policy if exists "Formularios ativos sao publicos" on public.formularios;
 create policy "Formularios ativos sao publicos"
 on public.formularios for select
@@ -116,7 +139,7 @@ begin
   end if;
 
   insert into public.formulario_respostas(formulario_id,nome_estudante,curso,semestre_atual)
-  values (p_formulario_id,trim(p_nome_estudante),p_curso,p_semestre_atual)
+  values (p_formulario_id,upper(trim(p_nome_estudante)),p_curso,p_semestre_atual)
   returning id into v_resposta_id;
 
   insert into public.formulario_resposta_disciplinas(resposta_id,matriz_disciplina_id)
