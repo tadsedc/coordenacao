@@ -99,7 +99,8 @@ begin
   if char_length(trim(coalesce(p_nome_estudante,''))) not between 3 and 160 then
     raise exception 'Informe o nome completo';
   end if;
-  if p_semestre_atual < 1 or p_semestre_atual > case when p_curso='ADS' then 6 else 10 end then
+  if p_semestre_atual < 1
+     or p_semestre_atual > (case when p_curso = 'ADS' then 6 else 10 end) then
     raise exception 'Semestre atual invalido';
   end if;
   if coalesce(cardinality(p_disciplinas),0) < 1 or cardinality(p_disciplinas) > 30 then
