@@ -1,0 +1,11 @@
+.public-doc-form{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.8fr) minmax(0,1.1fr) auto;gap:12px;align-items:end;margin-bottom:18px}
+.public-doc-form .field{margin:0}.public-doc-slug-wrap{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.public-doc-slug-wrap span{padding:11px 0 11px 12px;color:var(--mut);font-size:12px;white-space:nowrap}.public-doc-slug-wrap input{border:0!important;border-radius:0!important;padding-left:2px!important;min-width:90px}
+.public-doc-help{grid-column:1/-1;margin:0;color:var(--mut);font-size:12px}.public-doc-list{display:grid;gap:12px}
+.public-doc-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.public-doc-item h3{margin:0 0 5px;font-size:16px}.public-doc-link{display:inline-flex;align-items:center;gap:5px;color:var(--g2);font-weight:800;text-decoration:none;overflow-wrap:anywhere}
+.public-doc-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;color:var(--mut);font-size:11px}.public-doc-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;align-content:center;gap:7px;max-width:270px}
+.public-doc-status{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800}.public-doc-status::before{content:'';width:8px;height:8px;border-radius:50%;background:#2c8a68}.public-doc-status.off::before{background:#a7b1b9}
+.public-doc-install{border-color:#efcf8e;background:#fff7e2}.public-doc-file-hidden{position:absolute;inline-size:1px;block-size:1px;opacity:0;pointer-events:none}
+@media(max-width:1050px){.public-doc-form{grid-template-columns:1fr 1fr}.public-doc-form .btn{min-height:42px}.public-doc-help{grid-column:1/-1}}
+@media(max-width:700px){.public-doc-form{grid-template-columns:1fr}.public-doc-help{grid-column:auto}.public-doc-item{grid-template-columns:1fr}.public-doc-actions{justify-content:flex-start;max-width:none}.public-doc-actions .mini{flex:1 1 auto}.public-doc-slug-wrap span{font-size:11px}.public-doc-item h3{font-size:15px}}
