@@ -1,0 +1,681 @@
+﻿/* ==========================================================================
+   COMPONENTS - PORTAL ACADÊMICO ADS & EDC (AEMS)
+   ========================================================================== */
+
+/* 1. Header / Navbar Principal */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border-light);
+  transition: all var(--transition-normal);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 74px;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.brand-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(7, 26, 53, 0.08));
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-navy-900);
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-header:hover {
+  color: var(--color-blue-600);
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-header.active {
+  background: var(--color-navy-900);
+  color: var(--text-inverted);
+  border-color: var(--color-navy-900);
+}
+
+.theme-toggle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+  color: var(--color-gold-500);
+  border-color: var(--color-gold-400);
+}
+
+/* 2. Portal Gate (Tela Inicial) */
+.hero-gate {
+  padding: 48px 0 64px;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--color-blue-50);
+  border: 1px solid var(--color-blue-100);
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-blue-600);
+  margin-bottom: 18px;
+}
+
+.hero-badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gold-500);
+}
+
+.hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-navy-950);
+  max-width: 860px;
+  margin: 0 auto 16px;
+}
+
+.hero-title span {
+  background: linear-gradient(135deg, var(--color-blue-600), var(--color-cyan-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.12rem;
+  color: var(--text-muted);
+  max-width: 640px;
+  margin: 0 auto 36px;
+}
+
+/* Grid de Cards de Curso */
+.course-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+  margin-top: 36px;
+}
+
+.course-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all var(--transition-smooth);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.course-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-blue-400);
+}
+
+.course-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--color-blue-600);
+}
+
+.course-card.card-ads::before {
+  background: linear-gradient(90deg, #0868b2, #00c4df);
+}
+
+.course-card.card-edc::before {
+  background: linear-gradient(90deg, #0c274c, #f4b41f);
+}
+
+.course-card.card-prof::before {
+  background: linear-gradient(90deg, #059669, #10b981);
+}
+
+.course-card.card-stage::before {
+  background: linear-gradient(90deg, #d99a0d, #f4b41f);
+}
+
+.card-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--color-blue-50);
+  color: var(--color-blue-600);
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+}
+
+.course-card.card-edc .card-icon-wrap {
+  background: var(--color-gold-50);
+  color: var(--color-gold-600);
+}
+
+.course-card.card-prof .card-icon-wrap {
+  background: var(--color-emerald-100);
+  color: var(--color-emerald-600);
+}
+
+.course-card.card-stage .card-icon-wrap {
+  background: var(--color-gold-100);
+  color: var(--color-gold-600);
+}
+
+.course-card-title {
+  font-size: 1.45rem;
+  margin-bottom: 8px;
+  color: var(--color-navy-950);
+}
+
+.course-card-desc {
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.card-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-blue-600);
+  margin-top: auto;
+}
+
+.course-card:hover .card-arrow {
+  gap: 12px;
+}
+
+/* 3. Navegação de Abas do Portal (Grade, Avisos, Provas, etc.) */
+.portal-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  padding: 6px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-xs);
+  margin: 24px 0 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.portal-nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn {
+  padding: 10px 18px;
+  border-radius: var(--radius-full);
+  border: 0;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.tab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-app);
+}
+
+.tab-btn.active {
+  background: var(--color-navy-900);
+  color: var(--text-inverted);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 4. Grade de Aulas (Schedule Timeline) */
+.schedule-hero {
+  background: linear-gradient(135deg, var(--color-navy-900) 0%, var(--color-navy-800) 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  color: var(--text-inverted);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.schedule-hero h2 {
+  color: var(--text-inverted);
+  font-size: 1.65rem;
+}
+
+.schedule-hero p {
+  color: var(--color-blue-100);
+  font-size: 0.95rem;
+}
+
+.weekday-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.weekday-pill {
+  flex: 1;
+  min-width: 90px;
+  padding: 12px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.weekday-pill:hover {
+  border-color: var(--color-blue-400);
+  transform: translateY(-2px);
+}
+
+.weekday-pill.active {
+  background: var(--color-blue-600);
+  color: var(--text-inverted);
+  border-color: var(--color-blue-600);
+  box-shadow: 0 4px 14px rgba(8, 104, 178, 0.3);
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.class-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.class-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-medium);
+}
+
+.class-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.class-time {
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--color-blue-600);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  background: var(--color-emerald-100);
+  color: var(--color-emerald-600);
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.live-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-emerald-500);
+  animation: pulseGlow 1.5s infinite;
+}
+
+.class-subject {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-navy-950);
+  margin-bottom: 6px;
+}
+
+.class-group-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  background: var(--color-blue-50);
+  color: var(--color-blue-600);
+  border-radius: var(--radius-xs);
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.class-card-bottom {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.86rem;
+}
+
+.teacher-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.room-badge {
+  padding: 5px 10px;
+  background: var(--bg-surface-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  color: var(--color-navy-900);
+}
+
+.room-badge.alert-change {
+  background: var(--color-gold-100);
+  border-color: var(--color-gold-400);
+  color: var(--color-gold-600);
+}
+
+/* 5. Wizard de Estágio (Multi-step) */
+.wizard-container {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  padding: 36px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.wizard-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-bottom: 36px;
+}
+
+.wizard-steps::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  right: 30px;
+  height: 2px;
+  background: var(--border-light);
+  z-index: 1;
+}
+
+.step-item {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  padding: 0 8px;
+}
+
+.step-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-medium);
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+}
+
+.step-item.active .step-circle {
+  background: var(--color-blue-600);
+  border-color: var(--color-blue-600);
+  color: var(--text-inverted);
+  box-shadow: 0 0 0 4px var(--color-blue-100);
+}
+
+.step-item.completed .step-circle {
+  background: var(--color-emerald-500);
+  border-color: var(--color-emerald-500);
+  color: var(--text-inverted);
+}
+
+.step-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.step-item.active .step-label {
+  color: var(--color-navy-950);
+}
+
+/* Formulários Modernos */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  transition: all var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-blue-500);
+  box-shadow: 0 0 0 3px rgba(13, 132, 214, 0.15);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  border: 0;
+  background: var(--color-blue-600);
+  color: var(--text-inverted);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background: var(--color-blue-500);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-app);
+}
+
+/* 6. Toasts e Notificações */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: var(--color-navy-900);
+  color: var(--text-inverted);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  font-weight: 600;
+  animation: fadeIn 0.25s forwards;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .header-container {
+    height: 64px;
+  }
+  .brand-text {
+    display: none;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .wizard-container {
+    padding: 20px 16px;
+  }
+  .step-label {
+    display: none;
+  }
+}
