@@ -13,7 +13,7 @@ import { renderStageWizardView, bindStageWizardEvents } from './views/stage-wiza
 import { renderFormsView, bindFormsEvents } from './views/forms-view.js';
 import { renderAuthView, bindAuthEvents } from './views/auth-view.js';
 import { renderAdminView, bindAdminEvents } from './views/admin-view.js';
-import { showToast } from './ui-helpers.js';
+import { showToast, exportToICS } from './ui-helpers.js';
 
 // Renderização Geral do App
 function renderApp() {
@@ -41,8 +41,8 @@ function renderApp() {
             <button class="btn-header ${state.currentCourse === 'EDC' ? 'active' : ''}" data-nav-course="EDC">EDC</button>
           ` : ''}
 
-          <button class="btn-header" data-nav-tab="estagio">Estágio</button>
-          <button class="btn-header" data-nav-tab="auth">
+          <button class="btn-header ${state.currentTab === 'estagio' ? 'active' : ''}" data-nav-tab="estagio">Estágio</button>
+          <button class="btn-header ${state.currentTab === 'auth' || state.currentTab === 'admin' ? 'active' : ''}" data-nav-tab="auth">
             ${state.auth.isAuthenticated ? '⚙️ Painel' : '👤 Docente'}
           </button>
 
@@ -163,6 +163,17 @@ function bindGlobalEvents() {
       setState({ theme: newTheme });
       return;
     }
+
+    // Exportar Prova para Google Agenda / iCal (.ics)
+    const icsBtn = e.target.closest('[data-export-ics]');
+    if (icsBtn) {
+      const disc = icsBtn.dataset.exportIcs;
+      const dt = icsBtn.dataset.date;
+      if (dt) {
+        exportToICS(`Avaliação: ${disc}`, `Prova da disciplina ${disc} no portal AEMS`, dt, '19:00', '22:30', 'AEMS');
+        showToast('Arquivo de calendário (.ics) baixado!', 'success');
+      }
+    }
   });
 
   // Vincular eventos de submódulos
@@ -172,24 +183,29 @@ function bindGlobalEvents() {
   bindAdminEvents();
 }
 
-// Carga Inicial de Dados do Supabase
-async function loadInitialData() {
+// Carga de Dados do Supabase em Produção
+async function loadProductionData() {
   setState({ loading: true });
   try {
-    const [aulas, informes, provas, turmas, professores] = await Promise.all([
-      api.fetchAulas(),
-      api.fetchInformes(),
-      api.fetchProvas(),
+    const [salas, turmas, informes, professores, matriz] = await Promise.all([
+      api.fetchSalas(),
       api.fetchTurmas(),
-      api.fetchProfessores()
+      api.fetchInformes(),
+      api.fetchProfessores(),
+      api.fetchMatriz()
+    ]);
+
+    const [aulas, provas] = await Promise.all([
+      api.fetchAulas(salas, turmas),
+      api.fetchProvas(salas)
     ]);
 
     setState({
-      data: { aulas, informes, provas, turmas, professores, forms: [] },
+      data: { salas, turmas, aulas, informes, provas, professores, matriz, forms: [] },
       loading: false
     });
   } catch (err) {
-    console.warn('Erro ao carregar dados iniciais:', err);
+    console.error('Erro ao carregar dados do Supabase:', err);
     setState({ loading: false });
   }
 }
@@ -203,8 +219,8 @@ export async function initApp() {
   renderApp();
   bindGlobalEvents();
 
-  // Carrega dados em segundo plano
-  await loadInitialData();
+  // Carrega dados de produção do Supabase
+  await loadProductionData();
 
   // Registro de Service Worker PWA
   if ('serviceWorker' in navigator) {

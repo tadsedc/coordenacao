@@ -11,32 +11,41 @@ export function renderTeachersView() {
   let filteredProfs = data.professores.filter(p => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return (p.nome?.toLowerCase().includes(q) || p.email?.toLowerCase().includes(q));
+      return ((p.nome || '').toLowerCase().includes(q) || (p.email || '').toLowerCase().includes(q));
     }
     return true;
   });
 
   const cards = filteredProfs.length ? filteredProfs.map(p => {
-    const initials = p.nome ? p.nome.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'PR';
+    const initials = p.nome ? p.nome.split(' ').filter(Boolean).slice(0, 2).map(n => n[0]).join('').toUpperCase() : 'PR';
 
     return `
       <article class="class-card animate-fade-in">
         <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 14px;">
-          <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--color-blue-100); color: var(--color-blue-600); font-weight: 800; font-size: 1.1rem; display: grid; place-items: center;">
-            ${initials}
-          </div>
+          ${p.avatar_url ? `
+            <img src="${esc(p.avatar_url)}" alt="${esc(p.nome)}" style="width: 50px; height: 50px; border-radius: var(--radius-md); object-fit: cover;">
+          ` : `
+            <div style="width: 50px; height: 50px; border-radius: var(--radius-md); background: var(--color-blue-100); color: var(--color-blue-600); font-weight: 800; font-size: 1.1rem; display: grid; place-items: center;">
+              ${initials}
+            </div>
+          `}
           <div>
-            <h3 style="font-size: 1.1rem; color: var(--color-navy-950); margin-bottom: 2px;">${esc(p.nome)}</h3>
-            <span style="font-size: 0.8rem; color: var(--text-subtle);">${esc(p.titulacao || 'Professor(a)')}</span>
+            <h3 style="font-size: 1.15rem; color: var(--color-navy-950); margin-bottom: 2px;">${esc(p.nome)}</h3>
+            <span style="font-size: 0.8rem; color: var(--text-subtle);">Docente AEMS</span>
           </div>
         </div>
 
-        <div style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
+        <div style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px;">
           <p>📧 <a href="mailto:${esc(p.email)}">${esc(p.email || 'Não informado')}</a></p>
+          ${p.whatsapp ? `<p>📱 <b>WhatsApp:</b> ${esc(p.whatsapp)}</p>` : ''}
+          ${p.classroom_url ? `<p>📚 <a href="${esc(p.classroom_url)}" target="_blank" rel="noopener">Google Classroom ↗</a></p>` : ''}
+          ${p.github_url ? `<p>💻 <a href="${esc(p.github_url)}" target="_blank" rel="noopener">GitHub ↗</a></p>` : ''}
         </div>
 
         <div class="class-card-bottom">
-          <span style="font-size: 0.8rem; color: var(--text-subtle);">Atendimento: ${esc(p.horario_atendimento || 'Sob agendamento')}</span>
+          <span style="font-size: 0.8rem; color: var(--text-subtle);">
+            ${(p.materiais && p.materiais.length) ? `Materiais: ${p.materiais.join(', ')}` : 'Atendimento acadêmico'}
+          </span>
         </div>
       </article>
     `;
@@ -51,7 +60,7 @@ export function renderTeachersView() {
       <div class="schedule-hero animate-fade-in" style="background: linear-gradient(135deg, #073830 0%, #0d6e5e 100%);">
         <div>
           <h2>Corpo Docente</h2>
-          <p>Conheça os professores, e-mails institucionais e canais de contato acadêmico.</p>
+          <p>Conheça os professores, e-mails institucionais e canais de atendimento acadêmico (${filteredProfs.length} docentes cadastrados).</p>
         </div>
       </div>
 

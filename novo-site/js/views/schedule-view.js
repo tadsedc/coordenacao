@@ -31,18 +31,19 @@ function isClassLive(startTimeStr, endTimeStr, weekdayId) {
 
 export function renderScheduleView() {
   const { currentCourse, selectedWeekday, data, searchQuery } = state;
-  const courseLabel = currentCourse === 'ADS' ? 'Análise e Desenvolvimento de Sistemas' : 'Engenharia de Computação';
+  const courseLabel = currentCourse === 'ADS' ? 'Análise e Desenvolvimento de Sistemas' : (currentCourse === 'EDC' ? 'Engenharia de Computação' : 'Todos os Cursos');
 
-  // Filtragem de Aulas
+  // Filtragem de Aulas do Supabase
   let filteredAulas = data.aulas.filter(a => {
     if (a.dia_semana !== selectedWeekday) return false;
-    if (currentCourse && a.disciplinas?.curso && a.disciplinas.curso !== currentCourse && a.disciplinas.curso !== 'Compartilhada') return false;
+    if (currentCourse && a.cursos && a.cursos.length && !a.cursos.includes(currentCourse)) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      const matchName = a.disciplinas?.nome?.toLowerCase().includes(q);
-      const matchProf = a.professores?.nome?.toLowerCase().includes(q);
-      const matchRoom = a.salas?.nome?.toLowerCase().includes(q);
-      return matchName || matchProf || matchRoom;
+      const matchName = (a.disciplina || '').toLowerCase().includes(q);
+      const matchProf = (a.professor_nome || '').toLowerCase().includes(q);
+      const matchRoom = (a.sala_nome || '').toLowerCase().includes(q);
+      const matchGroup = (a.turma_nome || '').toLowerCase().includes(q);
+      return matchName || matchProf || matchRoom || matchGroup;
     }
     return true;
   });
@@ -54,14 +55,14 @@ export function renderScheduleView() {
   `).join('');
 
   const classCards = filteredAulas.length ? filteredAulas.map(aula => {
-    const isLive = isClassLive(aula.horario_inicio, aula.horario_fim, aula.dia_semana);
-    const roomType = aula.salas?.tipo === 'laboratorio' ? '💻 Lab' : '🏫 Sala';
+    const isLive = isClassLive(aula.inicio, aula.fim, aula.dia_semana);
+    const roomType = aula.sala_tipo === 'laboratorio' ? '💻 Lab' : '🏫 Sala';
     
     return `
       <article class="class-card animate-fade-in">
         <div class="class-card-top">
           <span class="class-time">
-            🕒 ${esc(aula.horario_inicio || '19:00')} - ${esc(aula.horario_fim || '22:30')}
+            🕒 ${esc(aula.inicio || '19:00')} - ${esc(aula.fim || '22:30')}
           </span>
           ${isLive ? `
             <span class="live-indicator">
@@ -70,23 +71,23 @@ export function renderScheduleView() {
           ` : ''}
         </div>
 
-        <h3 class="class-subject">${esc(aula.disciplinas?.nome || 'Disciplina')}</h3>
-        <span class="class-group-badge">${esc(aula.turmas?.nome || 'Turma Geral')}</span>
+        <h3 class="class-subject">${esc(aula.disciplina || 'Disciplina')}</h3>
+        <span class="class-group-badge">${esc(aula.turma_nome || 'Turma Geral')}</span>
 
         <div class="class-card-bottom">
           <div class="teacher-info">
-            <span>👤 ${esc(aula.professores?.nome || 'Docente')}</span>
+            <span>👤 ${esc(aula.professor_nome || 'Docente')}</span>
           </div>
           <span class="room-badge">
-            ${roomType} ${esc(aula.salas?.nome || 'A definir')}
+            ${roomType}: <b>${esc(aula.sala_nome || 'A definir')}</b>
           </span>
         </div>
       </article>
     `;
   }).join('') : `
     <div style="grid-column: 1 / -1; padding: 48px; text-align: center; color: var(--text-muted); background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
-      <p style="font-size: 1.1rem; font-weight: 600;">Nenhuma aula cadastrada para este dia ou filtro.</p>
-      <p style="font-size: 0.9rem; margin-top: 6px;">Verifique os outros dias da semana na barra acima.</p>
+      <p style="font-size: 1.1rem; font-weight: 600;">Nenhuma aula cadastrada para este dia na grade.</p>
+      <p style="font-size: 0.9rem; margin-top: 6px;">Selecione outro dia da semana ou limpe os filtros de busca.</p>
     </div>
   `;
 
@@ -95,7 +96,7 @@ export function renderScheduleView() {
       <div class="schedule-hero animate-fade-in">
         <div>
           <h2>Grade de Aulas & Salas · ${esc(currentCourse || 'Geral')}</h2>
-          <p>${courseLabel}</p>
+          <p>${courseLabel} · ${filteredAulas.length} aula(s) neste dia</p>
         </div>
         <div>
           <button class="btn-header" id="switch-course-btn" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">

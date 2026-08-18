@@ -9,10 +9,14 @@ export function renderExamsView() {
   const { currentCourse, data, searchQuery } = state;
 
   let filteredProvas = data.provas.filter(prova => {
-    if (currentCourse && prova.curso && prova.curso !== currentCourse && prova.curso !== 'Geral') return false;
+    if (currentCourse && prova.cursos && prova.cursos.length && !prova.cursos.includes(currentCourse)) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      return (prova.disciplina?.toLowerCase().includes(q) || prova.turma?.toLowerCase().includes(q));
+      return (
+        (prova.disciplina || '').toLowerCase().includes(q) ||
+        (prova.professor_nome || '').toLowerCase().includes(q) ||
+        (prova.tipo || '').toLowerCase().includes(q)
+      );
     }
     return true;
   });
@@ -33,15 +37,17 @@ export function renderExamsView() {
       <article class="class-card animate-fade-in" style="border-left: 5px solid var(--color-gold-500);">
         <div class="class-card-top">
           <span style="font-weight: 800; color: var(--color-gold-600); font-size: 0.85rem; text-transform: uppercase;">
-            📅 ${esc(p.tipo || 'Bimestral')}
+            📅 ${esc(p.tipo || 'Avaliação')}
           </span>
           ${countdownBadge}
         </div>
 
         <h3 class="class-subject">${esc(p.disciplina || 'Disciplina')}</h3>
         <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
-          Turma: <b>${esc(p.turma || 'Geral')}</b> · Sala: <b>${esc(p.sala || 'A definir')}</b>
+          Docente: <b>${esc(p.professor_nome || 'A definir')}</b> · Local: <b>${esc(p.sala_nome || 'A definir')}</b>
         </p>
+
+        ${p.observacoes ? `<p style="font-size: 0.8rem; color: var(--text-subtle); margin-bottom: 10px;">${esc(p.observacoes)}</p>` : ''}
 
         <div class="class-card-bottom">
           <span style="font-weight: 700; color: var(--color-navy-900);">${dataStr}</span>
@@ -53,7 +59,7 @@ export function renderExamsView() {
     `;
   }).join('') : `
     <div style="grid-column: 1 / -1; padding: 48px; text-align: center; color: var(--text-muted); background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
-      <p style="font-size: 1.1rem; font-weight: 600;">Nenhuma avaliação cadastrada no momento.</p>
+      <p style="font-size: 1.1rem; font-weight: 600;">Nenhuma avaliação cadastrada para os filtros selecionados.</p>
     </div>
   `;
 
@@ -62,7 +68,7 @@ export function renderExamsView() {
       <div class="schedule-hero animate-fade-in" style="background: linear-gradient(135deg, #0f2b48 0%, #1e5a8a 100%);">
         <div>
           <h2>Calendário Oficial de Avaliações</h2>
-          <p>Confira datas de provas bimestrais, substitutivas, exames finais e provão integrado.</p>
+          <p>Confira datas de provas bimestrais, substitutivas, exames finais e provão integrado (${filteredProvas.length} avaliações cadastradas).</p>
         </div>
       </div>
 
