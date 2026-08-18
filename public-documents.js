@@ -1,7 +1,7 @@
 /* Documentos públicos administrados pela coordenação. */
 (function(){
   const BUCKET='documentos-publicos',MAX_SIZE=20*1024*1024;
-  const RESERVED=new Set(['ads','edc','painel','professor','estagio','conheca','conhece','conhecaocurso','novoportal','assets','models','vendor','documento','favicon','robots','sitemap']);
+  const RESERVED=new Set(['ads','edc','painel','professor','estagio','conheca','conhece','conhecaocurso','novoportal','novo-site','assets','models','vendor','documento','favicon','robots','sitemap']);
   const esc=value=>String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
   const slugify=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50);
   const shortDate=value=>value?new Date(value).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'';
