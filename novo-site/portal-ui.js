@@ -1,9 +1,9 @@
-const PORTAL_ROOT = '/';
+﻿const PORTAL_ROOT = location.pathname.startsWith('/novo-site') ? '/novo-site' : '/';
 const directRoutes = new Map([
-  ['/ads/', '/painel.html?acesso=ads'],
-  ['/edc/', '/painel.html?acesso=edc'],
-  ['/professor/', '/painel.html?acesso=professor'],
-  ['/estagio/', '/painel.html?acesso=estagio']
+  ['/ads/', PORTAL_ROOT + '/?acesso=ads'],
+  ['/edc/', PORTAL_ROOT + '/?acesso=edc'],
+  ['/professor/', PORTAL_ROOT + '/?acesso=professor'],
+  ['/estagio/', PORTAL_ROOT + '/?acesso=estagio']
 ]);
 
 class PortalModernDock extends HTMLElement {
@@ -21,7 +21,9 @@ class PortalModernDock extends HTMLElement {
     });
   }
 }
-customElements.define('portal-modern-dock', PortalModernDock);
+if (!customElements.get('portal-modern-dock')) {
+  customElements.define('portal-modern-dock', PortalModernDock);
+}
 
 function modernizeRoutes(root = document) {
   root.querySelectorAll('a[href]').forEach(link => {
@@ -52,13 +54,13 @@ function addRipple(button, event) {
 }
 
 let publicEntrancePlayed = false;
-let publicDataReady = false;
+let publicDataReady = true;
 function playPublicEntrance(root = document) {
-  if (publicEntrancePlayed || !publicDataReady) return;
+  if (publicEntrancePlayed) return;
   const publicMain = root.matches?.('.public-main')
     ? root
     : root.querySelector?.('.public-main') || document.querySelector('.public-main');
-  if (!publicMain || publicMain.querySelector('.portal-loading')) return;
+  if (!publicMain) return;
   publicEntrancePlayed = true;
   requestAnimationFrame(() => {
     document.body.classList.remove('np-public-pending');
@@ -93,5 +95,7 @@ const observer = new MutationObserver(records => {
 observer.observe(document.documentElement, { childList: true, subtree: true });
 enhance();
 
-const dock = document.createElement('portal-modern-dock');
-document.body.append(dock);
+if (!document.querySelector('portal-modern-dock')) {
+  const dock = document.createElement('portal-modern-dock');
+  document.body.append(dock);
+}
