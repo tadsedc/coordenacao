@@ -1,13 +1,13 @@
 /* ==========================================================================
-   MODERN UI DESIGN SYSTEM 2026 - PORTAL ACADÊMICO TADS & EDC (AEMS)
-   Camada Visual Premium: Glassmorphism, Paleta Acadêmica, Tipografia Refinada
-   100% Compatível com toda a lógica funcional do sistema base.
+   ACADEMIC DESIGN SYSTEM 2026 - TADS & EDC (AEMS)
+   Folha de Estilos Completa: Base SPA + Camada Visual Premium 2026
+   Preserva 100% das classes e estruturas funcionais.
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap');
 
 :root {
-  /* Paleta Principal */
+  /* Cores Institucionais Modernas */
   --np-navy: #061a33;
   --np-navy-deep: #030d1c;
   --np-navy-light: #0d284d;
@@ -27,7 +27,7 @@
   --np-purple: #8b5cf6;
   --np-purple-soft: #ede9fe;
 
-  /* Superfícies & Layout */
+  /* Superfícies & Glassmorphism */
   --np-bg: #f4f8fc;
   --np-surface: #ffffff;
   --np-surface-glass: rgba(255, 255, 255, 0.88);
@@ -43,16 +43,16 @@
   --np-text-white: #ffffff;
 
   /* Sombras */
-  --np-shadow-sm: 0 4px 12px rgba(7, 26, 53, 0.05);
+  --np-shadow-sm: 0 4px 14px rgba(7, 26, 53, 0.05);
   --np-shadow-md: 0 10px 28px rgba(7, 26, 53, 0.08);
   --np-shadow-lg: 0 20px 48px rgba(7, 26, 53, 0.12);
   --np-shadow-glow-blue: 0 0 24px rgba(8, 104, 178, 0.22);
   --np-shadow-glow-cyan: 0 0 24px rgba(0, 196, 223, 0.28);
   --np-shadow-glow-gold: 0 0 24px rgba(244, 180, 31, 0.25);
 
-  /* Variáveis de compatibilidade legada */
-  --g: var(--np-blue);
-  --g2: var(--np-navy);
+  /* Mapeamento de Compatibilidade com Sistema Base */
+  --g: var(--np-navy);
+  --g2: var(--np-blue);
   --lime: var(--np-gold);
   --bg: var(--np-bg);
   --ink: var(--np-text-main);
@@ -60,9 +60,12 @@
   --line: var(--np-border);
   --warn: var(--np-gold-deep);
   --white: #ffffff;
+  --accent: var(--np-gold);
 }
 
-/* Resets Globais & Tipografia */
+/* ==========================================================================
+   RESETS GLOBAIS E TIPOGRAFIA
+   ========================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -100,10 +103,13 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--np-text-main);
 }
 
-/* ==========================================================================
-   ESTRUTURA PÚBLICA (PORTAL DO ESTUDANTE)
-   ========================================================================== */
+button, select, input, textarea {
+  font: inherit;
+}
 
+/* ==========================================================================
+   PORTAL PÚBLICO (HEADER & GATE)
+   ========================================================================== */
 .public-shell {
   min-height: 100vh;
   background: transparent;
@@ -111,10 +117,9 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
 }
 
-/* Header Público Moderno */
 .public-header {
   height: 84px;
-  background: rgba(6, 26, 51, 0.92);
+  background: rgba(6, 26, 51, 0.94);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -137,14 +142,23 @@ h1, h2, h3, h4, h5, h6 {
   gap: 14px;
 }
 
-/* Marca / Wordmark Visual */
-.brand-wordmark-modern, .brandVisual {
+.public-header .brand-logo, .public-header .brand-logo-front {
+  width: auto;
+  height: 48px;
+  max-height: 48px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+  padding: 4px 8px;
+}
+
+.brand-wordmark, .brand-wordmark-modern {
   display: flex;
   flex-direction: column;
   line-height: 1;
 }
 
-.np-brand-overline {
+.np-brand-overline, .brand-overline {
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 2.2px;
@@ -153,7 +167,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 4px;
 }
 
-.np-brand-title {
+.np-brand-title, .brand-wordmark strong {
   font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 22px;
   font-weight: 900;
@@ -161,7 +175,7 @@ h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
 }
 
-.np-brand-courses {
+.np-brand-courses, .brand-sub {
   font-size: 13px;
   font-weight: 800;
   color: var(--np-gold);
@@ -169,13 +183,13 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 4px;
 }
 
-.np-brand-courses i {
+.np-brand-courses i, .brand-sub i {
   font-style: normal;
   color: rgba(255, 255, 255, 0.6);
   margin: 0 3px;
 }
 
-.np-brand-place {
+.np-brand-place, .brand-accent {
   font-size: 9.5px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
@@ -183,7 +197,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 3px;
 }
 
-/* Ações do Header (Botões rápidos) */
 .action-stack {
   display: flex;
   align-items: center;
@@ -226,7 +239,6 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-2px);
 }
 
-/* Área Principal Pública */
 .public-main {
   max-width: 1240px;
   width: 100%;
@@ -235,11 +247,13 @@ h1, h2, h3, h4, h5, h6 {
   flex: 1;
 }
 
-/* Portal Gate (Página de Escolha de Curso) */
+/* Portal Gate */
 .portal-gate {
-  min-height: calc(100vh - 84px);
-  display: grid;
-  place-items: center;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 40px 20px;
 }
 
@@ -248,22 +262,12 @@ h1, h2, h3, h4, h5, h6 {
   text-align: center;
 }
 
-.course-gate-intro {
-  margin-bottom: 36px;
-}
-
-.course-gate-title {
-  font-size: clamp(34px, 5vw, 54px);
+.course-gate-title, .gate-inner h1 {
+  font-size: clamp(32px, 5vw, 52px);
   font-weight: 900;
-  line-height: 1.1;
+  line-height: 1.15;
   color: var(--np-navy);
   margin: 0 0 16px;
-}
-
-.course-gate-title span {
-  background: linear-gradient(135deg, var(--np-blue), var(--np-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .course-gate-meta {
@@ -271,6 +275,7 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   gap: 12px;
   flex-wrap: wrap;
+  margin-top: 14px;
 }
 
 .course-gate-meta span {
@@ -283,7 +288,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
 }
 
-/* Opções de Cursos (Cards Grandes) */
+/* Opções de Cursos (Cards da Página Inicial) */
 .course-options {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -353,7 +358,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .course-symbol {
-  font-size: 38px;
+  font-size: 36px;
   line-height: 1;
   margin-bottom: 12px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
@@ -374,20 +379,7 @@ h1, h2, h3, h4, h5, h6 {
   color: rgba(255, 255, 255, 0.9);
 }
 
-.course-guide-trigger {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  margin: 8px 0;
-  width: max-content;
-  backdrop-filter: blur(8px);
-}
-
-/* Disclaimer Institucional */
+/* Disclaimer */
 .portal-disclaimer {
   margin: 40px auto 0;
   max-width: 980px;
@@ -417,8 +409,8 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: underline;
 }
 
-/* Hero do Curso Selecionado */
-.portal-hero {
+/* Hero do Curso */
+.portal-hero, .public-hero {
   border-radius: 24px;
   padding: 32px 36px;
   margin-bottom: 26px;
@@ -436,13 +428,13 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, #0a1f38 0%, #173f6b 55%, #ba790d 100%);
 }
 
-.portal-hero h1 {
+.portal-hero h1, .public-hero h1 {
   font-size: clamp(24px, 3.5vw, 36px);
   margin: 0 0 6px;
   color: #fff;
 }
 
-.portal-hero p {
+.portal-hero p, .public-hero .sub {
   margin: 0;
   color: rgba(255, 255, 255, 0.85);
   font-size: 14px;
@@ -459,7 +451,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Abas de Navegação do Portal */
+/* Abas */
 .portal-tabs {
   display: flex;
   gap: 8px;
@@ -500,7 +492,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 16px rgba(6, 26, 51, 0.25);
 }
 
-/* Barra de Filtros dos Estudantes */
+/* Filtros */
 .student-filter {
   background: var(--np-surface-glass);
   backdrop-filter: blur(16px);
@@ -513,6 +505,10 @@ h1, h2, h3, h4, h5, h6 {
   gap: 20px;
   margin-bottom: 28px;
   box-shadow: var(--np-shadow-sm);
+}
+
+.student-filter.with-course {
+  grid-template-columns: 0.9fr 1.3fr 1.2fr auto;
 }
 
 .student-filter label {
@@ -543,7 +539,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 0 3px rgba(8, 104, 178, 0.15);
 }
 
-/* Segmented Picker dos Dias da Semana */
+/* Weekday Picker */
 .weekday-picker {
   display: flex;
   gap: 6px;
@@ -605,7 +601,6 @@ h1, h2, h3, h4, h5, h6 {
   50% { opacity: 0.6; transform: scale(1.2); }
 }
 
-/* Cabeçalho de Resultados */
 .results-head {
   display: flex;
   justify-content: space-between;
@@ -625,7 +620,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--np-text-muted);
 }
 
-/* Cards da Grade de Aulas (Tiles) */
+/* Grade de Aulas (Cards / Tiles) */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -697,7 +692,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 2px;
 }
 
-/* Tags de Turmas & Cursos */
 .student-group-pill {
   display: inline-flex;
   align-items: center;
@@ -721,10 +715,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--np-gold-deep);
 }
 
-/* ==========================================================================
-   CARDS DE INFORMES (AVISOS)
-   ========================================================================== */
-
+/* Avisos / Informes */
 .notice-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -772,10 +763,7 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
-/* ==========================================================================
-   CARDS DO CORPO DOCENTE (PROFESSORES)
-   ========================================================================== */
-
+/* Professores */
 .teacher-public-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -867,10 +855,7 @@ h1, h2, h3, h4, h5, h6 {
   border-color: rgba(244, 180, 31, 0.3);
 }
 
-/* ==========================================================================
-   CALENDÁRIO DE AVALIAÇÕES (PROVAS)
-   ========================================================================== */
-
+/* Provas / Avaliações */
 .exam-calendar {
   display: grid;
   gap: 32px;
@@ -949,10 +934,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--np-navy);
 }
 
-/* ==========================================================================
-   ESTÁGIO OBRIGATÓRIO & FORMULÁRIOS
-   ========================================================================== */
-
+/* Estágio & Formulários */
 .stage-guidance {
   background: linear-gradient(145deg, #fffcf2 0%, #fff6df 100%);
   border: 1px solid #edd59a;
@@ -1042,7 +1024,6 @@ h1, h2, h3, h4, h5, h6 {
   gap: 16px;
 }
 
-/* Botões Globais */
 .btn {
   border: 0;
   border-radius: 12px;
@@ -1070,10 +1051,6 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 10px 24px rgba(8, 104, 178, 0.4);
 }
 
-.btn.primary:active {
-  transform: translateY(0);
-}
-
 .btn.soft {
   background: var(--np-blue-soft);
   color: var(--np-blue);
@@ -1087,14 +1064,12 @@ h1, h2, h3, h4, h5, h6 {
 /* ==========================================================================
    PAINEL ADMINISTRATIVO (COORDENADOR & PROFESSOR)
    ========================================================================== */
-
 .app {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 280px 1fr;
 }
 
-/* Sidebar Moderna */
 .side {
   position: fixed;
   inset: 0 auto 0 0;
@@ -1160,16 +1135,6 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
-.nav-icon svg {
-  width: 19px;
-  height: 19px;
-  stroke: currentColor;
-  stroke-width: 2;
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .user {
   margin-top: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -1196,7 +1161,6 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 12px rgba(244, 180, 31, 0.3);
 }
 
-/* Área Principal do Painel */
 .main {
   grid-column: 2;
   min-width: 0;
@@ -1244,7 +1208,6 @@ h1, h2, h3, h4, h5, h6 {
   padding: 36px 40px 64px;
 }
 
-/* Cards de Estatísticas / KPIs */
 .stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1294,7 +1257,6 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
-/* Toolbar Administrativa */
 .toolbar {
   background: var(--np-surface-glass);
   backdrop-filter: blur(16px);
@@ -1318,7 +1280,6 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--np-navy);
 }
 
-/* Tabela Administrativa */
 .card {
   background: var(--np-surface-glass);
   backdrop-filter: blur(16px);
@@ -1371,7 +1332,6 @@ tbody tr:hover {
   background: rgba(8, 104, 178, 0.03);
 }
 
-/* Badges e Status */
 .badge {
   display: inline-block;
   background: var(--np-blue-soft);
@@ -1417,7 +1377,6 @@ tbody tr:hover {
   color: #ffffff;
 }
 
-/* Modais & Diálogos */
 .modalbg {
   position: fixed;
   inset: 0;
@@ -1479,10 +1438,7 @@ tbody tr:hover {
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* ==========================================================================
-   TELA DE LOGIN
-   ========================================================================== */
-
+/* Tela de Login */
 .loginpage {
   min-height: 100vh;
   display: grid;
@@ -1555,10 +1511,7 @@ tbody tr:hover {
   font-size: 14px;
 }
 
-/* ==========================================================================
-   RESPONSIVIDADE (MOBILE & TABLETS)
-   ========================================================================== */
-
+/* Responsividade */
 @media (max-width: 1024px) {
   .course-options, .grid, .notice-grid, .teacher-public-grid, .exam-grid {
     grid-template-columns: 1fr 1fr;
@@ -1603,7 +1556,7 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 
-  .student-filter {
+  .student-filter, .student-filter.with-course {
     grid-template-columns: 1fr;
     gap: 14px;
   }
@@ -1620,7 +1573,7 @@ tbody tr:hover {
     display: none;
   }
 
-  .portal-hero {
+  .portal-hero, .public-hero {
     flex-direction: column;
     align-items: flex-start;
     padding: 24px;
