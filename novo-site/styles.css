@@ -125,6 +125,8 @@ body:has(.welcome-main) .welcome-intro>.eyebrow{display:none}
  .section-intro{margin-bottom:14px}
  .section-intro .eyebrow{display:none}
  .section-intro h1{margin:0;font-size:28px}
+ .section-intro-notices,.section-intro-dates,.section-intro-forms{display:none}
+ .section-intro-notices+.section-heading,.section-intro-dates+.section-heading,.section-intro-forms+.section-heading{margin-top:0}
  .filters{margin-bottom:20px;padding:8px;border-radius:17px}
  .day-list{padding-bottom:6px}
  .day-btn{padding:10px 8px}
