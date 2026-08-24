@@ -106,3 +106,30 @@ body:has(.welcome-main) .welcome-intro>.eyebrow{display:none}
  .sheet-grid{gap:8px}
  .teacher-sheet .sheet-section,.teacher-sheet details{padding:14px}
 }
+
+/* Consulta rápida: prioriza aulas e conteúdo nas telas pequenas */
+@media(max-width:720px){
+ .public-header.compact{padding-top:5px}
+ .public-header.compact .public-header-inner{min-height:52px;padding:6px 8px 6px 10px;border-radius:17px}
+ .public-header.compact .wordmark{font-size:13px;gap:8px}
+ .public-header.compact .wordmark-mark{width:32px;height:32px;border-radius:10px}
+ .public-header.compact .wordmark small{font-size:6px}
+ .access-toggle{min-width:36px;min-height:36px;padding:7px 9px}
+ .access-popover{top:66px}
+ .course-banner{min-height:116px;margin-top:7px;padding:50px 18px 16px;border-radius:21px}
+ .course-banner small,.course-banner p{display:none}
+ .course-banner h1{max-width:100%;margin:0;font-size:23px;line-height:1.03;letter-spacing:-.035em}
+ .banner-back{left:15px;top:13px;width:37px;height:37px;border-radius:12px}
+ .course-code{top:13px;right:15px;padding:8px 14px}
+ .page-content{padding:18px 0 24px}
+ .section-intro{margin-bottom:14px}
+ .section-intro .eyebrow{display:none}
+ .section-intro h1{margin:0;font-size:28px}
+ .filters{margin-bottom:20px;padding:8px;border-radius:17px}
+ .day-list{padding-bottom:6px}
+ .day-btn{padding:10px 8px}
+ .select-wrap select{height:42px}
+ .section-heading{margin:18px 0 12px}
+ .section-heading h2{font-size:23px}
+ .section-heading p{margin-top:3px}
+}
