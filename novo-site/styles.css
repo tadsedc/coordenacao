@@ -48,8 +48,8 @@ body:has(.welcome-main) .welcome-intro>.eyebrow{display:none}
  body:has(.welcome-main) .welcome-main{padding-top:8px}
  body:has(.welcome-main) .welcome-intro{margin-bottom:14px}
  body:has(.welcome-main) .welcome-intro h1{font-size:39px;line-height:.98}
- body:has(.welcome-main) .welcome-chips{width:min(100%,340px);margin:13px auto 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0}
- body:has(.welcome-main) .welcome-chips span{display:flex;align-items:center;justify-content:flex-start;min-width:0;padding:7px 9px;font-size:9px;white-space:nowrap}
+ body:has(.welcome-main) .welcome-chips{width:min(100%,350px);margin:13px auto 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 7px;padding:0}
+ body:has(.welcome-main) .welcome-chips span{display:inline-flex;align-items:center;justify-content:flex-start;width:auto;flex:0 0 auto;padding:7px 11px;font-size:9px;white-space:nowrap}
  body:has(.welcome-main) .course-choice,body:has(.welcome-main) .student-choice{min-height:190px;padding:22px}
  body:has(.welcome-main) .choice-icon{width:47px;height:47px;border-radius:15px}
  body:has(.welcome-main) .choice-copy{margin-top:18px}
