@@ -40,17 +40,16 @@ body:has(.welcome-main) .welcome-intro>.eyebrow{display:none}
 .access-popover a:hover,.access-popover button:hover{background:#edf7fe!important;color:#075f9e!important;transform:none!important}
 
 @media(max-width:720px){
- body:has(.welcome-main) .public-header-inner{padding:12px 0 0}
+ body:has(.welcome-main) .public-header-inner{min-height:auto;padding:8px 0 0}
  body:has(.welcome-main) .wordmark{font-size:15px;gap:9px}
  body:has(.welcome-main) .wordmark-mark{width:35px;height:35px;border-radius:11px}
  body:has(.welcome-main) .header-links{margin-top:8px;gap:5px}
  body:has(.welcome-main) .header-links a{padding:7px 9px;font-size:10px;border-radius:10px}
- body:has(.welcome-main) .welcome-main{padding-top:17px}
- body:has(.welcome-main) .welcome-intro{margin-bottom:17px}
+ body:has(.welcome-main) .welcome-main{padding-top:8px}
+ body:has(.welcome-main) .welcome-intro{margin-bottom:14px}
  body:has(.welcome-main) .welcome-intro h1{font-size:39px;line-height:.98}
- body:has(.welcome-main) .welcome-chips{margin-top:15px;display:flex;justify-content:flex-start;gap:6px;overflow-x:auto;padding:0 1px 4px;scrollbar-width:none}
- body:has(.welcome-main) .welcome-chips::-webkit-scrollbar{display:none}
- body:has(.welcome-main) .welcome-chips span{flex:0 0 auto;padding:6px 9px;font-size:9px}
+ body:has(.welcome-main) .welcome-chips{width:min(100%,340px);margin:13px auto 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:0}
+ body:has(.welcome-main) .welcome-chips span{display:flex;align-items:center;justify-content:flex-start;min-width:0;padding:7px 9px;font-size:9px;white-space:nowrap}
  body:has(.welcome-main) .course-choice,body:has(.welcome-main) .student-choice{min-height:190px;padding:22px}
  body:has(.welcome-main) .choice-icon{width:47px;height:47px;border-radius:15px}
  body:has(.welcome-main) .choice-copy{margin-top:18px}
