@@ -82,15 +82,6 @@ function enhance(root = document) {
   });
 }
 
-const observer = new MutationObserver(records => {
-  for (const record of records) {
-    record.addedNodes.forEach(node => {
-      if (node.nodeType === Node.ELEMENT_NODE) enhance(node);
-    });
-  }
-});
-
-observer.observe(document.documentElement, { childList: true, subtree: true });
 enhance();
 
 const dock = document.createElement('portal-modern-dock');

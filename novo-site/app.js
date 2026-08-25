@@ -52,3 +52,22 @@ window.addEventListener('focus',refreshPortalIfStale);
 window.addEventListener('popstate',()=>{const course=courseFromPath();course?openCourse(course,{updatePath:false}):showWelcome()});
 const initialCourse=courseFromPath();
 initialCourse?openCourse(initialCourse,{updatePath:false}):showWelcome();
+
+/* As rotas de acesso usam diretamente as telas renovadas, sem páginas intermediárias. */
+(function(){
+  const freshRoutes={
+    '/professor/':sitePath('/professor-novo/'),
+    '/estagio/':sitePath('/estagio-novo/')
+  };
+  function refreshAccessRoutes(scope=document){
+    scope.querySelectorAll('a[href]').forEach(link=>{
+      const href=link.getAttribute('href');
+      if(freshRoutes[href])link.setAttribute('href',freshRoutes[href]);
+    });
+  }
+  const renderWelcomeBeforeRoutes=showWelcome;
+  showWelcome=function(){renderWelcomeBeforeRoutes();refreshAccessRoutes()};
+  const renderPortalBeforeRoutes=renderPortal;
+  renderPortal=function(){renderPortalBeforeRoutes();refreshAccessRoutes()};
+  refreshAccessRoutes();
+})();

@@ -42,6 +42,15 @@ body:has(.welcome-main) .welcome-intro>.eyebrow{display:none}
 .access-popover a,.access-popover button{width:100%;margin:0;border:0!important;border-radius:11px!important;background:transparent!important;color:#294d68!important;padding:11px 12px!important;text-align:left;text-decoration:none;box-shadow:none!important}
 .access-popover a:hover,.access-popover button:hover{background:#edf7fe!important;color:#075f9e!important;transform:none!important}
 
+/* Cabeçalho interno com a mesma superfície leve da seleção de cursos. */
+.public-header.compact{background:transparent}
+.public-header.compact .public-header-inner{border-color:#e0eaf3;background:#ffffffed;box-shadow:0 14px 36px #173e6714}
+.public-header.compact .wordmark{color:#10213d}
+.public-header.compact .wordmark-name em{color:#0876bd}
+.public-header.compact .wordmark small{color:#6b7d91}
+.public-header.compact .access-toggle{border-color:#d9e6f0;background:#f2f7fb;color:#174766}
+.public-header.compact .access-toggle:hover,.public-header.compact .portal-access.open .access-toggle{border-color:#b9d8ee;background:#e9f5fd;color:#076aa9}
+
 @media(max-width:720px){
  body:has(.welcome-main) .public-header-inner{min-height:auto;padding:8px 0 0}
  body:has(.welcome-main) .wordmark{font-size:15px;gap:9px}

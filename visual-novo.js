@@ -10,5 +10,26 @@
     });
   }
   applyVisualIdentity();
-  new MutationObserver(applyVisualIdentity).observe(document.documentElement,{childList:true,subtree:true});
+  const renderBeforeVisualIdentity=render;
+  render=function(){renderBeforeVisualIdentity();applyVisualIdentity()};
+})();
+
+/* Ao sair do painel renovado, retorne ao portal público renovado — nunca à tela legada. */
+(function(){
+  if(new URLSearchParams(location.search).get('visual')!=='novo')return;
+  const bindBeforeModernLogout=bind;
+  bind=function(){
+    const logout=document.getElementById('logout');
+    if(logout){
+      logout.addEventListener('click',async function(event){
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        try{await banco.auth.signOut()}catch(error){console.warn('Não foi possível encerrar a sessão remotamente:',error)}
+        const destination=portalRoot+'/' ;
+        if(window.top&&window.top!==window)window.top.location.replace(destination);
+        else location.replace(destination);
+      },true);
+    }
+    bindBeforeModernLogout();
+  };
 })();
