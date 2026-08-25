@@ -5,8 +5,8 @@
     document.querySelectorAll('.brand-visual').forEach(function(el){if(!el.querySelector('.np-portal-brand'))el.insertAdjacentHTML('beforeend',markup)});
     document.querySelectorAll('a[href]').forEach(function(link){
       const href=link.getAttribute('href')||'';
-      if(href==='/painel.html?acesso=professor'||href.endsWith('/professor/'))link.setAttribute('href','/professor-novo/');
-      if(href==='/painel.html?acesso=estagio'||href.endsWith('/estagio/'))link.setAttribute('href','/estagio-novo/');
+      if(href==='/painel.html?acesso=professor'||href.endsWith('/professor/')||href.endsWith('/professor-novo/'))link.setAttribute('href','/professor/');
+      if(href==='/painel.html?acesso=estagio'||href.endsWith('/estagio/')||href.endsWith('/estagio-novo/'))link.setAttribute('href','/estagio/');
     });
   }
   applyVisualIdentity();

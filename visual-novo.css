@@ -66,31 +66,38 @@ html.visual-novo body .tile{padding:19px!important}.tile:hover{transform:transla
  html.visual-novo body .public-main.gate-main .loginform{margin-top:20px!important}
 }
 
-/* Barra superior dos acessos: discreta, compacta e sem o grande bloco colorido. */
+/* Barra superior dos acessos: mesma linguagem leve do portal público. */
 html.visual-novo body .public-shell:has(.gate-main) .public-header{
-  min-height:64px!important;
-  padding:8px 12px!important;
-  border-color:#e4edf5!important;
-  background:rgba(255,255,255,.94)!important;
-  box-shadow:0 12px 30px #173e6710!important;
+  width:min(1360px,calc(100% - 48px))!important;
+  min-height:112px!important;
+  padding:18px 20px!important;
+  border-color:#dce8f2!important;
+  border-radius:24px!important;
+  background:rgba(255,255,255,.92)!important;
+  box-shadow:0 18px 46px #173e6712!important;
 }
 html.visual-novo body .public-shell:has(.gate-main) .public-header:after{
-  content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 5px 5px 0;
-  background:linear-gradient(180deg,#49d1e8,#4c5ce5);pointer-events:none;
+  display:none!important;
 }
-html.visual-novo body .public-shell:has(.gate-main) .public-header .loginbrand{padding-left:6px!important}
+html.visual-novo body .public-shell:has(.gate-main) .public-header .loginbrand{padding-left:0!important}
 html.visual-novo body .public-shell:has(.gate-main) .public-header .action-stack{
-  padding:4px!important;gap:2px!important;border:1px solid #e1edf6!important;border-radius:14px!important;background:#f4f8fc!important;
+  padding:0!important;gap:12px!important;border:0!important;border-radius:0!important;background:transparent!important;
 }
 html.visual-novo body .public-shell:has(.gate-main) .public-header .action-stack .mini{
-  padding:8px 11px!important;background:transparent!important;color:#536d84!important;transition:background .18s,color .18s!important;
+  padding:13px 19px!important;background:#fff!important;color:#244d6d!important;border:1px solid #d9e6f0!important;border-radius:14px!important;font-size:13px!important;font-weight:800!important;box-shadow:0 8px 20px #173e670b!important;transition:transform .18s,background .18s,color .18s!important;
 }
 html.visual-novo body .public-shell:has(.gate-main) .public-header .action-stack .mini:hover{
-  background:#fff!important;color:#0871b9!important;box-shadow:0 4px 12px #173e6712!important;
+  background:#edf7ff!important;color:#0871b9!important;box-shadow:0 10px 24px #173e6714!important;transform:translateY(-1px);
+}
+@media(min-width:721px) and (max-width:900px){
+  html.visual-novo body .public-shell:has(.gate-main) .public-header .action-stack{display:flex!important}
 }
 @media(max-width:720px){
-  html.visual-novo body .public-shell:has(.gate-main) .public-header{min-height:58px!important;padding:7px 10px!important}
-  html.visual-novo body .public-shell:has(.gate-main) .public-header:after{top:12px;bottom:12px;width:3px}
+  html.visual-novo body .public-shell:has(.gate-main){padding:10px 12px 28px!important}
+  html.visual-novo body .public-shell:has(.gate-main) .public-header{width:100%!important;min-height:0!important;padding:14px!important;gap:12px!important;flex-direction:column!important;align-items:center!important}
+  html.visual-novo body .public-shell:has(.gate-main) .public-header .loginbrand{width:100%!important;justify-content:center!important}
+  html.visual-novo body .public-shell:has(.gate-main) .public-header .action-stack{display:flex!important;width:100%!important;justify-content:center!important;gap:7px!important}
+  html.visual-novo body .public-shell:has(.gate-main) .public-header .action-stack .mini{padding:9px 10px!important;font-size:10px!important;border-radius:11px!important;box-shadow:none!important}
 }
 
 html.visual-novo .portal-loading-modern{min-height:100vh!important;display:grid!important;place-items:center!important;background:#f4f8fc!important}

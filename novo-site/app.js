@@ -56,8 +56,8 @@ initialCourse?openCourse(initialCourse,{updatePath:false}):showWelcome();
 /* As rotas de acesso usam diretamente as telas renovadas, sem páginas intermediárias. */
 (function(){
   const freshRoutes={
-    '/professor/':sitePath('/professor-novo/'),
-    '/estagio/':sitePath('/estagio-novo/')
+    '/professor-novo/':sitePath('/professor/'),
+    '/estagio-novo/':sitePath('/estagio/')
   };
   function refreshAccessRoutes(scope=document){
     scope.querySelectorAll('a[href]').forEach(link=>{
