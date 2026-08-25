@@ -2,8 +2,8 @@ const PORTAL_ROOT = '/';
 const directRoutes = new Map([
   ['/ads/', '/painel.html?acesso=ads'],
   ['/edc/', '/painel.html?acesso=edc'],
-  ['/professor/', '/painel.html?acesso=professor'],
-  ['/estagio/', '/painel.html?acesso=estagio']
+  ['/professor/', '/professor-novo/'],
+  ['/estagio/', '/estagio-novo/']
 ]);
 
 class PortalModernDock extends HTMLElement {
