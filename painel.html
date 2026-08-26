@@ -271,7 +271,7 @@ applyShortcutRoute();
 const __baseRenderBeforeBoot=render;
 let __bootReady=false;
 render=function(){if(__bootReady)__baseRenderBeforeBoot()};
-let __visualNewMode=new URLSearchParams(location.search).get('visual')==='novo';document.getElementById('root').innerHTML=__visualNewMode?'<div class="portal-loading portal-loading-modern" role="status" aria-live="polite" aria-label="Carregando o portal"><div class="portal-loading-box"><span class="portal-loading-mark" aria-hidden="true"></span><strong>Carregando</strong></div></div>':'<div class="portal-loading" role="status" aria-live="polite" aria-label="Carregando o Portal da Coordenação"><div class="portal-loading-box"><span class="portal-loading-mark" aria-hidden="true"></span><strong>Preparando o portal</strong><span class="portal-loading-dots" aria-hidden="true"><i></i><i></i><i></i></span></div></div>';
+document.getElementById('root').innerHTML='<div class="portal-loading portal-loading-modern" role="status" aria-live="polite" aria-label="Carregando o portal"><div class="portal-loading-box"><span class="portal-loading-mark" aria-hidden="true"></span><strong>Carregando</strong></div></div>';
 boot().finally(async()=>{__bootReady=true;if(typeof loadImportantDateGroups==='function')await loadImportantDateGroups();render();document.dispatchEvent(new Event('portal-boot-ready'))});
 </script></body></html><script>
 const modalWithEdit=modal;
@@ -1265,4 +1265,4 @@ dash=function(){let first=(state.userName||'Coordenador').split(' ')[0],grade=to
 <script src="public-documents.js?v=20260811a"></script>
 <link rel="stylesheet" href="student-support.css?v=20260825a">
 <script src="student-support.js?v=20260825a"></script>
-<script>if(new URLSearchParams(location.search).get('visual')==='novo'){document.documentElement.classList.add('visual-novo');const link=document.createElement('link');link.rel='stylesheet';link.href='../visual-novo.css?v=20260825j';document.head.appendChild(link);const script=document.createElement('script');script.src='../visual-novo.js?v=20260825j';document.body.appendChild(script)}</script>
+<script>document.documentElement.classList.add('visual-novo');const link=document.createElement('link');link.rel='stylesheet';link.href='../visual-novo.css?v=20260825j';document.head.appendChild(link);const script=document.createElement('script');script.src='../visual-novo.js?v=20260825j';document.body.appendChild(script)</script>
