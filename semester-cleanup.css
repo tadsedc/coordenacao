@@ -1,9 +1,15 @@
 .semester-cleanup-button{
   color:#a63f37;
-  background:#fff4f2;
-  border:1px solid #efc5c1;
+  background:transparent;
+  border:1px solid transparent;
+  box-shadow:none;
+  font-weight:600;
+  margin-left:14px;
+  position:relative;
+  padding-left:20px;
 }
-.semester-cleanup-button:hover{background:#ffe8e5}
+.semester-cleanup-button:before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:1px;height:20px;background:#e6d3d1}
+.semester-cleanup-button:hover{background:#fff4f2;border-color:#efc5c1}
 .semester-cleanup-modal{width:min(560px,100%)}
 .semester-cleanup-warning{
   margin:16px 0 12px;
