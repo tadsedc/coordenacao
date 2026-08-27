@@ -3,18 +3,18 @@
    estudante enviar um card específico como imagem para um colega, por
    exemplo pelo WhatsApp. */
 .share-card-footer{
-  margin-top:14px;
-  padding-top:12px;
-  border-top:1px solid var(--line,#dbe7f1);
+  margin-top:10px;
   display:flex;
   justify-content:flex-end;
 }
 .share-card-button{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
+  width:36px;
+  height:36px;
+  display:grid;
+  place-items:center;
   flex:0 0 auto;
-  white-space:nowrap;
+  padding:0!important;
+  border-radius:11px!important;
 }
 .share-card-button svg{
   width:15px;
@@ -26,6 +26,8 @@
   stroke-linejoin:round;
 }
 .share-card-button:disabled{opacity:.6;cursor:progress}
+.share-card-spinner{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:share-card-spin .65s linear infinite}
+@keyframes share-card-spin{to{transform:rotate(360deg)}}
 
 /* Só aparece durante a captura da imagem (inserido e removido pelo
    share-card.js); não faz parte do layout normal do cartão. */

@@ -34,7 +34,8 @@
     button.className='mini share-card-button';
     button.dataset.shareHide='1';
     button.setAttribute('aria-label',label);
-    button.innerHTML=SHARE_ICON+'<span>Compartilhar</span>';
+    button.title=label;
+    button.innerHTML=SHARE_ICON;
     return button;
   }
 
@@ -115,7 +116,7 @@
     const subject=cardLabel(card);
     const originalHtml=button.innerHTML;
     button.disabled=true;
-    button.innerHTML='<span>Gerando imagem…</span>';
+    button.innerHTML='<span class="share-card-spinner" aria-hidden="true"></span>';
     const hiddenEls=[...card.querySelectorAll('[data-share-hide]')];
     const previousDisplay=hiddenEls.map(el=>el.style.display);
     const watermark=document.createElement('div');
