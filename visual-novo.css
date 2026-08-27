@@ -110,6 +110,8 @@ html.visual-novo body .head:has(> [data-newattendance]){display:grid!important;g
 html.visual-novo body .head:has(> [data-newattendance])>button{margin:0!important;justify-self:end!important;white-space:nowrap!important}
 html.visual-novo body .np-portal-mark svg path{stroke:#fff!important}
 html.visual-novo body .group-filter-clear{background:#edf7ff!important;color:#0871b9!important;border:1px solid #d2e9f7!important}
+html.visual-novo body [data-page="forms"] .nav-icon,html.visual-novo body [data-page="forms"] .nav-icon svg{color:#cfe5f7!important;stroke:#cfe5f7!important}
+html.visual-novo body [data-page="forms"].on .nav-icon,html.visual-novo body [data-page="forms"].on .nav-icon svg,html.visual-novo body [data-page="forms"]:hover .nav-icon,html.visual-novo body [data-page="forms"]:hover .nav-icon svg{color:#fff!important;stroke:#fff!important}
 html.visual-novo body .public-doc-form{padding:20px!important;border:1px solid #dbe7f1!important;border-radius:20px!important;background:#ffffffed!important;box-shadow:0 10px 34px #173e670c!important}
 html.visual-novo body .public-doc-item{border-radius:18px!important;box-shadow:0 10px 34px #173e670c!important}
 @media(max-width:720px){html.visual-novo body .head:has(> [data-newattendance]){grid-template-columns:1fr 1fr!important}.head:has(> [data-newattendance])>div{grid-column:1/-1}.head:has(> [data-newattendance])>button{width:100%!important}.public-doc-form{padding:16px!important}}
