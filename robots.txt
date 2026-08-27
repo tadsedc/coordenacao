@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /painel.html
+Disallow: /professor/
+Disallow: /estagio/
+
+Sitemap: https://tadsedc.site/sitemap.xml

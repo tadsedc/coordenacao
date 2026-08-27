@@ -1,6 +1,6 @@
 const SUPABASE_URL='https://uvdnejmdqgwdcipctyur.supabase.co';
 const SUPABASE_KEY='sb_publishable_Afn5llFEgcHD4Uhmt8N4pA_W0T_NHZk';
-const api=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let api=null;try{api=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){console.error('Falha ao inicializar o Supabase (CDN pode não ter carregado):',e)}
 const DAYS=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 const SHORT=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const state={course:'',view:'schedule',day:(()=>{const d=new Date().getDay();return d>0&&d<7?d:1})(),group:'all',dateGroup:'all',datePicker:false,loading:false,error:'',teacherInfo:null};
