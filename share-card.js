@@ -75,10 +75,17 @@
       [...wrap.querySelectorAll('.exam-card')].forEach((card,index)=>{
         const item=sorted[index];
         if(item)card.dataset.date=item.date;
-        card.appendChild(buildFooter(
+        const footer=buildFooter(
           buildButton('ics','Adicionar esta data à agenda'),
           buildButton('share','Compartilhar esta data')
-        ));
+        );
+        const tags=card.querySelector('.course-tags');
+        if(tags){
+          const actions=document.createElement('div');
+          actions.className='share-card-actions';
+          tags.before(actions);
+          actions.append(tags,footer);
+        }else card.appendChild(footer);
       });
     });
   };
