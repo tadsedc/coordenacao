@@ -1,11 +1,13 @@
-/* Botão "Compartilhar" nos cartões públicos do portal (grade de
-   horários, Datas importantes e Informes da coordenação), para o
-   estudante enviar um card específico como imagem para um colega, por
-   exemplo pelo WhatsApp. */
+/* Botões "Compartilhar" e "Adicionar à agenda" nos cartões públicos do
+   portal (grade de horários, Datas importantes e Informes da
+   coordenação), para o estudante enviar um card específico como
+   imagem para um colega (por exemplo pelo WhatsApp) ou importar uma
+   data importante para o calendário do celular. */
 .share-card-footer{
   margin-top:10px;
   display:flex;
   justify-content:flex-end;
+  gap:8px;
 }
 .share-card-button{
   width:36px;
@@ -28,14 +30,3 @@
 .share-card-button:disabled{opacity:.6;cursor:progress}
 .share-card-spinner{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:share-card-spin .65s linear infinite}
 @keyframes share-card-spin{to{transform:rotate(360deg)}}
-
-/* Só aparece durante a captura da imagem (inserido e removido pelo
-   share-card.js); não faz parte do layout normal do cartão. */
-.share-card-watermark{
-  margin-top:12px;
-  padding-top:10px;
-  border-top:1px dashed var(--line,#dbe7f1);
-  font-size:11px;
-  color:var(--mut,#61768b);
-  text-align:center;
-}

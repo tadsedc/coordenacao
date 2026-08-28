@@ -1,0 +1,17 @@
+{
+  "name": "EDC - Coordenação TADS e EDC - AEMS",
+  "short_name": "EDC",
+  "description": "Horários, salas, datas importantes e informes de Engenharia de Computação - AEMS.",
+  "start_url": "/edc/",
+  "scope": "/",
+  "id": "/edc/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f8fc",
+  "theme_color": "#111a3a",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/apple-touch-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
