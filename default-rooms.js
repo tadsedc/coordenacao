@@ -90,7 +90,7 @@
   }
 
   function elegivelParaLiberacaoAutomatica(conflict,roomId){
-    return !!(conflict.overrideRoomId&&String(conflict.overrideRoomId)===String(roomId)&&conflict.roomChangedAt&&diasDesdeAlteracao(conflict.roomChangedAt)>DIAS_LIMITE_INATIVIDADE);
+    return !!(conflict.overrideRoomId&&String(conflict.overrideRoomId)===String(roomId)&&conflict.roomChangedAt&&diasDesdeAlteracao(conflict.roomChangedAt)>=DIAS_LIMITE_INATIVIDADE);
   }
 
   async function liberarSalaPorInatividade(item,roomId,conflict){
