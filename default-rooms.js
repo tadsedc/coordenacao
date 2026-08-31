@@ -72,11 +72,55 @@
 
   function refreshedClass(id){return db.classes.find(entry=>String(entry.id)===String(id))}
 
+  /* Sala esquecida: se a aula que está no caminho troca de sala há mais de
+     7 dias (uma semana) sem o professor responsável atualizar de novo, a reserva do
+     laboratório (feita só para o dia em questão e a semana seguinte) quase
+     certamente já não vale mais — então libera automaticamente, devolvendo
+     aquela aula para a sala padrão da disciplina dela. */
+  const DIAS_LIMITE_INATIVIDADE=7;
+
+  function diasDesdeAlteracao(value){
+    if(!value)return null;
+    const fmt=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Campo_Grande',year:'numeric',month:'2-digit',day:'2-digit'});
+    const partes=data=>fmt.formatToParts(data).reduce((acc,p)=>{if(p.type!=='literal')acc[p.type]=p.value;return acc},{});
+    const alterado=partes(new Date(value)),hoje=partes(new Date());
+    const diaAlterado=Date.UTC(+alterado.year,+alterado.month-1,+alterado.day);
+    const diaHoje=Date.UTC(+hoje.year,+hoje.month-1,+hoje.day);
+    return Math.round((diaHoje-diaAlterado)/86400000);
+  }
+
+  function elegivelParaLiberacaoAutomatica(conflict,roomId){
+    return !!(conflict.overrideRoomId&&String(conflict.overrideRoomId)===String(roomId)&&conflict.roomChangedAt&&diasDesdeAlteracao(conflict.roomChangedAt)>DIAS_LIMITE_INATIVIDADE);
+  }
+
+  async function liberarSalaPorInatividade(item,roomId,conflict){
+    try{
+      const {data,error}=await banco.rpc('liberar_sala_por_inatividade',{p_minha_aula_id:item.id,p_aula_conflitante_id:conflict.id,p_sala_id:roomId});
+      if(error){console.warn('Não foi possível liberar a sala automaticamente:',error.message);return false}
+      return !!data;
+    }catch(error){console.warn('Não foi possível liberar a sala automaticamente:',error);return false}
+  }
+
+  const MSG_SALA_OCUPADA='Este ambiente já está reservado por outra turma no mesmo horário.';
+  const MSG_SALA_PADRAO_OCUPADA='A sala padrão está ocupada por outra turma nesse horário.';
+  const MSG_LIBERADA_SAVEROOM='Local da aula atualizado. A sala estava sem atualização há mais de uma semana pela outra turma, que voltou automaticamente para a sala padrão da disciplina dela.';
+  const MSG_LIBERADA_RESTORE='Sala padrão restaurada. A outra turma também estava sem atualização há mais de uma semana e voltou para a sala padrão da disciplina dela.';
+
   saveRoom=async function(){
     const button=document.getElementById('saveroom'),item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),roomId=+document.getElementById('roomsel')?.value;
     if(!item||!roomId)return toast('Selecione uma sala diferente da sala padrão.');
     if(String(roomId)===String(item.baseRoomId))return toast('Essa já é a sala padrão. Use “Voltar para a sala padrão”.');
-    if(conflictFor(item,roomId))return toast('Este ambiente já está reservado por outra turma no mesmo horário.');
+    let liberouSalaInativa=false;
+    const conflict=conflictFor(item,roomId);
+    if(conflict){
+      if(!elegivelParaLiberacaoAutomatica(conflict,roomId))return toast(MSG_SALA_OCUPADA);
+      if(button){button.disabled=true;button.textContent='Verificando...'}
+      liberouSalaInativa=await liberarSalaPorInatividade(item,roomId,conflict);
+      if(!liberouSalaInativa){
+        if(button){button.disabled=false;button.textContent='Confirmar novo local'}
+        return toast(MSG_SALA_OCUPADA);
+      }
+    }
     if(button){button.disabled=true;button.textContent='Salvando...'}
     try{
       const result=await banco.from('aulas').update({sala_padrao_id:roomId}).eq('id',item.id).select('id,sala_padrao_id').single();
@@ -84,7 +128,7 @@
       if(String(result.data?.sala_padrao_id)!==String(roomId))throw new Error('O Supabase não confirmou a nova sala.');
       await loadData();
       if(String(refreshedClass(item.id)?.overrideRoomId)!==String(roomId))throw new Error('A nova sala não foi confirmada após a releitura.');
-      state.modal=null;render();toast('Local da aula atualizado com sucesso.');
+      state.modal=null;render();toast(liberouSalaInativa?MSG_LIBERADA_SAVEROOM:'Local da aula atualizado com sucesso.');
     }catch(error){console.error(error);toast('Erro ao atualizar: '+(error?.message||error))}
     finally{const current=document.getElementById('saveroom');if(current){current.disabled=false;current.textContent='Confirmar novo local'}}
   };
@@ -92,7 +136,17 @@
   async function restoreDefaultRoom(){
     const button=document.getElementById('restore-default-room'),item=db.classes.find(entry=>String(entry.id)===String(state.modal?.id)),standard=baseRoom(item);
     if(!item||!standard)return toast('A coordenação ainda não definiu uma sala padrão.');
-    if(conflictFor(item,standard.id))return toast('A sala padrão está ocupada por outra turma nesse horário.');
+    let liberouSalaInativa=false;
+    const conflict=conflictFor(item,standard.id);
+    if(conflict){
+      if(!elegivelParaLiberacaoAutomatica(conflict,standard.id))return toast(MSG_SALA_PADRAO_OCUPADA);
+      if(button){button.disabled=true;button.textContent='Verificando...'}
+      liberouSalaInativa=await liberarSalaPorInatividade(item,standard.id,conflict);
+      if(!liberouSalaInativa){
+        if(button){button.disabled=false;button.textContent='Voltar para a sala padrão'}
+        return toast(MSG_SALA_PADRAO_OCUPADA);
+      }
+    }
     if(button){button.disabled=true;button.textContent='Restaurando...'}
     try{
       const result=await banco.from('aulas').update({sala_padrao_id:null}).eq('id',item.id).select('id,sala_padrao_id').single();
@@ -101,7 +155,7 @@
       await loadData();
       const refreshed=refreshedClass(item.id);
       if(refreshed?.overrideRoomId||String(refreshed?.roomId)!==String(standard.id))throw new Error('A sala padrão não foi confirmada após a releitura.');
-      state.modal=null;render();toast('Sala padrão restaurada com sucesso.');
+      state.modal=null;render();toast(liberouSalaInativa?MSG_LIBERADA_RESTORE:'Sala padrão restaurada com sucesso.');
     }catch(error){console.error(error);toast('Não foi possível restaurar: '+(error?.message||error))}
     finally{const current=document.getElementById('restore-default-room');if(current){current.disabled=false;current.textContent='Voltar para a sala padrão'}}
   }
