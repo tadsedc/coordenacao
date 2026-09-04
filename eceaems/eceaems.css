@@ -1,0 +1,37 @@
+/* Complementos ao novo-site/styles.css só para a página do ECEAEMS. */
+
+.eceaems-main{width:var(--content);margin:32px auto 60px;position:relative;z-index:1}
+.eceaems-intro{max-width:760px;margin:0 auto 26px}
+.eceaems-intro .eyebrow{color:#086aaa;font-weight:800;letter-spacing:.08em;font-size:12px;text-transform:uppercase}
+.eceaems-intro h1{font:800 clamp(26px,4vw,38px)/1.15 Manrope,sans-serif;margin:8px 0}
+.eceaems-intro p{color:var(--muted);margin:0}
+
+.public-form{max-width:760px;margin:0 auto}
+
+.author-rows{display:grid;gap:14px;margin-top:6px}
+.author-row{border:1px solid var(--line);border-radius:16px;background:#f9fbfd;padding:14px}
+.author-row-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.author-row-head b{font-size:12px;letter-spacing:.04em;color:#086aaa;text-transform:uppercase}
+.author-remove{border:0;background:none;color:#c23b3b;font-weight:700;font-size:12px;cursor:pointer;padding:4px 6px}
+.author-remove:disabled{opacity:.35;cursor:not-allowed}
+.author-row .form-row{grid-template-columns:1.3fr 1fr .8fr}
+@media(max-width:720px){.author-row .form-row{grid-template-columns:1fr}}
+
+.add-author{border:1px dashed #9db6d6;background:#fff;color:#0878c8;border-radius:12px;padding:11px 14px;font-weight:800;cursor:pointer;width:100%;margin-top:4px}
+.add-author:disabled{opacity:.45;cursor:not-allowed}
+
+.file-field{border:2px dashed var(--line);border-radius:16px;padding:18px;text-align:center;background:#f9fbfd}
+.file-field input[type="file"]{width:100%}
+.file-field small{display:block;margin-top:8px;color:var(--muted)}
+.file-picked{margin-top:10px;font-size:13px;font-weight:700;color:var(--ink)}
+
+.eceaems-closed{max-width:640px;margin:0 auto;border:1px solid var(--line);border-radius:26px;background:#fff;padding:clamp(24px,4vw,40px);text-align:center;box-shadow:var(--soft)}
+.eceaems-closed .lock-icon{width:52px;height:52px;margin:0 auto 14px;color:#8b98ac}
+.eceaems-closed h2{margin:0 0 8px;font:800 22px Manrope,sans-serif}
+.eceaems-closed p{color:var(--muted);margin:0}
+
+.eceaems-success{max-width:640px;margin:0 auto;border:1px solid #cfe8dd;border-radius:26px;background:#f2fbf7;padding:clamp(24px,4vw,40px);text-align:center}
+.eceaems-success h2{margin:8px 0;font:800 22px Manrope,sans-serif;color:#19775f}
+.eceaems-success p{color:#3c5a50;margin:0 0 18px}
+
+.loading-inline{max-width:640px;margin:60px auto;text-align:center;color:var(--muted)}
