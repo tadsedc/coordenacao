@@ -1,6 +1,9 @@
 /* Painel da coordenação para o Controle de Presença (check-in por código/QR). */
 (function(){
   const presencaUI={expandedId:null,pollTimer:null};
+  function escapeHtml(value=''){
+    return String(value).replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  }
 
   const previousLoadData=loadData;
   loadData=async function(){
