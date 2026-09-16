@@ -157,7 +157,7 @@ set public = false,
 -- documentos de estágio.
 drop policy if exists "Estudante envia artigos do eceaems" on storage.objects;
 create policy "Estudante envia artigos do eceaems"
-on storage.objects for insert to anon
+on storage.objects for insert to anon, authenticated
 with check (
   bucket_id = 'eceaems-artigos'
   and lower(right(name, 5)) = '.docx'
