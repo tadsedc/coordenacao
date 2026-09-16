@@ -48,13 +48,14 @@
   const previousBind=bind;
   bind=function(){
     previousBind();
+    const configTitle=document.querySelector('.eceaems-config-card .cardhead h2');
+    if(configTitle)configTitle.textContent='Configuração do ECEAEMS';
     document.getElementById('save-eceaems-config')?.addEventListener('click',saveEceaemsConfig);
-    document.getElementById('eceaems-resultados')?.addEventListener('change',event=>{
-      if(event.target.checked){
-        const inscricoes=document.getElementById('eceaems-abertas');
-        if(inscricoes)inscricoes.checked=false;
-      }
-    });
+    const abertas=document.getElementById('eceaems-abertas');
+    const resultados=document.getElementById('eceaems-resultados');
+    const syncPhases=()=>document.querySelectorAll('.eceaems-phase').forEach(label=>label.classList.toggle('selected',!!label.querySelector('input')?.checked));
+    abertas?.addEventListener('change',event=>{if(event.target.checked&&resultados)resultados.checked=false;syncPhases()});
+    resultados?.addEventListener('change',event=>{if(event.target.checked&&abertas)abertas.checked=false;syncPhases()});
     document.querySelectorAll('[data-eceaems-status]').forEach(sel=>sel.addEventListener('change',()=>{
       atualizarStatusTrabalhoEceaems(sel.dataset.eceaemsStatus,sel.value);
     }));
@@ -89,14 +90,19 @@
     const config=db.eceaemsConfig||{inscricoesAbertas:false,resultadosPublicados:false,maxAutores:3,prazoFinal:''};
     const trabalhos=db.eceaemsTrabalhos||[];
     const aprovados=trabalhos.filter(t=>t.status==='aprovado'&&t.ativo).length;
-    const configCard='<div class="card"><div class="cardhead"><div><h2>Configuração do ECEAEMS</h2><small>Controla o formulário público em tadsedc.site/eceaems</small></div></div>'
-      +'<div class="field"><label><input type="checkbox" id="eceaems-abertas" '+(config.inscricoesAbertas?'checked':'')+'> Inscrições abertas para submissão</label></div>'
-      +'<div class="field"><label><input type="checkbox" id="eceaems-resultados" '+(config.resultadosPublicados?'checked':'')+'> Publicar trabalhos aprovados</label><small>Ao publicar, as inscrições serão encerradas automaticamente. Somente título, curso, orientador e nomes dos autores ficarão visíveis.</small></div>'
-      +'<div class="field"><small>'+aprovados+' trabalho(s) aprovado(s) e disponível(is) para divulgação.</small></div>'
-      +'<div class="field"><label>Máximo de autores por trabalho</label><input type="number" id="eceaems-max-autores" min="1" max="10" value="'+config.maxAutores+'"></div>'
-      +'<div class="field"><label>Prazo final (opcional, só para referência interna)</label><input type="date" id="eceaems-prazo" value="'+(config.prazoFinal||'')+'"></div>'
-      +'<button class="btn primary" id="save-eceaems-config">Salvar configuração</button></div>';
-    const listCard='<div class="card"><div class="cardhead"><div><h2>Trabalhos submetidos</h2><small>'+trabalhos.length+' trabalho(s)</small></div></div>'
+    const status=config.resultadosPublicados?'Resultados publicados':config.inscricoesAbertas?'Inscrições abertas':'Inscrições encerradas';
+    const statusTone=config.resultadosPublicados?'published':config.inscricoesAbertas?'open':'closed';
+    const configCard='<div class="card eceaems-config-card"><div class="cardhead"><div><h2>Configuração do ECEAEMS</h2><small>Controle o que os estudantes encontram em tadsedc.site/eceaems</small></div><span class="eceaems-status '+statusTone+'">'+status+'</span></div>'
+      +'<div class="eceaems-config-body"><div class="eceaems-section-title"><span>1</span><div><b>Fase atual</b><small>Escolha uma fase e salve para atualizar a página pública.</small></div></div>'
+      +'<div class="eceaems-phase-grid">'
+      +'<label class="eceaems-phase '+(config.inscricoesAbertas?'selected':'')+'"><input type="checkbox" id="eceaems-abertas" '+(config.inscricoesAbertas?'checked':'')+'><span class="eceaems-phase-icon">↗</span><span><b>Receber trabalhos</b><small>Mantém o formulário de submissão aberto aos estudantes.</small></span></label>'
+      +'<label class="eceaems-phase '+(config.resultadosPublicados?'selected':'')+'"><input type="checkbox" id="eceaems-resultados" '+(config.resultadosPublicados?'checked':'')+'><span class="eceaems-phase-icon">✓</span><span><b>Divulgar aprovados</b><small>Encerra as inscrições e publica somente os trabalhos aprovados.</small></span></label>'
+      +'</div><div class="eceaems-approved-summary"><b>'+aprovados+'</b><span>trabalho'+(aprovados===1?'':'s')+' aprovado'+(aprovados===1?'':'s')+' para divulgação</span></div>'
+      +'<div class="eceaems-section-title"><span>2</span><div><b>Regras da submissão</b><small>Estas opções são usadas enquanto o formulário estiver aberto.</small></div></div>'
+      +'<div class="eceaems-settings-grid"><div class="field"><label>Máximo de autores por trabalho</label><input type="number" id="eceaems-max-autores" min="1" max="10" value="'+config.maxAutores+'"></div>'
+      +'<div class="field"><label>Prazo final <em>uso interno</em></label><input type="date" id="eceaems-prazo" value="'+(config.prazoFinal||'')+'"></div></div>'
+      +'<div class="eceaems-save-row"><p>Dados pessoais e arquivos dos estudantes permanecem privados.</p><button class="btn primary" id="save-eceaems-config">Salvar alterações</button></div></div></div>';
+    const listCard='<div class="card eceaems-list-card"><div class="cardhead"><div><h2>Trabalhos submetidos</h2><small>'+trabalhos.length+' trabalho(s) recebido(s)</small></div></div>'
       +'<div class="table"><table><thead><tr><th>Trabalho</th><th>Autores</th><th>Envio</th><th>Status</th><th>Ações</th></tr></thead><tbody>'
       +(trabalhos.length?trabalhos.map(eceaemsRow).join(''):'<tr><td colspan="5"><div class="empty">Nenhum trabalho submetido ainda.</div></td></tr>')
       +'</tbody></table></div></div>';
