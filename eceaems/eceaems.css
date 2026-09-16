@@ -26,6 +26,7 @@
 
 .public-form{max-width:760px;margin:0 auto}
 .eceaems-single-field{grid-template-columns:1fr}
+.public-form input[type="email"]{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;background:#f9fbfd;padding:11px 13px;color:var(--ink)}
 
 .author-rows{display:grid;gap:14px;margin-top:6px}
 .author-row{border:1px solid var(--line);border-radius:16px;background:#f9fbfd;padding:14px}
