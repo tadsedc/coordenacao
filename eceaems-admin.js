@@ -71,11 +71,12 @@
 
   function eceaemsRow(t){
     const statusOptions=['recebido','em_analise','aprovado','reprovado'].map(s=>'<option value="'+s+'" '+(t.status===s?'selected':'')+'>'+eceaemsStatusLabel(s)+'</option>').join('');
-    return '<tr><td><b>'+escapeHtml(t.titulo)+'</b><br><small>'+t.curso+' · '+escapeHtml(t.disciplina)+'</small><br><small>Orientador(a): '+escapeHtml(t.orientador)+'</small></td>'
+    const contexto=escapeHtml(t.curso)+(t.disciplina?' · '+escapeHtml(t.disciplina):'');
+    return '<tr><td><b>'+escapeHtml(t.titulo)+'</b><br><small>'+contexto+'</small><br><small>Orientador(a): '+escapeHtml(t.orientador)+'</small></td>'
       +'<td>'+eceaemsAutoresList(t.autores)+'</td>'
       +'<td>'+new Date(t.criadoEm).toLocaleDateString('pt-BR')+'</td>'
       +'<td><select data-eceaems-status="'+t.id+'">'+statusOptions+'</select></td>'
-      +'<td><div class="action-stack"><button class="mini" data-eceaems-baixar="'+t.id+'">Baixar PDF</button><button class="mini danger" data-eceaems-apagar="'+t.id+'">Apagar</button></div></td></tr>';
+      +'<td><div class="action-stack"><button class="mini" data-eceaems-baixar="'+t.id+'">Baixar artigo</button><button class="mini danger" data-eceaems-apagar="'+t.id+'">Apagar</button></div></td></tr>';
   }
 
   function eceaemsAdminPage(){
@@ -127,7 +128,7 @@
   async function apagarTrabalhoEceaems(id){
     const trabalho=(db.eceaemsTrabalhos||[]).find(t=>String(t.id)===String(id));
     if(!trabalho)return;
-    if(!confirm('Apagar o trabalho "'+trabalho.titulo+'"? O artigo em PDF também será removido do armazenamento.'))return;
+    if(!confirm('Apagar o trabalho "'+trabalho.titulo+'"? O arquivo do artigo também será removido do armazenamento.'))return;
     try{
       const {error}=await banco.from('eceaems_trabalhos').delete().eq('id',id);
       if(error)throw error;

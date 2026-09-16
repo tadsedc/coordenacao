@@ -25,6 +25,7 @@
 .eceaems-model-download svg{width:15px;height:15px}
 
 .public-form{max-width:760px;margin:0 auto}
+.eceaems-single-field{grid-template-columns:1fr}
 
 .author-rows{display:grid;gap:14px;margin-top:6px}
 .author-row{border:1px solid var(--line);border-radius:16px;background:#f9fbfd;padding:14px}

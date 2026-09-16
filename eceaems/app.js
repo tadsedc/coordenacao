@@ -4,8 +4,9 @@ let api=null;try{api=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}cat
 
 const BUCKET='eceaems-artigos';
 const MAX_ARQUIVO_BYTES=10*1024*1024;
+const WORD_MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-const state={loading:true,error:'',config:null,orientadores:[],disciplinas:[],curso:'',autores:[{nome:'',email:'',ra:''}],enviado:false};
+const state={loading:true,error:'',config:null,orientadores:[],curso:'',autores:[{nome:'',email:'',ra:''}],enviado:false};
 
 function escapeHtml(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 const svg=(path)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
@@ -13,15 +14,13 @@ function wordmark(){return `<div class="wordmark"><span class="wordmark-mark">${
 function toast(message){document.querySelector('.toast')?.remove();const el=document.createElement('div');el.className='toast';el.textContent=message;document.body.appendChild(el);setTimeout(()=>el.remove(),4200)}
 
 async function loadData(){
-  const [config,orientadores,disciplinas]=await Promise.all([
+  const [config,orientadores]=await Promise.all([
     api.from('eceaems_configuracoes').select('*').eq('id',1).maybeSingle(),
-    api.from('professores_publicos').select('id,nome').order('nome'),
-    api.from('matriz_disciplinas').select('id,curso,disciplina').eq('ativa',true).order('curso').order('disciplina')
+    api.from('professores_publicos').select('id,nome').order('nome')
   ]);
   if(config.error)throw config.error;
   state.config=config.data||{inscricoes_abertas:false,max_autores_por_trabalho:1};
   state.orientadores=orientadores.error?[]:(orientadores.data||[]);
-  state.disciplinas=disciplinas.error?[]:(disciplinas.data||[]);
 }
 
 function header(){return `<header class="public-header"><div class="public-header-inner">${wordmark()}</div></header>`}
@@ -58,9 +57,8 @@ function authorRow(autor,index,max){const canRemove=state.autores.length>1;retur
 
 function formScreen(){
   const max=state.config.max_autores_por_trabalho||1;
-  const disciplinasCurso=state.disciplinas.filter(d=>d.curso===state.curso);
   return `${header()}<main class="eceaems-main">
-  <div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1><p>Envie o artigo do seu trabalho para o Encontro Científico de Estudantes da AEMS. Preencha os dados abaixo e anexe o arquivo em PDF (até 10 MB).</p></div>
+  <div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1><p>Envie o artigo do seu trabalho para o Encontro Científico de Estudantes da AEMS. Preencha os dados abaixo e anexe o arquivo em Word (.docx, até 10 MB).</p></div>
   ${modelsSection()}
   <article class="public-form">
     <span class="form-badge">ECEAEMS</span>
@@ -74,14 +72,10 @@ function formScreen(){
           <option value="EDC" ${state.curso==='EDC'?'selected':''}>Engenharia de Computação</option>
         </select></label>
       </div>
-      <div class="form-row">
+      <div class="form-row eceaems-single-field">
         <label><b>Professor(a) orientador(a)</b><select name="orientador" required>
           <option value="">Selecione</option>
           ${state.orientadores.map(o=>`<option value="${o.id}">${escapeHtml(o.nome)}</option>`).join('')}
-        </select></label>
-        <label><b>Disciplina (matriz do curso)</b><select name="disciplina" id="eceaems-disciplina" ${state.curso?'':'disabled'} required>
-          <option value="">${state.curso?'Selecione':'Escolha o curso primeiro'}</option>
-          ${disciplinasCurso.map(d=>`<option value="${d.id}">${escapeHtml(d.disciplina)}</option>`).join('')}
         </select></label>
       </div>
 
@@ -89,10 +83,10 @@ function formScreen(){
       <div class="author-rows" id="author-rows">${state.autores.map((a,i)=>authorRow(a,i,max)).join('')}</div>
       <button type="button" class="add-author" id="add-author" ${state.autores.length>=max?'disabled':''}>+ Adicionar autor</button>
 
-      <div class="dependency-head"><b>Artigo (PDF, até 10 MB)</b></div>
+      <div class="dependency-head"><b>Artigo em Word (.docx, até 10 MB)</b></div>
       <div class="file-field">
-        <input type="file" id="eceaems-arquivo" accept="application/pdf" required>
-        <small>Envie o artigo completo em formato PDF. Tamanho máximo: 10 MB.</small>
+        <input type="file" id="eceaems-arquivo" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
+        <small>Envie o artigo completo em formato Word (.docx). Tamanho máximo: 10 MB.</small>
         <div class="file-picked" id="file-picked" hidden></div>
       </div>
 
@@ -161,7 +155,6 @@ async function submitForm(event){
   const titulo=form.elements['titulo'].value.trim();
   const curso=form.elements['curso'].value;
   const orientadorId=form.elements['orientador'].value;
-  const disciplinaId=+form.elements['disciplina'].value||0;
   const arquivo=document.getElementById('eceaems-arquivo').files[0];
   const autores=state.autores.map(a=>({nome:a.nome.trim(),email:a.email.trim().toLowerCase(),ra:a.ra.trim()}));
   const max=state.config.max_autores_por_trabalho||1;
@@ -169,9 +162,8 @@ async function submitForm(event){
   if(titulo.length<3)return toast('Informe o título completo do trabalho.');
   if(!curso)return toast('Selecione o curso.');
   if(!orientadorId)return toast('Selecione o professor orientador.');
-  if(!disciplinaId)return toast('Selecione a disciplina da matriz.');
-  if(!arquivo)return toast('Anexe o artigo em PDF.');
-  if(arquivo.type!=='application/pdf'&&!arquivo.name.toLowerCase().endsWith('.pdf'))return toast('O arquivo precisa estar em formato PDF.');
+  if(!arquivo)return toast('Anexe o artigo em Word (.docx).');
+  if(!arquivo.name.toLowerCase().endsWith('.docx')||(arquivo.type&&arquivo.type!==WORD_MIME))return toast('O arquivo precisa estar em formato Word (.docx).');
   if(arquivo.size>MAX_ARQUIVO_BYTES)return toast('O arquivo excede o limite de 10 MB.');
   if(!autores.length||autores.length>max)return toast('Este trabalho aceita de 1 a '+max+' autor(es).');
   for(const autor of autores){
@@ -183,14 +175,13 @@ async function submitForm(event){
   const button=document.getElementById('eceaems-submit');
   button.disabled=true;button.textContent='Enviando…';
   try{
-    const caminho=crypto.randomUUID()+'/'+Date.now()+'.pdf';
-    const upload=await api.storage.from(BUCKET).upload(caminho,arquivo,{contentType:'application/pdf',upsert:false});
+    const caminho=crypto.randomUUID()+'/'+Date.now()+'.docx';
+    const upload=await api.storage.from(BUCKET).upload(caminho,arquivo,{contentType:WORD_MIME,upsert:false});
     if(upload.error)throw upload.error;
     const {data,error}=await api.rpc('enviar_trabalho_eceaems',{
       p_titulo:titulo,
       p_curso:curso,
       p_orientador_id:orientadorId,
-      p_disciplina_id:disciplinaId,
       p_arquivo_caminho:caminho,
       p_arquivo_nome_original:arquivo.name,
       p_autores:autores
