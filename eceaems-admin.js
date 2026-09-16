@@ -14,7 +14,7 @@
       banco.from('eceaems_trabalhos').select('*,eceaems_autores(*)').order('criado_em',{ascending:false})
     ]);
     if(config.error){console.warn('Configurações do ECEAEMS ainda não estão disponíveis:',config.error.message);return}
-    db.eceaemsConfig={inscricoesAbertas:!!config.data?.inscricoes_abertas,maxAutores:config.data?.max_autores_por_trabalho||1,prazoFinal:config.data?.prazo_final||''};
+    db.eceaemsConfig={inscricoesAbertas:!!config.data?.inscricoes_abertas,resultadosPublicados:!!config.data?.resultados_publicados,maxAutores:config.data?.max_autores_por_trabalho||1,prazoFinal:config.data?.prazo_final||''};
     if(trabalhos.error){console.warn('Trabalhos do ECEAEMS ainda não estão disponíveis:',trabalhos.error.message);db.eceaemsTrabalhos=[];return}
     db.eceaemsTrabalhos=(trabalhos.data||[]).map(t=>({
       id:t.id,titulo:t.titulo,curso:t.curso,orientador:t.orientador_nome,disciplina:t.disciplina_nome,
@@ -49,6 +49,12 @@
   bind=function(){
     previousBind();
     document.getElementById('save-eceaems-config')?.addEventListener('click',saveEceaemsConfig);
+    document.getElementById('eceaems-resultados')?.addEventListener('change',event=>{
+      if(event.target.checked){
+        const inscricoes=document.getElementById('eceaems-abertas');
+        if(inscricoes)inscricoes.checked=false;
+      }
+    });
     document.querySelectorAll('[data-eceaems-status]').forEach(sel=>sel.addEventListener('change',()=>{
       atualizarStatusTrabalhoEceaems(sel.dataset.eceaemsStatus,sel.value);
     }));
@@ -80,10 +86,13 @@
   }
 
   function eceaemsAdminPage(){
-    const config=db.eceaemsConfig||{inscricoesAbertas:false,maxAutores:3,prazoFinal:''};
+    const config=db.eceaemsConfig||{inscricoesAbertas:false,resultadosPublicados:false,maxAutores:3,prazoFinal:''};
     const trabalhos=db.eceaemsTrabalhos||[];
+    const aprovados=trabalhos.filter(t=>t.status==='aprovado'&&t.ativo).length;
     const configCard='<div class="card"><div class="cardhead"><div><h2>Configuração do ECEAEMS</h2><small>Controla o formulário público em tadsedc.site/eceaems</small></div></div>'
       +'<div class="field"><label><input type="checkbox" id="eceaems-abertas" '+(config.inscricoesAbertas?'checked':'')+'> Inscrições abertas para submissão</label></div>'
+      +'<div class="field"><label><input type="checkbox" id="eceaems-resultados" '+(config.resultadosPublicados?'checked':'')+'> Publicar trabalhos aprovados</label><small>Ao publicar, as inscrições serão encerradas automaticamente. Somente título, curso, orientador e nomes dos autores ficarão visíveis.</small></div>'
+      +'<div class="field"><small>'+aprovados+' trabalho(s) aprovado(s) e disponível(is) para divulgação.</small></div>'
       +'<div class="field"><label>Máximo de autores por trabalho</label><input type="number" id="eceaems-max-autores" min="1" max="10" value="'+config.maxAutores+'"></div>'
       +'<div class="field"><label>Prazo final (opcional, só para referência interna)</label><input type="date" id="eceaems-prazo" value="'+(config.prazoFinal||'')+'"></div>'
       +'<button class="btn primary" id="save-eceaems-config">Salvar configuração</button></div>';
@@ -96,13 +105,15 @@
 
   async function saveEceaemsConfig(){
     const button=document.getElementById('save-eceaems-config');
-    const inscricoesAbertas=document.getElementById('eceaems-abertas').checked;
+    let inscricoesAbertas=document.getElementById('eceaems-abertas').checked;
+    const resultadosPublicados=document.getElementById('eceaems-resultados').checked;
+    if(resultadosPublicados)inscricoesAbertas=false;
     const maxAutores=+document.getElementById('eceaems-max-autores').value||1;
     const prazo=document.getElementById('eceaems-prazo').value||null;
     if(maxAutores<1||maxAutores>10)return toast('O máximo de autores deve ser entre 1 e 10.');
     if(button){button.disabled=true;button.textContent='Salvando...'}
     try{
-      const {error}=await banco.from('eceaems_configuracoes').update({inscricoes_abertas:inscricoesAbertas,max_autores_por_trabalho:maxAutores,prazo_final:prazo}).eq('id',1);
+      const {error}=await banco.from('eceaems_configuracoes').update({inscricoes_abertas:inscricoesAbertas,resultados_publicados:resultadosPublicados,max_autores_por_trabalho:maxAutores,prazo_final:prazo}).eq('id',1);
       if(error)throw error;
       await loadData();render();
       toast('Configuração do ECEAEMS atualizada.');
