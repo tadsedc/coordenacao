@@ -26,11 +26,31 @@ async function loadData(){
 
 function header(){return `<header class="public-header"><div class="public-header-inner">${wordmark()}</div></header>`}
 
+function modelsSection(){return `<section class="eceaems-models" aria-labelledby="eceaems-models-title">
+  <div class="eceaems-models-copy">
+    <p class="eyebrow">Materiais para os estudantes</p>
+    <h2 id="eceaems-models-title">Modelos para download</h2>
+    <p>Use os arquivos oficiais para preparar o resumo e a apresentação oral.</p>
+  </div>
+  <div class="eceaems-model-grid">
+    <a class="eceaems-model-card" href="./modelos/modelo-resumo-eceaems.docx" download>
+      <span class="eceaems-model-icon" aria-hidden="true">${svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>')}</span>
+      <span class="eceaems-model-text"><b>Modelo para elaboração do resumo</b><small>Documento Word (.docx)</small></span>
+      <span class="eceaems-model-download">Baixar ${svg('<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>')}</span>
+    </a>
+    <a class="eceaems-model-card" href="./modelos/modelo-apresentacao-oral-2026.pptx" download>
+      <span class="eceaems-model-icon" aria-hidden="true">${svg('<rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4M7 12l3-3 3 3 4-4"/>')}</span>
+      <span class="eceaems-model-text"><b>Modelo da apresentação oral 2026</b><small>Apresentação PowerPoint (.pptx)</small></span>
+      <span class="eceaems-model-download">Baixar ${svg('<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>')}</span>
+    </a>
+  </div>
+</section>`}
+
 function loadingScreen(){document.getElementById('app').innerHTML=`${header()}<div class="loading-inline"><p>Carregando o formulário do ECEAEMS…</p></div>`}
 
 function errorScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-closed"><h2>Não foi possível carregar</h2><p>Verifique sua conexão e tente novamente em instantes.</p><button class="submit-form" id="retry" style="margin-top:16px">Tentar novamente</button></div></main>`;document.getElementById('retry').onclick=boot}
 
-function closedScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1></div><div class="eceaems-closed"><h2>Inscrições fechadas</h2><p>As submissões de trabalhos para o ECEAEMS não estão abertas no momento. Consulte a coordenação para saber o período de envio.</p></div></main>`}
+function closedScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1></div><div class="eceaems-closed"><h2>Inscrições fechadas</h2><p>As submissões de trabalhos para o ECEAEMS não estão abertas no momento. Consulte a coordenação para saber o período de envio.</p></div>${modelsSection()}</main>`}
 
 function successScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-success"><h2>Trabalho enviado com sucesso!</h2><p>Recebemos o artigo e os dados da equipe. A coordenação vai avaliar a submissão.</p><button class="submit-form" id="enviar-outro">Enviar outro trabalho</button></div></main>`;document.getElementById('enviar-outro').onclick=()=>{state.enviado=false;state.curso='';state.autores=[{nome:'',email:'',ra:''}];render()}}
 
@@ -41,6 +61,7 @@ function formScreen(){
   const disciplinasCurso=state.disciplinas.filter(d=>d.curso===state.curso);
   return `${header()}<main class="eceaems-main">
   <div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1><p>Envie o artigo do seu trabalho para o Encontro Científico de Estudantes da AEMS. Preencha os dados abaixo e anexe o arquivo em PDF (até 10 MB).</p></div>
+  ${modelsSection()}
   <article class="public-form">
     <span class="form-badge">ECEAEMS</span>
     <h2>Dados do trabalho</h2>
