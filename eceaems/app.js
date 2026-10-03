@@ -60,7 +60,7 @@ function resultsScreen(){
   const total=Number(state.resumo?.total_recebidos)||trabalhos.length;
   const aprovados=Number(state.resumo?.total_aprovados)||trabalhos.length;
   const emCorrecao=Math.max(0,total-aprovados);
-  const progress=emCorrecao?`<aside class="eceaems-review-notice"><span>${svg('<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/>')}</span><div><b>Correção dos trabalhos em andamento</b><p>${aprovados} de ${total} trabalho${total===1?'':'s'} ${aprovados===1?'já foi aprovado e publicado':'já foram aprovados e publicados'}. Os demais estão sendo corrigidos e aparecerão nesta página conforme forem aprovados.</p></div></aside>`:'';
+  const progress=emCorrecao?`<aside class="eceaems-review-notice"><span>${svg('<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/>')}</span><div><b>Correção dos trabalhos em andamento</b><p>Os trabalhos enviados estão sendo corrigidos. Conforme forem aprovados pela coordenação, serão publicados nesta página.</p></div></aside>`:'';
   const cards=trabalhos.map(t=>`<article class="eceaems-result-card">
     <span class="eceaems-course">${escapeHtml(t.curso)}</span>
     <h2>${escapeHtml(t.titulo)}</h2>
