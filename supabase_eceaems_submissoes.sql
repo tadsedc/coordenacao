@@ -187,6 +187,26 @@ $$;
 revoke all on function public.listar_trabalhos_aprovados_eceaems() from public;
 grant execute on function public.listar_trabalhos_aprovados_eceaems() to anon, authenticated;
 
+create or replace function public.resumo_publico_eceaems()
+returns table (total_recebidos bigint, total_aprovados bigint)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    count(*) filter (where t.ativo) as total_recebidos,
+    count(*) filter (where t.ativo and t.status = 'aprovado') as total_aprovados
+  from public.eceaems_trabalhos t
+  where exists (
+    select 1 from public.eceaems_configuracoes c
+    where c.id = 1 and c.resultados_publicados
+  );
+$$;
+
+revoke all on function public.resumo_publico_eceaems() from public;
+grant execute on function public.resumo_publico_eceaems() to anon, authenticated;
+
 -- ==========================================================================
 -- 3. Armazenamento do artigo (bucket privado, até 10 MB, Word .docx)
 -- ==========================================================================

@@ -6,7 +6,7 @@ const BUCKET='eceaems-artigos';
 const MAX_ARQUIVO_BYTES=10*1024*1024;
 const WORD_MIME='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-const state={loading:true,error:'',config:null,orientadores:[],aprovados:[],curso:'',autores:[{nome:'',email:'',ra:''}],enviado:false};
+const state={loading:true,error:'',config:null,orientadores:[],aprovados:[],resumo:{total_recebidos:0,total_aprovados:0},curso:'',autores:[{nome:'',email:'',ra:''}],enviado:false};
 
 function escapeHtml(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 const svg=(path)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
@@ -14,15 +14,17 @@ function wordmark(){return `<div class="wordmark"><span class="wordmark-mark">${
 function toast(message){document.querySelector('.toast')?.remove();const el=document.createElement('div');el.className='toast';el.textContent=message;document.body.appendChild(el);setTimeout(()=>el.remove(),4200)}
 
 async function loadData(){
-  const [config,orientadores,aprovados]=await Promise.all([
+  const [config,orientadores,aprovados,resumo]=await Promise.all([
     api.from('eceaems_configuracoes').select('*').eq('id',1).maybeSingle(),
     api.from('professores_publicos').select('id,nome').order('nome'),
-    api.rpc('listar_trabalhos_aprovados_eceaems')
+    api.rpc('listar_trabalhos_aprovados_eceaems'),
+    api.rpc('resumo_publico_eceaems').maybeSingle()
   ]);
   if(config.error)throw config.error;
   state.config=config.data||{inscricoes_abertas:false,max_autores_por_trabalho:1};
   state.orientadores=orientadores.error?[]:(orientadores.data||[]);
   state.aprovados=aprovados.error?[]:(aprovados.data||[]);
+  state.resumo=resumo.error?{total_recebidos:state.aprovados.length,total_aprovados:state.aprovados.length}:(resumo.data||{total_recebidos:0,total_aprovados:0});
 }
 
 function header(){return `<header class="public-header"><div class="public-header-inner">${wordmark()}</div></header>`}
@@ -55,13 +57,17 @@ function closedScreen(){document.getElementById('app').innerHTML=`${header()}<ma
 
 function resultsScreen(){
   const trabalhos=state.aprovados||[];
+  const total=Number(state.resumo?.total_recebidos)||trabalhos.length;
+  const aprovados=Number(state.resumo?.total_aprovados)||trabalhos.length;
+  const emCorrecao=Math.max(0,total-aprovados);
+  const progress=emCorrecao?`<aside class="eceaems-review-notice"><span>${svg('<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/>')}</span><div><b>Correção dos trabalhos em andamento</b><p>${aprovados} de ${total} trabalho${total===1?'':'s'} ${aprovados===1?'já foi aprovado e publicado':'já foram aprovados e publicados'}. Os demais estão sendo corrigidos e aparecerão nesta página conforme forem aprovados.</p></div></aside>`:'';
   const cards=trabalhos.map(t=>`<article class="eceaems-result-card">
     <span class="eceaems-course">${escapeHtml(t.curso)}</span>
     <h2>${escapeHtml(t.titulo)}</h2>
     <p><b>Orientador(a):</b> ${escapeHtml(t.orientador_nome)}</p>
     <div class="eceaems-result-authors"><b>Autores</b><span>${(t.autores||[]).map(escapeHtml).join(' · ')}</span></div>
   </article>`).join('');
-  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Trabalhos aprovados</h1><p>Conheça os trabalhos aprovados pela coordenação para o Encontro Científico de Estudantes da AEMS.</p></div><section class="eceaems-results">${cards||'<div class="eceaems-closed"><h2>Divulgação em preparação</h2><p>Os resultados foram liberados, mas ainda não há trabalhos aprovados para exibição.</p></div>'}</section></main>`;
+  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Trabalhos aprovados</h1><p>Conheça os trabalhos aprovados pela coordenação para o Encontro Científico de Estudantes da AEMS.</p></div>${progress}<section class="eceaems-results">${cards||'<div class="eceaems-closed"><h2>Divulgação em preparação</h2><p>Os resultados foram liberados, mas ainda não há trabalhos aprovados para exibição.</p></div>'}</section></main>`;
 }
 
 function successScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-success"><h2>Trabalho enviado com sucesso!</h2><p>Recebemos o artigo e os dados da equipe. A coordenação vai avaliar a submissão.</p><button class="submit-form" id="enviar-outro">Enviar outro trabalho</button></div></main>`;document.getElementById('enviar-outro').onclick=()=>{state.enviado=false;state.curso='';state.autores=[{nome:'',email:'',ra:''}];render()}}
