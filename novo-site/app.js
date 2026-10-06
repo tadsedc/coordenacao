@@ -107,3 +107,9 @@ initialCourse?openCourse(initialCourse,{updatePath:false}):showWelcome();
   renderPortal=function(){renderPortalBeforeRoutes();refreshAccessRoutes()};
   refreshAccessRoutes();
 })();
+(function(){
+  function addInovatecLink(){document.querySelectorAll('.header-links').forEach(links=>{if(!links.querySelector('[data-inovatec-link]'))links.insertAdjacentHTML('beforeend',`<a data-inovatec-link href="${sitePath('/inovatec/')}">INOVATEC</a>`)})}
+  const welcomeBeforeInovatec=showWelcome;showWelcome=function(){welcomeBeforeInovatec();addInovatecLink()};
+  const portalBeforeInovatec=renderPortal;renderPortal=function(){portalBeforeInovatec();addInovatecLink()};
+  addInovatecLink();
+})();
