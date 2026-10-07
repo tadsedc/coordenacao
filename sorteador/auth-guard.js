@@ -1,7 +1,7 @@
 (function(){
   const SUPABASE_URL='https://uvdnejmdqgwdcipctyur.supabase.co';
   const SUPABASE_KEY='sb_publishable_Afn5llFEgcHD4Uhmt8N4pA_W0T_NHZk';
-  const loginUrl='../professor/?destino=sorteador';
+  const loginUrl='../painel.html?acesso=professor&destino=sorteador';
 
   function liberar(){document.documentElement.classList.remove('auth-pending')}
   function mostrarErro(){

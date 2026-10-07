@@ -14,6 +14,8 @@ assert.match(panel,/\['teacher','coord'\]/,'a ferramenta deve estar disponível 
 assert.match(panel,/src="\.\/sorteador\/"/,'o painel deve carregar a ferramenta incorporada');
 assert.match(panel,/Abrir em tela inteira/,'deve existir alternativa para projeção e uso em tela inteira');
 assert.match(painel,/sorteador-panel\.js\?v=1/,'o módulo deve ser carregado pelo painel');
+assert.match(painel,/destino==='sorteador'.*state\.page='sorteador'/,'o login direto deve retornar ao sorteador');
+assert.match(painel,/await loadData\(\);applyShortcutRoute\(\);render\(\)/,'o destino deve ser aplicado depois da autenticação');
 assert.match(teacherHome,/page:'sorteador'.*label:'Sorteador'/,'o acesso rápido do professor deve abrir o sorteador');
 assert.doesNotMatch(teacherHome,/label:'Portal dos estudantes'/,'o card antigo não deve permanecer no acesso rápido');
 for(const page of ['sorteador/index.html','sorteador/apresentacoes.html','sorteador/projetor.html']){
@@ -24,5 +26,6 @@ for(const page of ['sorteador/index.html','sorteador/apresentacoes.html','sortea
 }
 const guard=read('sorteador/auth-guard.js');
 assert.match(guard,/\['professor','coordenador'\]/,'somente professor e coordenação devem acessar');
+assert.match(guard,/painel\.html\?acesso=professor&destino=sorteador/,'o acesso sem sessão deve voltar ao sorteador após o login');
 
 console.log('Sorteador: arquivos e integração com os dois perfis validados.');
