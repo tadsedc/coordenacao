@@ -1,7 +1,7 @@
 window.ECEAEMS_PROGRAMACAO={
   edicao:'XVIII ECEAEMS 2026',
   modalidade:'Apresentação oral',
-  sala:'Sala 1',
+  dataHorario:'14 de outubro de 2026, às 19h',
   cursos:['Engenharia de Computação','Tecnologia em Análise e Desenvolvimento de Sistemas'],
   meet:'https://meet.google.com/rmu-ggbp-rve',
   avaliadores:['Alex Sander Amorim Borges','Bruno Gabriel Correa Pereira','Vinicius Duarte Tessari'],

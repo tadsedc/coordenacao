@@ -38,17 +38,17 @@ function programSection(){
   </details>`).join('');
   return `<section class="eceaems-program" aria-labelledby="eceaems-program-title">
     <div class="eceaems-program-hero">
-      <div><p class="eyebrow">Programação oficial</p><h2 id="eceaems-program-title">${escapeHtml(p.modalidade)} · ${escapeHtml(p.sala)}</h2><p>${p.cursos.map(escapeHtml).join(' e ')}</p></div>
+      <div><p class="eyebrow">Programação oficial</p><h2 id="eceaems-program-title">${escapeHtml(p.modalidade)}</h2><p>${p.cursos.map(escapeHtml).join(' e ')}</p><strong class="eceaems-program-date">${svg('<path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 14h.01M12 14h.01M16 14h.01"/>')} ${escapeHtml(p.dataHorario)}</strong></div>
       <span class="eceaems-program-edition">${escapeHtml(p.edicao)}</span>
     </div>
     <div class="eceaems-room-card">
       <span class="eceaems-room-icon">${svg('<path d="M15 10l4.6-2.6a1 1 0 0 1 1.4.9v7.4a1 1 0 0 1-1.4.9L15 14"/><rect x="3" y="6" width="12" height="12" rx="2"/>')}</span>
-      <div><small>Sala virtual</small><b>Google Meet · Sala 1</b><span>meet.google.com/rmu-ggbp-rve</span></div>
+      <div><small>Sala virtual</small><b>Google Meet</b><span>meet.google.com/rmu-ggbp-rve</span></div>
       <a href="${escapeHtml(p.meet)}" target="_blank" rel="noopener">Entrar na sala ${svg('<path d="M14 3h7v7M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>')}</a>
     </div>
     <aside class="eceaems-copyright-alert">${svg('<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.6 2.5 17a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/>')}<span><b>Atenção aos autores</b>O termo de autorização de direitos autorais deve ser entregue aos avaliadores no dia da apresentação do artigo.</span></aside>
     <div class="eceaems-evaluators"><small>Professores avaliadores</small><div>${p.avaliadores.map(nome=>`<span>${escapeHtml(nome)}</span>`).join('')}</div></div>
-    <div class="eceaems-program-head"><div><small>Ordem oficial</small><h3>Trabalhos da Sala 1</h3></div><span>${p.trabalhos.length} apresentações</span></div>
+    <div class="eceaems-program-head"><div><small>Ordem oficial</small><h3>Trabalhos apresentados</h3></div><span>${p.trabalhos.length} apresentações</span></div>
     <div class="eceaems-program-list">${cards}</div>
     <a class="eceaems-program-pdf" href="./programacao-oficial-sala-1-2026.pdf" target="_blank" rel="noopener">${svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>')} Consultar a programação oficial em PDF</a>
   </section>`;

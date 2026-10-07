@@ -8,7 +8,7 @@ const context={window:{}};
 vm.runInNewContext(source,context);
 const program=context.window.ECEAEMS_PROGRAMACAO;
 
-assert.equal(program.sala,'Sala 1');
+assert.equal(program.dataHorario,'14 de outubro de 2026, às 19h');
 assert.equal(program.meet,'https://meet.google.com/rmu-ggbp-rve');
 assert.equal(program.avaliadores.length,3);
 assert.equal(program.trabalhos.length,8);
@@ -22,6 +22,7 @@ assert.ok(existsSync(new URL('eceaems/programacao-oficial-sala-1-2026.pdf',root)
 const app=readFileSync(new URL('eceaems/app.js',root),'utf8');
 assert.match(app,/programSection\(\)/,'a programação deve fazer parte da página principal');
 assert.match(app,/Entrar na sala/,'a sala virtual deve ser clicável');
+assert.doesNotMatch(app,/Trabalhos da Sala 1|Google Meet · Sala 1/,'a identificação Sala 1 não deve aparecer na versão interativa');
 assert.match(app,/termo de autorização de direitos autorais/i,'o aviso oficial deve permanecer visível');
 const resultsBody=app.match(/function resultsScreen\(\)\{([\s\S]*?)\n\}/)?.[1]||'';
 assert.match(resultsBody,/programSection\(\)/,'a fase publicada deve mostrar a programação oficial');
