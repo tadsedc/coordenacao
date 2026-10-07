@@ -482,9 +482,14 @@ bind=function(){bindBeforeMatrixForm();document.querySelectorAll('.class-day').f
     }).join('');
   }
   function importantDateMatchesPublicFilter(e){
+    if(e.date<currentAcademicDate())return false;
     if(!(e.courses||[]).includes(state.course))return false;
     if(state.period==='Todos'||!(e.groupIds||[]).length)return true;
     return (e.groups||[]).some(g=>g.name===state.period&&(g.courses||[]).includes(state.course));
+  }
+  function currentAcademicDate(){
+    let parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Campo_Grande',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()),values=Object.fromEntries(parts.map(p=>[p.type,p.value]));
+    return values.year+'-'+values.month+'-'+values.day;
   }
   function importantDateMatchesAdminFilter(e){
     let course=state.importantDateCourse||'Todos',groupId=String(state.importantDateGroupId||'');
