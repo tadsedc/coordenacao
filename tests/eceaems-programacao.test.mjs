@@ -16,6 +16,7 @@ for(const [index,trabalho] of program.trabalhos.entries()){
   assert.ok(trabalho.titulo,`trabalho ${index+1} precisa de título`);
   assert.ok(trabalho.autores.length,`trabalho ${index+1} precisa de autores`);
   assert.ok(trabalho.resumo,`trabalho ${index+1} precisa de resumo`);
+  assert.ok(trabalho.resumo.length>500,`trabalho ${index+1} deve preservar o resumo integral`);
 }
 assert.ok(existsSync(new URL('eceaems/programacao-oficial-sala-1-2026.pdf',root)),'o PDF oficial deve estar publicado');
 const app=readFileSync(new URL('eceaems/app.js',root),'utf8');
