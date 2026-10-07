@@ -25,9 +25,18 @@
 .eceaems-room-card a:hover{background:#edf8ff}
 .eceaems-room-card a svg{width:17px;height:17px}
 .eceaems-copyright-alert{display:flex;align-items:flex-start;gap:11px;margin:14px 0;border:1px solid #f0d587;border-radius:15px;background:#fff8dc;color:#69520b;padding:14px 15px;font-size:13px;line-height:1.5}
-.eceaems-copyright-alert svg{flex:0 0 22px;width:22px;height:22px;color:#ad7900}
-.eceaems-copyright-alert span{display:grid;gap:2px}
+.eceaems-copyright-alert>svg{flex:0 0 22px;width:22px;height:22px;color:#ad7900}
 .eceaems-copyright-alert b{font-family:Manrope,sans-serif}
+.eceaems-term-copy{display:grid;gap:5px;min-width:0}
+.eceaems-term-copy p{margin:0}
+.eceaems-term-copy p a{color:#765700;font-weight:900;text-underline-offset:2px}
+.eceaems-term-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:7px}
+.eceaems-term-actions>a{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:38px;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:900;text-decoration:none}
+.eceaems-term-download{background:#ad7900;color:#fff}
+.eceaems-term-download:hover{background:#8f6400}
+.eceaems-term-email{border:1px solid #d5b85e;background:#fffdf5;color:#765700}
+.eceaems-term-email:hover{background:#fff4c7}
+.eceaems-term-actions svg{width:16px;height:16px}
 .eceaems-evaluators{padding:14px 0 18px;border-bottom:1px solid var(--line)}
 .eceaems-evaluators>small{display:block;margin-bottom:9px;color:#687b90;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
 .eceaems-evaluators>div{display:flex;flex-wrap:wrap;gap:7px}
@@ -131,6 +140,9 @@
   .eceaems-program-number{width:34px;height:34px;border-radius:10px}
   .eceaems-program-title b{font-size:13px}
   .eceaems-program-detail{padding:0 13px 15px;font-size:13px}
+  .eceaems-copyright-alert{padding:13px}
+  .eceaems-term-actions{display:grid;grid-template-columns:1fr}
+  .eceaems-term-actions>a{width:100%}
   .eceaems-model-grid{grid-template-columns:1fr}
   .eceaems-model-card{grid-template-columns:42px minmax(0,1fr) auto;padding:13px}
   .eceaems-model-icon{width:42px;height:42px}
