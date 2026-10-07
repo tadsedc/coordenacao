@@ -2,7 +2,7 @@ const SUPABASE_URL='https://uvdnejmdqgwdcipctyur.supabase.co';
 const SUPABASE_KEY='sb_publishable_Afn5llFEgcHD4Uhmt8N4pA_W0T_NHZk';
 let api=null;try{api=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){console.error('Falha ao inicializar o Supabase (CDN pode não ter carregado):',e)}
 
-const state={loading:true,etapa:'codigo',codigo:'',atividade:null,mensagemErro:'',enviado:false,geo:null,geoStatus:'idle'};
+const state={loading:true,etapa:'codigo',codigo:'',atividade:null,mensagemErro:'',enviado:false,geo:null,geoStatus:'idle',disciplinas:[],disciplinasStatus:'idle'};
 
 function escapeHtml(v=''){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 const svg=(path)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
@@ -31,6 +31,9 @@ function codigoScreen(){
 
 function formScreen(){
   const a=state.atividade;
+  const disciplinaField=a.solicitar_disciplina?`<label><b>Disciplina para atribuição da pontuação</b><select name="disciplina_id" id="presenca-disciplina" required disabled>
+          <option value="">Escolha o curso primeiro</option>
+        </select><small class="field-help">Escolha em qual disciplina deseja receber a pontuação pela participação.</small></label>`:'';
   return `${header()}<main class="presenca-main">
   <div class="presenca-intro"><p class="eyebrow">Presença</p><h1>${escapeHtml(a.titulo)}</h1>${a.categoria?`<p>${escapeHtml(a.categoria)}</p>`:''}</div>
   <article class="public-form">
@@ -42,11 +45,12 @@ function formScreen(){
         <label><b>RA / Matrícula</b><input name="ra" maxlength="30" required></label>
       </div>
       <div class="form-row">
-        <label><b>Curso</b><select name="curso" required>
+        <label><b>Curso</b><select name="curso" id="presenca-curso" required>
           <option value="">Selecione</option>
           <option value="ADS">Análise e Desenvolvimento de Sistemas</option>
           <option value="EDC">Engenharia de Computação</option>
         </select></label>
+        ${disciplinaField}
       </div>
       ${a.capturar_geolocalizacao?`<div class="presenca-geo-hint">${svg('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/>')}<span>Vamos pedir a localização do seu celular para confirmar a presença. Se você não permitir, o check-in ainda funciona normalmente.</span></div>`:''}
       <button class="submit-form" type="submit" id="presenca-submit">Confirmar presença</button>
@@ -81,7 +85,29 @@ function bind(){
   }
   if(state.etapa==='form'){
     document.getElementById('presenca-form').addEventListener('submit',onPresencaSubmit);
+    document.getElementById('presenca-curso')?.addEventListener('change',event=>carregarDisciplinas(event.target.value));
     if(state.atividade?.capturar_geolocalizacao)captureGeoInBackground();
+  }
+}
+
+async function carregarDisciplinas(curso){
+  const select=document.getElementById('presenca-disciplina');
+  if(!select)return;
+  if(!curso){select.disabled=true;select.innerHTML='<option value="">Escolha o curso primeiro</option>';return}
+  select.disabled=true;select.innerHTML='<option value="">Carregando disciplinas…</option>';
+  state.disciplinasStatus='loading';
+  try{
+    const {data,error}=await api.rpc('listar_disciplinas_presenca',{p_codigo:state.codigo,p_curso:curso});
+    if(error)throw error;
+    state.disciplinas=data||[];
+    state.disciplinasStatus='ok';
+    select.innerHTML='<option value="">Selecione a disciplina</option>'+state.disciplinas.map(d=>`<option value="${d.id}">${escapeHtml(d.disciplina)}${d.semestre?` · ${d.semestre}º período`:''}</option>`).join('');
+    select.disabled=false;
+  }catch(error){
+    console.error(error);
+    state.disciplinasStatus='error';
+    select.innerHTML='<option value="">Não foi possível carregar</option>';
+    toast('Não foi possível carregar as disciplinas. Tente novamente.');
   }
 }
 
@@ -123,6 +149,8 @@ async function verificarCodigo(codigo){
     state.atividade=data;
     state.geo=null;
     state.geoStatus='idle';
+    state.disciplinas=[];
+    state.disciplinasStatus='idle';
     state.etapa='form';
     history.replaceState(null,'','?codigo='+encodeURIComponent(codigo));
     render();
@@ -138,14 +166,16 @@ async function onPresencaSubmit(event){
   const nome=form.elements['nome'].value.trim();
   const ra=form.elements['ra'].value.trim();
   const curso=form.elements['curso'].value;
+  const disciplinaId=state.atividade?.solicitar_disciplina?form.elements['disciplina_id']?.value:null;
   if(nome.length<3)return toast('Informe o nome completo.');
   if(!ra)return toast('Informe o RA / matrícula.');
   if(!curso)return toast('Selecione o curso.');
+  if(state.atividade?.solicitar_disciplina&&!disciplinaId)return toast('Selecione a disciplina para atribuição da pontuação.');
 
   const button=document.getElementById('presenca-submit');
   button.disabled=true;button.textContent='Enviando…';
   try{
-    const {data,error}=await api.rpc('registrar_presenca',{
+    const parametros={
       p_codigo:state.codigo,
       p_nome:nome,
       p_ra:ra,
@@ -154,7 +184,9 @@ async function onPresencaSubmit(event){
       p_longitude:state.geo?.longitude??null,
       p_precisao:state.geo?.precisao??null,
       p_user_agent:navigator.userAgent
-    });
+    };
+    if(state.atividade?.solicitar_disciplina)parametros.p_disciplina_id=Number(disciplinaId);
+    const {data,error}=await api.rpc('registrar_presenca',parametros);
     if(error)throw error;
     if(!data)throw new Error('O check-in não foi confirmado pelo servidor.');
     state.etapa='sucesso';

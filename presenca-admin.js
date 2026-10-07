@@ -55,6 +55,7 @@
     document.querySelectorAll('[data-presenca-encerrar]').forEach(btn=>btn.addEventListener('click',()=>encerrarPresenca(btn.dataset.presencaEncerrar)));
     document.querySelectorAll('[data-presenca-expandir]').forEach(btn=>btn.addEventListener('click',()=>toggleExpandPresenca(btn.dataset.presencaExpandir)));
     document.querySelectorAll('[data-presenca-exportar]').forEach(btn=>btn.addEventListener('click',()=>exportarCsvPresenca(btn.dataset.presencaExportar)));
+    document.querySelectorAll('[data-presenca-disciplina]').forEach(btn=>btn.addEventListener('click',()=>alternarDisciplinaPresenca(btn.dataset.presencaDisciplina)));
     document.querySelectorAll('[data-presenca-apagar]').forEach(btn=>btn.addEventListener('click',()=>apagarAtividadePresenca(btn.dataset.presencaApagar)));
   };
 
@@ -77,6 +78,7 @@
   const PRESENCA_STYLE='<style>'
     +'.presenca-card{display:grid;gap:12px}'
     +'.presenca-badge-sem-geo{display:inline-block;font-size:12px;color:#8a6d1a;background:#fff7df;border:1px solid #ecd08b;border-radius:999px;padding:3px 10px;width:fit-content}'
+    +'.presenca-badge-disciplina{display:inline-block;font-size:12px;color:#17614a;background:#edf9f4;border:1px solid #b9e3d2;border-radius:999px;padding:3px 10px;width:fit-content}'
     +'.presenca-liberacao-ativa{display:flex;gap:20px;flex-wrap:wrap;align-items:center;border:1px solid #cfe8dd;background:#f2fbf7;border-radius:16px;padding:16px}'
     +'.presenca-liberacao-info{flex:1;min-width:200px}'
     +'.presenca-codigo-grande{font:800 30px/1.1 Manrope,sans-serif;letter-spacing:.08em;margin:6px 0}'
@@ -93,6 +95,7 @@
       ?'<a href="https://www.google.com/maps?q='+r.latitude+','+r.longitude+'" target="_blank" rel="noopener">ver localização'+(r.precisao_metros?' (±'+Math.round(r.precisao_metros)+'m)':'')+'</a>'
       :'<span class="muted">sem localização</span>';
     return '<tr><td><b>'+escapeHtml(r.nome)+'</b><br><small>RA '+escapeHtml(r.ra)+' · '+escapeHtml(r.curso)+'</small></td>'
+      +'<td>'+(r.disciplina_nome?'<b>'+escapeHtml(r.disciplina_nome)+'</b>':'<span class="muted">não solicitada</span>')+'</td>'
       +'<td>'+new Date(r.criado_em).toLocaleTimeString('pt-BR')+'</td>'
       +'<td>'+link+'</td></tr>';
   }
@@ -100,7 +103,7 @@
   function presencaListaHtml(atividadeId){
     const registros=(db.presencaRegistros&&db.presencaRegistros[atividadeId])||[];
     if(!registros.length)return '<div class="empty">Nenhum check-in registrado ainda.</div>';
-    return '<div class="table"><table><thead><tr><th>Estudante</th><th>Horário</th><th>Localização</th></tr></thead><tbody>'
+    return '<div class="table"><table><thead><tr><th>Estudante</th><th>Disciplina escolhida</th><th>Horário</th><th>Localização</th></tr></thead><tbody>'
       +registros.map(presencaRegistroRow).join('')+'</tbody></table></div>'
       +'<p class="presenca-total-confirmados">'+registros.length+' confirmação(ões)</p>';
   }
@@ -136,9 +139,11 @@
       +'<div class="action-stack">'
       +'<button class="mini" data-presenca-expandir="'+atividade.id+'">'+(expandido?'Recolher':'Ver check-ins ('+totalConfirmacoes+')')+'</button>'
       +'<button class="mini" data-presenca-exportar="'+atividade.id+'">Exportar CSV</button>'
+      +'<button class="mini" data-presenca-disciplina="'+atividade.id+'">'+(atividade.solicitar_disciplina?'Não solicitar disciplina':'Solicitar disciplina')+'</button>'
       +'<button class="mini danger" data-presenca-apagar="'+atividade.id+'">Apagar</button>'
       +'</div></div>'
       +(atividade.capturar_geolocalizacao?'':'<span class="presenca-badge-sem-geo">Sem captura de localização (atividade on-line)</span>')
+      +(atividade.solicitar_disciplina?'<span class="presenca-badge-disciplina">Escolha de disciplina habilitada</span>':'')
       +corpo+listaSecao+'</div>';
   }
 
@@ -153,6 +158,7 @@
       +'<div class="field"><label>Data (opcional)</label><input type="date" name="data"></div>'
       +'<div class="field"><label>Local (opcional)</label><input name="local" maxlength="160" placeholder="Ex.: Auditório, ou &quot;On-line&quot;"></div>'
       +'<div class="field"><label><input type="checkbox" name="geo" checked> Capturar localização do celular no check-in (desmarque para atividades on-line)</label></div>'
+      +'<div class="field"><label><input type="checkbox" name="disciplina"> Solicitar uma disciplina para atribuição da pontuação</label><small>Quando habilitado, o estudante escolhe uma disciplina ativa da matriz do curso no check-in.</small></div>'
       +'<button class="btn primary" type="submit">Criar atividade</button>'
       +'</form></div>';
     const lista=atividades.length?atividades.map(presencaAtividadeCard).join(''):'<div class="card"><div class="empty">Nenhuma atividade cadastrada ainda.</div></div>';
@@ -167,11 +173,12 @@
     const data=form.elements['data'].value||null;
     const local=form.elements['local'].value.trim()||null;
     const capturarGeo=form.elements['geo'].checked;
+    const solicitarDisciplina=form.elements['disciplina'].checked;
     if(titulo.length<3)return toast('Informe o título da atividade.');
     const button=form.querySelector('button[type="submit"]');
     if(button){button.disabled=true;button.textContent='Criando...'}
     try{
-      const {error}=await banco.from('presenca_atividades').insert({titulo,categoria,data,local,capturar_geolocalizacao:capturarGeo});
+      const {error}=await banco.from('presenca_atividades').insert({titulo,categoria,data,local,capturar_geolocalizacao:capturarGeo,solicitar_disciplina:solicitarDisciplina});
       if(error)throw error;
       await loadData();render();
       toast('Atividade criada.');
@@ -276,8 +283,8 @@
       if(error)throw error;
       const registros=data||[];
       if(!registros.length)return toast('Ainda não há check-ins para exportar.');
-      const linhas=[['Nome','RA','Curso','Data/Hora','Latitude','Longitude','Precisão (m)']];
-      registros.forEach(r=>linhas.push([r.nome,r.ra,r.curso,new Date(r.criado_em).toLocaleString('pt-BR'),r.latitude??'',r.longitude??'',r.precisao_metros??'']));
+      const linhas=[['Nome','RA','Curso','Disciplina escolhida','Data/Hora','Latitude','Longitude','Precisão (m)']];
+      registros.forEach(r=>linhas.push([r.nome,r.ra,r.curso,r.disciplina_nome||'',new Date(r.criado_em).toLocaleString('pt-BR'),r.latitude??'',r.longitude??'',r.precisao_metros??'']));
       const csv=linhas.map(l=>l.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
       const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
       const link=document.createElement('a');
@@ -286,6 +293,18 @@
       document.body.appendChild(link);link.click();link.remove();
       URL.revokeObjectURL(link.href);
     }catch(error){console.error(error);toast('Não foi possível exportar: '+(error?.message||error))}
+  }
+
+  async function alternarDisciplinaPresenca(atividadeId){
+    const atividade=(db.presencaAtividades||[]).find(a=>String(a.id)===String(atividadeId));
+    if(!atividade)return;
+    const habilitar=!atividade.solicitar_disciplina;
+    try{
+      const {error}=await banco.from('presenca_atividades').update({solicitar_disciplina:habilitar}).eq('id',atividadeId);
+      if(error)throw error;
+      await loadData();render();
+      toast(habilitar?'Escolha de disciplina habilitada.':'Escolha de disciplina desabilitada.');
+    }catch(error){console.error(error);toast('Não foi possível alterar esta configuração: '+(error?.message||error))}
   }
 
   async function apagarAtividadePresenca(atividadeId){

@@ -24,6 +24,7 @@ create table if not exists public.presenca_atividades (
   data date,
   local text,
   capturar_geolocalizacao boolean not null default true,
+  solicitar_disciplina boolean not null default false,
   ativa boolean not null default true,
   criado_em timestamptz not null default now(),
   constraint presenca_atividades_titulo_tamanho
@@ -63,6 +64,8 @@ create table if not exists public.presenca_registros (
   ra text not null,
   ra_normalizado text generated always as (lower(regexp_replace(ra, '\s+', '', 'g'))) stored,
   curso text not null,
+  disciplina_id bigint references public.matriz_disciplinas(id) on delete set null,
+  disciplina_nome text,
   latitude double precision,
   longitude double precision,
   precisao_metros double precision,
@@ -145,7 +148,7 @@ begin
   end if;
 
   select l.id, l.atividade_id, l.expira_em, l.encerrada_em,
-         a.titulo, a.categoria, a.capturar_geolocalizacao, a.ativa
+         a.titulo, a.categoria, a.capturar_geolocalizacao, a.solicitar_disciplina, a.ativa
     into v_liberacao
   from public.presenca_liberacoes l
   join public.presenca_atividades a on a.id = l.atividade_id
@@ -172,7 +175,8 @@ begin
     'atividade_id', v_liberacao.atividade_id,
     'titulo', v_liberacao.titulo,
     'categoria', v_liberacao.categoria,
-    'capturar_geolocalizacao', v_liberacao.capturar_geolocalizacao
+    'capturar_geolocalizacao', v_liberacao.capturar_geolocalizacao,
+    'solicitar_disciplina', v_liberacao.solicitar_disciplina
   );
 end;
 $$;
@@ -180,15 +184,57 @@ $$;
 revoke all on function public.verificar_codigo_presenca(text) from public;
 grant execute on function public.verificar_codigo_presenca(text) to anon, authenticated;
 
+-- Lista somente as disciplinas da matriz enquanto o código estiver válido e
+-- a atividade tiver a escolha de disciplina habilitada.
+create or replace function public.listar_disciplinas_presenca(
+  p_codigo text,
+  p_curso text
+) returns table (id bigint, disciplina text, semestre integer)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_curso not in ('ADS', 'EDC') then
+    raise exception 'Selecione o curso.';
+  end if;
+
+  if not exists (
+    select 1
+      from public.presenca_liberacoes l
+      join public.presenca_atividades a on a.id = l.atividade_id
+     where l.codigo = upper(trim(coalesce(p_codigo, '')))
+       and a.ativa = true
+       and a.solicitar_disciplina = true
+       and l.encerrada_em is null
+       and l.expira_em > now()
+  ) then
+    raise exception 'O código não permite escolher uma disciplina neste momento.';
+  end if;
+
+  return query
+  select m.id, m.disciplina, m.semestre
+    from public.matriz_disciplinas m
+   where m.ativa = true and m.curso = p_curso
+   order by m.semestre, m.disciplina;
+end;
+$$;
+
+revoke all on function public.listar_disciplinas_presenca(text, text) from public;
+grant execute on function public.listar_disciplinas_presenca(text, text) to anon, authenticated;
+
 -- ==========================================================================
 -- 5. Função pública: registrar a presença
 -- ==========================================================================
+
+drop function if exists public.registrar_presenca(text, text, text, text, double precision, double precision, double precision, text);
 
 create or replace function public.registrar_presenca(
   p_codigo text,
   p_nome text,
   p_ra text,
   p_curso text,
+  p_disciplina_id bigint default null,
   p_latitude double precision default null,
   p_longitude double precision default null,
   p_precisao double precision default null,
@@ -202,9 +248,10 @@ declare
   v_codigo text := upper(trim(coalesce(p_codigo, '')));
   v_liberacao record;
   v_registro_id bigint;
+  v_disciplina_nome text;
 begin
   select l.id, l.atividade_id, l.expira_em, l.encerrada_em,
-         a.capturar_geolocalizacao, a.ativa
+         a.capturar_geolocalizacao, a.solicitar_disciplina, a.ativa
     into v_liberacao
   from public.presenca_liberacoes l
   join public.presenca_atividades a on a.id = l.atividade_id
@@ -234,15 +281,28 @@ begin
     raise exception 'Selecione o curso.';
   end if;
 
+  if v_liberacao.solicitar_disciplina then
+    select m.disciplina into v_disciplina_nome
+      from public.matriz_disciplinas m
+     where m.id = p_disciplina_id and m.curso = p_curso and m.ativa = true;
+    if not found then
+      raise exception 'Selecione uma disciplina válida da matriz do seu curso.';
+    end if;
+  else
+    p_disciplina_id := null;
+  end if;
+
   begin
     insert into public.presenca_registros
-      (atividade_id, liberacao_id, nome, ra, curso, latitude, longitude, precisao_metros, user_agent)
+      (atividade_id, liberacao_id, nome, ra, curso, disciplina_id, disciplina_nome, latitude, longitude, precisao_metros, user_agent)
     values (
       v_liberacao.atividade_id,
       v_liberacao.id,
       trim(p_nome),
       trim(p_ra),
       p_curso,
+      p_disciplina_id,
+      v_disciplina_nome,
       case when v_liberacao.capturar_geolocalizacao then p_latitude else null end,
       case when v_liberacao.capturar_geolocalizacao then p_longitude else null end,
       case when v_liberacao.capturar_geolocalizacao then p_precisao else null end,
@@ -258,7 +318,7 @@ begin
 end;
 $$;
 
-revoke all on function public.registrar_presenca(text, text, text, text, double precision, double precision, double precision, text) from public;
-grant execute on function public.registrar_presenca(text, text, text, text, double precision, double precision, double precision, text) to anon, authenticated;
+revoke all on function public.registrar_presenca(text, text, text, text, bigint, double precision, double precision, double precision, text) from public;
+grant execute on function public.registrar_presenca(text, text, text, text, bigint, double precision, double precision, double precision, text) to anon, authenticated;
 
 notify pgrst, 'reload schema';
