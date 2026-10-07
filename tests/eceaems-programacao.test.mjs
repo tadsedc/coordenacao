@@ -22,5 +22,8 @@ const app=readFileSync(new URL('eceaems/app.js',root),'utf8');
 assert.match(app,/programSection\(\)/,'a programação deve fazer parte da página principal');
 assert.match(app,/Entrar na sala/,'a sala virtual deve ser clicável');
 assert.match(app,/termo de autorização de direitos autorais/i,'o aviso oficial deve permanecer visível');
+const resultsBody=app.match(/function resultsScreen\(\)\{([\s\S]*?)\n\}/)?.[1]||'';
+assert.match(resultsBody,/programSection\(\)/,'a fase publicada deve mostrar a programação oficial');
+assert.doesNotMatch(resultsBody,/eceaems-results|eceaems-result-card/,'a lista antiga de aprovados não deve aparecer abaixo da programação');
 
 console.log('ECEAEMS: programação oficial, sala, avaliadores e oito trabalhos validados.');

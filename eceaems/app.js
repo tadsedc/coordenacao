@@ -81,18 +81,7 @@ function errorScreen(){document.getElementById('app').innerHTML=`${header()}<mai
 function closedScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1></div>${programSection()}<div class="eceaems-closed"><h2>Inscrições fechadas</h2><p>As submissões de trabalhos para o ECEAEMS não estão abertas no momento. Consulte a coordenação para saber o período de envio.</p></div>${modelsSection()}</main>`}
 
 function resultsScreen(){
-  const trabalhos=state.aprovados||[];
-  const total=Number(state.resumo?.total_recebidos)||trabalhos.length;
-  const aprovados=Number(state.resumo?.total_aprovados)||trabalhos.length;
-  const emCorrecao=Math.max(0,total-aprovados);
-  const progress=emCorrecao?`<aside class="eceaems-review-notice"><span>${svg('<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/>')}</span><div><b>Correção dos trabalhos em andamento</b><p>Os trabalhos enviados estão sendo corrigidos. Conforme forem aprovados pela Comissão do ECEAEMS, serão publicados nesta página.</p></div></aside>`:'';
-  const cards=trabalhos.map(t=>`<article class="eceaems-result-card">
-    <span class="eceaems-course">${escapeHtml(t.curso)}</span>
-    <h2>${escapeHtml(t.titulo)}</h2>
-    <p><b>Orientador(a):</b> ${escapeHtml(t.orientador_nome)}</p>
-    <div class="eceaems-result-authors"><b>Autores</b><span>${(t.autores||[]).map(escapeHtml).join(' · ')}</span></div>
-  </article>`).join('');
-  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Trabalhos aprovados</h1><p>Conheça os trabalhos aprovados pela Comissão do ECEAEMS para o Encontro Científico de Estudantes da AEMS.</p></div>${programSection()}${progress}<section class="eceaems-results">${cards||'<div class="eceaems-closed"><h2>Divulgação em preparação</h2><p>Os resultados foram liberados, mas ainda não há trabalhos aprovados para exibição.</p></div>'}</section></main>`;
+  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS 2026</p><h1>Programação oficial</h1><p>Consulte a sala virtual, os professores avaliadores e a ordem das apresentações.</p></div>${programSection()}</main>`;
 }
 
 function successScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-success"><h2>Trabalho enviado com sucesso!</h2><p>Recebemos o artigo e os dados da equipe. A coordenação vai avaliar a submissão.</p><button class="submit-form" id="enviar-outro">Enviar outro trabalho</button></div></main>`;document.getElementById('enviar-outro').onclick=()=>{state.enviado=false;state.curso='';state.autores=[{nome:'',email:'',ra:''}];render()}}
