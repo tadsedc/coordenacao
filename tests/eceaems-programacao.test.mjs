@@ -25,6 +25,8 @@ assert.match(app,/Entrar na sala/,'a sala virtual deve ser clicável');
 assert.doesNotMatch(app,/Trabalhos da Sala 1|Google Meet · Sala 1/,'a identificação Sala 1 não deve aparecer na versão interativa');
 assert.match(app,/termo de autorização de publicação/i,'o aviso do termo deve permanecer visível');
 assert.match(app,/um único e-mail/i,'o aviso deve orientar o envio conjunto dos termos');
+assert.match(app,/assinem digitalmente/i,'o aviso deve exigir assinatura digital');
+assert.match(app,/GOV\.BR/i,'o aviso deve indicar o GOV.BR como opção de assinatura');
 assert.match(app,/mailto:tads@aems\.edu\.br/,'o e-mail da coordenação deve ser clicável');
 assert.match(app,/termo-autorizacao-publicacao-eceaems\.docx/,'o termo deve estar disponível para download');
 assert.ok(existsSync(new URL('eceaems/modelos/termo-autorizacao-publicacao-eceaems.docx',root)),'o arquivo do termo deve estar publicado');
