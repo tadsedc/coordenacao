@@ -29,6 +29,31 @@ async function loadData(){
 
 function header(){return `<header class="public-header"><div class="public-header-inner">${wordmark()}</div></header>`}
 
+function programSection(){
+  const p=window.ECEAEMS_PROGRAMACAO;
+  if(!p)return'';
+  const cards=p.trabalhos.map((t,index)=>`<details class="eceaems-program-item">
+    <summary><span class="eceaems-program-number">${String(index+1).padStart(2,'0')}</span><span class="eceaems-program-title"><b>${escapeHtml(t.titulo)}</b><small>${t.autores.map(escapeHtml).join(' · ')}</small></span><span class="eceaems-program-open">＋</span></summary>
+    <div class="eceaems-program-detail"><p>${escapeHtml(t.resumo)}</p><small><b>Palavras-chave:</b> ${escapeHtml(t.palavras)}</small></div>
+  </details>`).join('');
+  return `<section class="eceaems-program" aria-labelledby="eceaems-program-title">
+    <div class="eceaems-program-hero">
+      <div><p class="eyebrow">Programação oficial</p><h2 id="eceaems-program-title">${escapeHtml(p.modalidade)} · ${escapeHtml(p.sala)}</h2><p>${p.cursos.map(escapeHtml).join(' e ')}</p></div>
+      <span class="eceaems-program-edition">${escapeHtml(p.edicao)}</span>
+    </div>
+    <div class="eceaems-room-card">
+      <span class="eceaems-room-icon">${svg('<path d="M15 10l4.6-2.6a1 1 0 0 1 1.4.9v7.4a1 1 0 0 1-1.4.9L15 14"/><rect x="3" y="6" width="12" height="12" rx="2"/>')}</span>
+      <div><small>Sala virtual</small><b>Google Meet · Sala 1</b><span>meet.google.com/rmu-ggbp-rve</span></div>
+      <a href="${escapeHtml(p.meet)}" target="_blank" rel="noopener">Entrar na sala ${svg('<path d="M14 3h7v7M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>')}</a>
+    </div>
+    <aside class="eceaems-copyright-alert">${svg('<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.6 2.5 17a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/>')}<span><b>Atenção aos autores</b>O termo de autorização de direitos autorais deve ser entregue aos avaliadores no dia da apresentação do artigo.</span></aside>
+    <div class="eceaems-evaluators"><small>Professores avaliadores</small><div>${p.avaliadores.map(nome=>`<span>${escapeHtml(nome)}</span>`).join('')}</div></div>
+    <div class="eceaems-program-head"><div><small>Ordem oficial</small><h3>Trabalhos da Sala 1</h3></div><span>${p.trabalhos.length} apresentações</span></div>
+    <div class="eceaems-program-list">${cards}</div>
+    <a class="eceaems-program-pdf" href="./programacao-oficial-sala-1-2026.pdf" target="_blank" rel="noopener">${svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>')} Consultar a programação oficial em PDF</a>
+  </section>`;
+}
+
 function modelsSection(){return `<section class="eceaems-models" aria-labelledby="eceaems-models-title">
   <div class="eceaems-models-copy">
     <p class="eyebrow">Materiais para os estudantes</p>
@@ -53,7 +78,7 @@ function loadingScreen(){document.getElementById('app').innerHTML=`${header()}<d
 
 function errorScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-closed"><h2>Não foi possível carregar</h2><p>Verifique sua conexão e tente novamente em instantes.</p><button class="submit-form" id="retry" style="margin-top:16px">Tentar novamente</button></div></main>`;document.getElementById('retry').onclick=boot}
 
-function closedScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1></div><div class="eceaems-closed"><h2>Inscrições fechadas</h2><p>As submissões de trabalhos para o ECEAEMS não estão abertas no momento. Consulte a coordenação para saber o período de envio.</p></div>${modelsSection()}</main>`}
+function closedScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1></div>${programSection()}<div class="eceaems-closed"><h2>Inscrições fechadas</h2><p>As submissões de trabalhos para o ECEAEMS não estão abertas no momento. Consulte a coordenação para saber o período de envio.</p></div>${modelsSection()}</main>`}
 
 function resultsScreen(){
   const trabalhos=state.aprovados||[];
@@ -67,7 +92,7 @@ function resultsScreen(){
     <p><b>Orientador(a):</b> ${escapeHtml(t.orientador_nome)}</p>
     <div class="eceaems-result-authors"><b>Autores</b><span>${(t.autores||[]).map(escapeHtml).join(' · ')}</span></div>
   </article>`).join('');
-  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Trabalhos aprovados</h1><p>Conheça os trabalhos aprovados pela Comissão do ECEAEMS para o Encontro Científico de Estudantes da AEMS.</p></div>${progress}<section class="eceaems-results">${cards||'<div class="eceaems-closed"><h2>Divulgação em preparação</h2><p>Os resultados foram liberados, mas ainda não há trabalhos aprovados para exibição.</p></div>'}</section></main>`;
+  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Trabalhos aprovados</h1><p>Conheça os trabalhos aprovados pela Comissão do ECEAEMS para o Encontro Científico de Estudantes da AEMS.</p></div>${programSection()}${progress}<section class="eceaems-results">${cards||'<div class="eceaems-closed"><h2>Divulgação em preparação</h2><p>Os resultados foram liberados, mas ainda não há trabalhos aprovados para exibição.</p></div>'}</section></main>`;
 }
 
 function successScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-success"><h2>Trabalho enviado com sucesso!</h2><p>Recebemos o artigo e os dados da equipe. A coordenação vai avaliar a submissão.</p><button class="submit-form" id="enviar-outro">Enviar outro trabalho</button></div></main>`;document.getElementById('enviar-outro').onclick=()=>{state.enviado=false;state.curso='';state.autores=[{nome:'',email:'',ra:''}];render()}}
@@ -78,6 +103,7 @@ function formScreen(){
   const max=state.config.max_autores_por_trabalho||1;
   return `${header()}<main class="eceaems-main">
   <div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1><p>Envie o artigo do seu trabalho para o Encontro Científico de Estudantes da AEMS. Preencha os dados abaixo e anexe o arquivo em Word (.docx, até 10 MB).</p></div>
+  ${programSection()}
   ${modelsSection()}
   <article class="public-form">
     <span class="form-badge">ECEAEMS</span>
