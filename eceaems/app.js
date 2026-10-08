@@ -74,21 +74,6 @@ function modelsSection(){return `<section class="eceaems-models" aria-labelledby
   </div>
 </section>`}
 
-function presentationModelSection(){return `<section class="eceaems-models eceaems-models--single" aria-labelledby="eceaems-presentation-model-title">
-  <div class="eceaems-models-copy">
-    <p class="eyebrow">Material para apresentação</p>
-    <h2 id="eceaems-presentation-model-title">Modelo oficial em PowerPoint</h2>
-    <p>Baixe o arquivo e utilize o padrão oficial para preparar sua apresentação oral.</p>
-  </div>
-  <div class="eceaems-model-grid">
-    <a class="eceaems-model-card" href="./modelos/modelo-apresentacao-oral-2026.pptx" download>
-      <span class="eceaems-model-icon" aria-hidden="true">${svg('<rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4M7 12l3-3 3 3 4-4"/>')}</span>
-      <span class="eceaems-model-text"><b>Modelo da apresentação oral 2026</b><small>Apresentação PowerPoint (.pptx)</small></span>
-      <span class="eceaems-model-download">Baixar ${svg('<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>')}</span>
-    </a>
-  </div>
-</section>`}
-
 function loadingScreen(){document.getElementById('app').innerHTML=`${header()}<div class="loading-inline"><p>Carregando o formulário do ECEAEMS…</p></div>`}
 
 function errorScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-closed"><h2>Não foi possível carregar</h2><p>Verifique sua conexão e tente novamente em instantes.</p><button class="submit-form" id="retry" style="margin-top:16px">Tentar novamente</button></div></main>`;document.getElementById('retry').onclick=boot}
@@ -96,7 +81,7 @@ function errorScreen(){document.getElementById('app').innerHTML=`${header()}<mai
 function closedScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS</p><h1>Submissão de Trabalhos</h1></div>${programSection()}<div class="eceaems-closed"><h2>Inscrições fechadas</h2><p>As submissões de trabalhos para o ECEAEMS não estão abertas no momento. Consulte a coordenação para saber o período de envio.</p></div>${modelsSection()}</main>`}
 
 function resultsScreen(){
-  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro"><p class="eyebrow">ECEAEMS 2026</p><h1>Programação oficial</h1><p>Consulte a sala virtual, os professores avaliadores e a ordem das apresentações.</p></div>${presentationModelSection()}${programSection()}</main>`;
+  document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-intro eceaems-intro--program"><div><p class="eyebrow">ECEAEMS 2026</p><h1>Trabalhos aprovados e programação</h1><p>Consulte a sala virtual, os professores avaliadores e a ordem das apresentações.</p></div><a class="eceaems-presentation-download" href="./modelos/modelo-apresentacao-oral-2026.pptx" download>${svg('<rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4M7 12l3-3 3 3 4-4"/>')}<span><b>Modelo da apresentação</b><small>Baixar PowerPoint</small></span>${svg('<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>')}</a></div>${programSection()}</main>`;
 }
 
 function successScreen(){document.getElementById('app').innerHTML=`${header()}<main class="eceaems-main"><div class="eceaems-success"><h2>Trabalho enviado com sucesso!</h2><p>Recebemos o artigo e os dados da equipe. A coordenação vai avaliar a submissão.</p><button class="submit-form" id="enviar-outro">Enviar outro trabalho</button></div></main>`;document.getElementById('enviar-outro').onclick=()=>{state.enviado=false;state.curso='';state.autores=[{nome:'',email:'',ra:''}];render()}}

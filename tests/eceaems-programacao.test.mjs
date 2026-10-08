@@ -32,7 +32,8 @@ assert.match(app,/termo-autorizacao-publicacao-eceaems\.docx/,'o termo deve esta
 assert.ok(existsSync(new URL('eceaems/modelos/termo-autorizacao-publicacao-eceaems.docx',root)),'o arquivo do termo deve estar publicado');
 const resultsBody=app.match(/function resultsScreen\(\)\{([\s\S]*?)\n\}/)?.[1]||'';
 assert.match(resultsBody,/programSection\(\)/,'a fase publicada deve mostrar a programação oficial');
-assert.match(resultsBody,/presentationModelSection\(\)/,'a fase publicada deve oferecer o modelo da apresentação em PowerPoint');
+assert.match(resultsBody,/Trabalhos aprovados e programação/,'a fase publicada deve destacar os trabalhos e a programação no topo');
+assert.match(resultsBody,/modelo-apresentacao-oral-2026\.pptx/,'a fase publicada deve oferecer o modelo da apresentação em PowerPoint');
 assert.doesNotMatch(resultsBody,/eceaems-results|eceaems-result-card/,'a lista antiga de aprovados não deve aparecer abaixo da programação');
 
 console.log('ECEAEMS: programação oficial, sala, avaliadores e oito trabalhos validados.');
