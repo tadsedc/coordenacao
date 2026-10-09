@@ -50,6 +50,8 @@
   const previousBind=bind;
   bind=function(){
     previousBind();
+    const novaAtividadeTitulo=document.querySelector('.presenca-new-card .cardhead h2');
+    if(novaAtividadeTitulo)novaAtividadeTitulo.textContent='Nova atividade';
     document.getElementById('presenca-nova-form')?.addEventListener('submit',criarAtividadePresenca);
     document.querySelectorAll('[data-presenca-liberar]').forEach(btn=>btn.addEventListener('click',()=>liberarPresenca(btn.dataset.presencaLiberar)));
     document.querySelectorAll('[data-presenca-encerrar]').forEach(btn=>btn.addEventListener('click',()=>encerrarPresenca(btn.dataset.presencaEncerrar)));
@@ -76,6 +78,26 @@
   }
 
   const PRESENCA_STYLE='<style>'
+    +'.presenca-new-card{max-width:1040px;margin-inline:auto;overflow:hidden}'
+    +'.presenca-new-card .cardhead{padding:22px 24px;background:linear-gradient(135deg,#f7fbff,#eef7fd)}'
+    +'.presenca-new-form{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(220px,.65fr);gap:16px 18px;padding:24px}'
+    +'.presenca-new-form .field{margin:0}'
+    +'.presenca-field-title,.presenca-field-local,.presenca-options,.presenca-form-actions{grid-column:1/-1}'
+    +'.presenca-new-form input:not([type="checkbox"]){min-height:48px}'
+    +'.presenca-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'
+    +'.presenca-option{position:relative;display:grid!important;grid-template-columns:46px minmax(0,1fr);align-items:center;gap:12px;border:1px solid #d6e4ef;border-radius:16px;background:#f8fbfd;padding:14px 15px;cursor:pointer;min-height:82px}'
+    +'.presenca-option:hover{border-color:#9fc8e3;background:#f3f9fd}'
+    +'.presenca-option>input{position:absolute!important;opacity:0!important;width:1px!important;height:1px!important;pointer-events:none}'
+    +'.presenca-switch{position:relative;width:44px;height:25px;border-radius:999px;background:#bdc9d5;transition:background .18s ease}'
+    +'.presenca-switch:after{content:"";position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(20,48,72,.22);transition:transform .18s ease}'
+    +'.presenca-option>input:checked+.presenca-switch{background:linear-gradient(135deg,#0878c8,#3f5bea)}'
+    +'.presenca-option>input:checked+.presenca-switch:after{transform:translateX(19px)}'
+    +'.presenca-option>input:focus-visible+.presenca-switch{outline:3px solid rgba(8,120,200,.24);outline-offset:3px}'
+    +'.presenca-option-copy{display:grid;gap:3px;line-height:1.3}'
+    +'.presenca-option-copy b{font:800 13px Manrope,sans-serif;color:var(--ink)}'
+    +'.presenca-option-copy small{color:var(--muted);font-size:12px}'
+    +'.presenca-form-actions{display:flex;justify-content:flex-end;padding-top:2px}'
+    +'.presenca-form-actions .btn{min-width:170px}'
     +'.presenca-card{display:grid;gap:12px}'
     +'.presenca-badge-sem-geo{display:inline-block;font-size:12px;color:#8a6d1a;background:#fff7df;border:1px solid #ecd08b;border-radius:999px;padding:3px 10px;width:fit-content}'
     +'.presenca-badge-disciplina{display:inline-block;font-size:12px;color:#17614a;background:#edf9f4;border:1px solid #b9e3d2;border-radius:999px;padding:3px 10px;width:fit-content}'
@@ -88,6 +110,7 @@
     +'.presenca-liberar-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:var(--muted)}'
     +'.presenca-liberar-form input{width:110px}'
     +'.presenca-total-confirmados{font-size:12px;color:var(--muted);margin:8px 0 0}'
+    +'@media(max-width:720px){.presenca-new-card .cardhead{padding:18px}.presenca-new-form{grid-template-columns:1fr;padding:18px;gap:14px}.presenca-new-form>*{grid-column:1/-1}.presenca-options{grid-template-columns:1fr}.presenca-form-actions .btn{width:100%}}'
     +'</style>';
 
   function presencaRegistroRow(r){
@@ -150,16 +173,18 @@
   function presencaAdminPage(){
     const atividades=db.presencaAtividades||[];
     const categoriasExistentes=[...new Set(atividades.map(a=>a.categoria).filter(Boolean))];
-    const novaCard='<div class="card"><div class="cardhead"><div><h2>Nova atividade</h2><small>Cadastre a atividade para depois liberar o check-in</small></div></div>'
-      +'<form id="presenca-nova-form">'
-      +'<div class="field"><label>Título</label><input name="titulo" maxlength="200" required></div>'
+    const novaCard='<div class="card presenca-new-card"><div class="cardhead"><div><h2>Nova atividade</h2><small>Cadastre as informações e depois libere o check-in quando estiver pronto.</small></div></div>'
+      +'<form id="presenca-nova-form" class="presenca-new-form">'
+      +'<div class="field presenca-field-title"><label>Título da atividade</label><input name="titulo" maxlength="200" placeholder="Ex.: Palestra de Inteligência Artificial" required></div>'
       +'<div class="field"><label>Categoria (opcional)</label><input name="categoria" list="presenca-categorias" maxlength="80" placeholder="Ex.: Semana Acadêmica, ECEAEMS"></div>'
       +'<datalist id="presenca-categorias">'+categoriasExistentes.map(c=>'<option value="'+escapeHtml(c)+'">').join('')+'</datalist>'
       +'<div class="field"><label>Data (opcional)</label><input type="date" name="data"></div>'
-      +'<div class="field"><label>Local (opcional)</label><input name="local" maxlength="160" placeholder="Ex.: Auditório, ou &quot;On-line&quot;"></div>'
-      +'<div class="field"><label><input type="checkbox" name="geo" checked> Capturar localização do celular no check-in (desmarque para atividades on-line)</label></div>'
-      +'<div class="field"><label><input type="checkbox" name="disciplina"> Solicitar uma disciplina para atribuição da pontuação</label><small>Quando habilitado, o estudante escolhe uma disciplina ativa da matriz do curso no check-in.</small></div>'
-      +'<button class="btn primary" type="submit">Criar atividade</button>'
+      +'<div class="field presenca-field-local"><label>Local (opcional)</label><input name="local" maxlength="160" placeholder="Ex.: Auditório ou atividade on-line"></div>'
+      +'<div class="presenca-options">'
+      +'<label class="presenca-option"><input type="checkbox" name="geo" checked><span class="presenca-switch" aria-hidden="true"></span><span class="presenca-option-copy"><b>Capturar localização</b><small>Confirma a localização do celular no momento do check-in. Desative para atividades on-line.</small></span></label>'
+      +'<label class="presenca-option"><input type="checkbox" name="disciplina"><span class="presenca-switch" aria-hidden="true"></span><span class="presenca-option-copy"><b>Solicitar disciplina para pontuação</b><small>O estudante escolhe uma disciplina ativa da matriz do curso durante o check-in.</small></span></label>'
+      +'</div>'
+      +'<div class="presenca-form-actions"><button class="btn primary" type="submit">Criar atividade</button></div>'
       +'</form></div>';
     const lista=atividades.length?atividades.map(presencaAtividadeCard).join(''):'<div class="card"><div class="empty">Nenhuma atividade cadastrada ainda.</div></div>';
     return PRESENCA_STYLE+layout(head('Presença','Controle de Presença','Libere um código por atividade para os estudantes confirmarem presença pelo celular. Funciona para atividades presenciais (Semana Acadêmica, palestras) e on-line (como apresentações do ECEAEMS).')+novaCard+lista,'Presença');
