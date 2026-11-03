@@ -1,0 +1,49 @@
+/* Identidade compartilhada com o INOVATEC Showcase. */
+:root{--ink:#142b49;--mut:#62748b;--line:#dce6ef;--blue:#086aaa}
+body{font-family:"DM Sans",sans-serif;background:radial-gradient(ellipse at 0 0,#dff5f5,transparent 55%),radial-gradient(ellipse at 100% 20%,#edf0fc,transparent 50%),#f4f7fb;color:var(--ink)}
+.hub{width:min(1040px,calc(100% - 40px));padding:24px 0 56px}
+.hub>header{min-height:76px;padding:14px 18px;background:#ffffffed;border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 30px #18385a08;gap:12px;flex-wrap:wrap}
+.hub>header strong{font:800 18px/1.2 Manrope,sans-serif;letter-spacing:-.5px}
+.hub>header small{font-size:10px;letter-spacing:1px;color:#086aaa;margin-top:4px}
+.mark{width:44px;height:44px;flex:0 0 44px;border-radius:13px;font-size:18px;background:linear-gradient(135deg,#58d1e4,#5376e9);box-shadow:0 6px 15px #1b678522}
+.admin{font-size:13px;border-radius:12px;color:#086aaa;background:#f4f9fd;box-shadow:none}
+.hero{max-width:none;margin:26px 0 24px;padding:clamp(26px,4.5vw,44px);border-radius:28px;background:linear-gradient(135deg,#11244c,#126fa0 58%,#21a49a);color:#fff;box-shadow:0 20px 45px #0d366c22}
+.hero p{font-size:11px;letter-spacing:1.5px;color:#9ee9df;margin:0 0 12px;font-weight:800}
+.hero h1{font:800 clamp(30px,4.6vw,46px)/1.12 Manrope,sans-serif;letter-spacing:-.035em;margin:0 0 14px;max-width:800px}
+.hero span{display:block;color:#e4f2ff;font-size:16px;line-height:1.65;max-width:720px}
+.cards{gap:18px;align-items:stretch}
+.card{min-height:245px;padding:25px;border-radius:22px;box-shadow:0 10px 30px #153a5a09;background:#fff;border:1px solid var(--line);transition:transform .18s,box-shadow .18s}
+a.card:hover{transform:translateY(-3px);box-shadow:0 18px 38px #153a5a15}
+a.card:focus-visible,button:focus-visible,a.admin:focus-visible{outline:3px solid #0c83bc;outline-offset:4px}
+.card>b{align-self:flex-start;font-size:11px;font-weight:800;color:#0b679d;background:#edf6fb;border-radius:999px;padding:7px 11px;letter-spacing:.6px}
+.card h2{font:800 23px/1.2 Manrope,sans-serif;letter-spacing:-.6px;margin:24px 0 12px}
+.card p{font-size:14px;line-height:1.65;color:var(--mut)}
+.card em{font-size:13px;font-weight:800;padding-top:24px;color:#086aaa}
+.showcase{background:linear-gradient(145deg,#11244c,#174a70);color:white;border-color:#215a7f}
+.showcase h2{color:#ffd96c}.showcase p,.showcase em{color:#e4f2ff}.showcase>b{color:#a8eee0;background:#ffffff18}
+.activity{min-height:0;gap:13px;padding:24px}.activity h2{margin:5px 0}.activity p{margin:0}
+.activity button{align-self:start;margin-top:auto}
+.notice{background:#ffffffec;border:1px solid var(--line);border-left:4px solid #20a394;border-radius:17px;padding:18px 22px;margin:0 0 24px;box-shadow:0 6px 20px #14335505}
+.notice strong{font:800 15px Manrope,sans-serif}.notice p{font-size:14px;line-height:1.65;margin:7px 0 0}
+.empty{background:#fff;border:1px solid var(--line);padding:32px 24px;line-height:1.6}
+.primary{background:linear-gradient(115deg,#096da7,#158d9d);min-height:44px;border-radius:12px;font-weight:800;font-size:13px;box-shadow:0 6px 15px #0d6e9a17}
+.secondary{border-radius:11px;min-height:40px;font-weight:700;font-size:12px;background:#f4f9fd}
+.panel{padding:24px;border-radius:22px;border-color:var(--line);box-shadow:0 8px 22px #14335506}
+.panel h2{font:800 21px/1.2 Manrope,sans-serif;letter-spacing:-.5px;margin:0 0 18px}
+.panel p{font-size:14px;line-height:1.6;color:var(--mut)}
+label{font-size:12px;font-weight:700;color:#29435f;margin:15px 0;gap:7px}
+input,textarea{min-height:46px;padding:12px 13px;background:#f9fbfd;border:1px solid var(--line);color:var(--ink);border-radius:12px;font-size:14px}
+input:focus,textarea:focus{outline:2px solid #6eb6d1;outline-offset:1px}
+input[type=checkbox]{min-height:auto;width:18px;height:18px;accent-color:#087ba0}
+textarea{min-height:105px;resize:vertical}.inline-check{line-height:1.5}
+.meeting{border:1px solid var(--line);border-radius:16px;padding:14px;margin:18px 0;background:#f9fbfd;min-width:0}
+.meeting legend{font-size:12px;color:#08769c;font-weight:800;padding:0 7px}
+.record{padding:20px 0}.record strong{font:800 15px Manrope,sans-serif}.record p{font-size:12px}.record button{margin-top:7px}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.7px;background:#f6f9fc;color:#62748b}td{line-height:1.5;overflow-wrap:anywhere}
+dialog{max-height:calc(100dvh - 32px);overflow:auto;border-radius:24px;padding:26px;color:var(--ink)}
+dialog h2{font:800 24px/1.2 Manrope,sans-serif;letter-spacing:-.6px;margin:22px 0 16px}
+dialog #close{display:block;margin-left:auto}dialog #meeting-details{font-size:13px;background:#edf6fb;padding:14px;border-radius:12px;line-height:1.7;color:#395671}
+dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#11243d99;backdrop-filter:blur(4px)}
+.status:empty{display:none}footer{font-size:12px;color:#748496}
+@media(max-width:720px){.hub{width:calc(100% - 28px);padding-top:14px}.hub>header{border-radius:18px;padding:12px;gap:9px}.hub>header strong{font-size:16px}.hub>header small{font-size:9px}.hub>header .admin{font-size:11px;padding:9px}.hero{margin-top:18px;padding:26px 22px;border-radius:22px}.hero h1{font-size:31px}.hero span{font-size:14px}.card{min-height:210px;padding:22px}.activity{min-height:0}.card h2{font-size:22px;margin-top:20px}.activity h2{margin-top:4px}.management{gap:0}.panel{padding:20px}.notice{padding:16px 18px}.notice strong{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}a.card:hover{transform:none}}
