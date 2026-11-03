@@ -1,4 +1,5 @@
 /* Identidade compartilhada com o INOVATEC Showcase. */
+.secondary.danger{color:#ad3939;border-color:#edcccc;background:#fff7f7}
 /* Marca: mesma estrutura, fontes e símbolo vetorial do portal raiz. */
 .coord-brand{display:flex;align-items:center;gap:13px;text-decoration:none;color:#10213d;font:800 21px/1.05 Manrope,sans-serif}
 .coord-symbol{width:46px;height:46px;flex:0 0 46px;border-radius:15px;background:linear-gradient(145deg,#53d2e8,#5570ef);display:grid;place-items:center;box-shadow:inset 0 1px #ffffff7a,0 10px 22px #002a5520}
