@@ -83,7 +83,11 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .event-time b{font:900 20px/1 Manrope,sans-serif}
 .event-time small{color:var(--mut);font-size:11px;font-weight:700}
 .event-copy{min-width:0}
-.event-kind{display:inline-flex;margin-bottom:6px;color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.event-meta{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-bottom:7px}
+.event-kind{display:inline-flex;color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.event-audience{display:inline-flex;align-items:center;border-radius:999px;padding:4px 7px;font-size:8px;font-weight:900;letter-spacing:.08em}
+.event-audience.open{border:1px solid #b8e1d3;background:#edf9f4;color:#147458}
+.event-audience.restricted{border:1px solid #eed39b;background:#fff7e5;color:#99620a}
 .event-copy h2{margin:0 0 7px;font:800 clamp(17px,2.4vw,21px)/1.25 Manrope,sans-serif;letter-spacing:-.35px;overflow-wrap:anywhere}
 .event-copy p{margin:0;color:var(--mut);font-size:13px;line-height:1.55}
 .event-copy>small{display:block;margin-top:7px;color:#49647d;font-size:12px;line-height:1.5}

@@ -21,8 +21,13 @@ for(const source of [schedule,workshops]){
 }
 assert.match(schedule,/agenda\.sort/,'a programação deve permanecer em ordem cronológica');
 assert.match(schedule,/seen\.has/,'encontros duplicados não devem reaparecer na programação');
+assert.match(schedule,/PARA TODOS/,'atividades gerais devem ser identificadas como abertas a todos');
+assert.match(schedule,/PARA INSCRITOS/,'oficinas da programação devem ser identificadas como exclusivas para inscritos');
 assert.match(workshops,/inscrever_inovatec/,'a nova lista deve preservar a inscrição nas oficinas');
+assert.match(workshops,/PARA INSCRITOS/,'a lista de oficinas deve indicar que a participação exige inscrição');
 assert.match(styles,/\.day-heading/,'os dias devem ter destaque visual próprio');
+assert.match(styles,/\.event-audience\.open/,'a indicação para todos deve ter estilo próprio');
+assert.match(styles,/\.event-audience\.restricted/,'a indicação para inscritos deve ter estilo próprio');
 assert.match(styles,/@media\(max-width:760px\)/,'a lista deve possuir tratamento responsivo');
 
 console.log('INOVATEC: navegação, programação e oficinas em listas por dia validadas.');
