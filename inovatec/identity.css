@@ -55,3 +55,55 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .status:empty{display:none}footer{font-size:12px;color:#748496}
 @media(max-width:720px){.hub{width:calc(100% - 28px);padding-top:14px}.hub>header{border-radius:18px;padding:12px;gap:9px}.hub>header strong{font-size:16px}.hub>header small{font-size:9px}.hub>header .admin{font-size:11px;padding:9px}.hero{margin-top:18px;padding:26px 22px;border-radius:22px}.hero h1{font-size:31px}.hero span{font-size:14px}.card{min-height:210px;padding:22px}.activity{min-height:0}.card h2{font-size:22px;margin-top:20px}.activity h2{margin-top:4px}.management{gap:0}.panel{padding:20px}.notice{padding:16px 18px}.notice strong{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.card{transition:none}a.card:hover{transform:none}}
+
+/* Navegação e programação em listas: os dias são a hierarquia principal. */
+.experience-list{display:grid;gap:12px}
+.experience-row{display:grid;grid-template-columns:58px minmax(0,1fr) auto;align-items:center;gap:18px;border:1px solid var(--line);border-left:5px solid #1683b5;border-radius:18px;background:#fff;padding:20px 22px;color:var(--ink);text-decoration:none;box-shadow:0 8px 24px #14335508;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+.experience-row:hover{border-color:#98c5dc;box-shadow:0 15px 34px #14335513;transform:translateX(3px)}
+.experience-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:15px;background:#e9f5fb;color:#0871a8;font:900 13px Manrope,sans-serif}
+.experience-copy{display:grid;gap:4px;min-width:0}
+.experience-copy small{color:#1683a9;font-size:10px;font-weight:900;letter-spacing:.09em}
+.experience-copy b{font:800 clamp(18px,2.6vw,23px)/1.2 Manrope,sans-serif}
+.experience-copy em{color:var(--mut);font-size:13px;font-style:normal;line-height:1.5}
+.experience-action{display:flex;align-items:center;gap:10px;color:#0871a8;font-size:13px;font-weight:900;white-space:nowrap}
+.experience-action i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#edf7fc;font-size:18px;font-style:normal}
+.experience-workshop{border-left-color:#1c9b86}.experience-workshop .experience-icon{background:#e9f8f4;color:#147b68}
+.experience-showcase{border-left-color:#3349a8}.experience-showcase .experience-icon{background:#edf0ff;color:#3349a8}
+
+.schedule-days{display:grid;gap:28px}
+.day-section{display:grid;grid-template-columns:210px minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 10px 30px #14335508}
+.day-heading{display:flex;flex-direction:column;align-items:flex-start;padding:24px;background:linear-gradient(155deg,#0d5585,#137d9e);color:#fff}
+.day-heading span{font:900 clamp(22px,3.2vw,30px)/1.1 Manrope,sans-serif;letter-spacing:-.04em}
+.day-heading strong{margin-top:8px;color:#bceff0;font-size:14px;text-transform:lowercase}
+.day-heading small{margin-top:auto;padding-top:28px;color:#dceffa;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.event-list{min-width:0}
+.event-row,.workshop-row{display:grid;grid-template-columns:92px minmax(0,1fr) auto;align-items:center;gap:20px;padding:22px 24px;border-bottom:1px solid #e3ebf2}
+.event-row:last-child,.workshop-row:last-child{border-bottom:0}
+.event-time{align-self:start;display:grid;gap:3px;padding-top:2px;color:#0b6693}
+.event-time b{font:900 20px/1 Manrope,sans-serif}
+.event-time small{color:var(--mut);font-size:11px;font-weight:700}
+.event-copy{min-width:0}
+.event-kind{display:inline-flex;margin-bottom:6px;color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.event-copy h2{margin:0 0 7px;font:800 clamp(17px,2.4vw,21px)/1.25 Manrope,sans-serif;letter-spacing:-.35px;overflow-wrap:anywhere}
+.event-copy p{margin:0;color:var(--mut);font-size:13px;line-height:1.55}
+.event-copy>small{display:block;margin-top:7px;color:#49647d;font-size:12px;line-height:1.5}
+.event-action{display:flex;align-items:center;gap:8px;border:1px solid #cfe1ec;border-radius:11px;background:#f4f9fc;padding:10px 12px;color:#0871a8;font-size:12px;font-weight:900;text-decoration:none;white-space:nowrap}
+.workshop-row{align-items:start}
+.workshop-action{align-self:center;white-space:nowrap}
+.meeting-list{display:grid;gap:5px;margin:12px 0 0;padding:0;list-style:none}
+.meeting-list li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:8px;color:#49647d;font-size:11px;line-height:1.45}
+.meeting-list b{color:#14788f}
+
+@media(max-width:760px){
+ .experience-row{grid-template-columns:45px minmax(0,1fr);gap:13px;padding:17px 16px}
+ .experience-icon{width:43px;height:43px;border-radius:12px}
+ .experience-action{grid-column:2;justify-content:space-between;margin-top:6px}
+ .day-section{grid-template-columns:1fr;border-radius:19px}
+ .day-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;padding:18px 19px}
+ .day-heading strong{margin:0;text-align:right}
+ .day-heading small{grid-column:1/-1;margin-top:6px;padding:0}
+ .event-row,.workshop-row{grid-template-columns:68px minmax(0,1fr);gap:13px;padding:18px 16px}
+ .event-time b{font-size:17px}
+ .event-action,.workshop-action{grid-column:2;width:100%;justify-content:center;margin-top:4px}
+ .meeting-list li{grid-template-columns:1fr;gap:1px;padding-top:5px}
+}
