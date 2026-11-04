@@ -8,6 +8,7 @@ const adminHtml=read('inovatec/admin.html');
 const adminScript=read('inovatec/admin.js');
 const common=read('inovatec/common.js');
 const promotionMigration=read('supabase_inovatec_oficinas_divulgacao.sql');
+const publicAttendeesMigration=read('supabase_inovatec_inscritos_publicos.sql');
 const scheduleHtml=read('inovatec/programacao.html');
 const schedule=read('inovatec/programacao.js');
 const workshopsHtml=read('inovatec/oficinas/index.html');
@@ -37,13 +38,22 @@ for(const source of [schedule,workshops]){
 }
 assert.match(schedule,/agenda\.sort/,'a programação deve permanecer em ordem cronológica');
 assert.match(schedule,/seen\.has/,'encontros duplicados não devem reaparecer na programação');
+assert.match(schedule,/Ver inscritos/,'as oficinas da programação devem abrir a lista de inscritos');
+assert.match(schedule,/listar_inscritos_oficina_inovatec/,'a lista pública deve usar a função restrita aos nomes');
+assert.match(schedule,/oficinaId:o\.id/,'cada encontro deve preservar a oficina da inscrição');
+assert.match(publicAttendeesMigration,/returns table\(nome_completo text\)/,'a função pública deve retornar somente o nome completo');
+assert.doesNotMatch(publicAttendeesMigration,/email|telefone|whatsapp/i,'a função pública não deve expor dados de contato');
 assert.match(schedule,/PARA TODOS/,'atividades gerais devem ser identificadas como abertas a todos');
 assert.match(schedule,/PARA INSCRITOS/,'oficinas da programação devem ser identificadas como exclusivas para inscritos');
 assert.match(workshops,/inscrever_inovatec/,'a nova lista deve preservar a inscrição nas oficinas');
 assert.match(workshops,/PARA INSCRITOS/,'a lista de oficinas deve indicar que a participação exige inscrição');
+assert.match(workshops,/OFICINA EM/,'oficinas em mais de um dia devem receber um aviso explícito');
+assert.match(workshops,/Parte /,'os encontros em dias diferentes devem ser identificados como partes');
+assert.match(workshops,/participação é necessária em todos eles/,'o estudante deve ser informado de que precisa participar de todos os dias');
 assert.match(styles,/\.day-heading/,'os dias devem ter destaque visual próprio');
 assert.match(styles,/\.event-audience\.open/,'a indicação para todos deve ter estilo próprio');
 assert.match(styles,/\.event-audience\.restricted/,'a indicação para inscritos deve ter estilo próprio');
+assert.match(styles,/\.workshop-series-note/,'o aviso de oficina em vários dias deve ter destaque visual');
 assert.match(styles,/\.experience-workshop\.is-open/,'o card das oficinas abertas deve receber destaque visual');
 assert.match(styles,/@media\(max-width:760px\)/,'a lista deve possuir tratamento responsivo');
 

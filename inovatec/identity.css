@@ -108,6 +108,11 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .meeting-list{display:grid;gap:5px;margin:12px 0 0;padding:0;list-style:none}
 .meeting-list li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:8px;color:#49647d;font-size:11px;line-height:1.45}
 .meeting-list b{color:#14788f}
+.workshop-series-note{display:flex;align-items:center;flex-wrap:wrap;gap:7px 10px;margin-top:12px;border:1px solid #f0d399;border-radius:11px;background:#fff8e8;padding:10px 12px;color:#8a5805}
+.workshop-series-note b{font-size:9px;letter-spacing:.08em}.workshop-series-note span{font-size:11px;font-weight:700}
+.attendees-kicker{display:block;margin-top:14px;color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em}
+.attendees-content>p{color:var(--mut);font-size:13px}.attendees-list{display:grid;gap:0;margin:16px 0 0;padding:0;list-style:none;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.attendees-list li{padding:11px 14px;border-bottom:1px solid var(--line);background:#f9fbfd;font-size:13px;font-weight:700}.attendees-list li:last-child{border-bottom:0}
 
 @media(max-width:760px){
  .experience-row{grid-template-columns:45px minmax(0,1fr);gap:13px;padding:17px 16px}
