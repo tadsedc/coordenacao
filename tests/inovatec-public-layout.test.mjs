@@ -16,6 +16,7 @@ const workshops=read('inovatec/oficinas/public.js');
 const styles=read('inovatec/identity.css');
 
 assert.match(home,/experience-list/,'a entrada do INOVATEC deve usar navegação em lista');
+assert.match(home,/class="admin" href="\/inovatec\/programacao\.html"/,'o botão superior da página inicial deve abrir a programação');
 assert.match(home,/Dias, horários e atividades/,'a programação deve ser o primeiro destaque');
 assert.doesNotMatch(home,/section class="cards"/,'a entrada não deve voltar aos blocos quadrados');
 assert.match(home,/id="workshops"/,'o acesso às oficinas deve poder ser promovido na página inicial');
