@@ -49,6 +49,8 @@ assert.doesNotMatch(publicAttendeesMigration,/email|telefone|whatsapp/i,'a funç
 assert.match(schedule,/PARA TODOS/,'atividades gerais devem ser identificadas como abertas a todos');
 assert.match(schedule,/PARA INSCRITOS/,'oficinas da programação devem ser identificadas como exclusivas para inscritos');
 assert.match(workshops,/inscrever_inovatec/,'a nova lista deve preservar a inscrição nas oficinas');
+assert.match(workshops,/Faça sua inscrição no evento em inscricao\.aems\.edu\.br/,'o estudante não habilitado deve receber a orientação de inscrição');
+assert.match(workshops,/informe a coordenação para solicitar a liberação/,'o estudante deve ser orientado a avisar a coordenação');
 assert.match(workshops,/PARA INSCRITOS/,'a lista de oficinas deve indicar que a participação exige inscrição');
 assert.match(workshops,/OFICINA EM/,'oficinas em mais de um dia devem receber um aviso explícito');
 assert.match(workshops,/Parte /,'os encontros em dias diferentes devem ser identificados como partes');
