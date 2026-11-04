@@ -50,10 +50,12 @@ assert.match(workshops,/PARA INSCRITOS/,'a lista de oficinas deve indicar que a 
 assert.match(workshops,/OFICINA EM/,'oficinas em mais de um dia devem receber um aviso explícito');
 assert.match(workshops,/Parte /,'os encontros em dias diferentes devem ser identificados como partes');
 assert.match(workshops,/participação é necessária em todos eles/,'o estudante deve ser informado de que precisa participar de todos os dias');
+assert.match(workshops,/meeting-when/,'a data e o horário de cada parte devem aparecer juntos');
 assert.match(styles,/\.day-heading/,'os dias devem ter destaque visual próprio');
 assert.match(styles,/\.event-audience\.open/,'a indicação para todos deve ter estilo próprio');
 assert.match(styles,/\.event-audience\.restricted/,'a indicação para inscritos deve ter estilo próprio');
 assert.match(styles,/\.workshop-series-note/,'o aviso de oficina em vários dias deve ter destaque visual');
+assert.match(styles,/\.meeting-when/,'o horário ao lado da data deve receber destaque visual');
 assert.match(styles,/\.experience-workshop\.is-open/,'o card das oficinas abertas deve receber destaque visual');
 assert.match(styles,/@media\(max-width:760px\)/,'a lista deve possuir tratamento responsivo');
 

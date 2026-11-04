@@ -90,7 +90,7 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .event-list{min-width:0}
 .event-row,.workshop-row{display:grid;grid-template-columns:92px minmax(0,1fr) auto;align-items:center;gap:20px;padding:22px 24px;border-bottom:1px solid #e3ebf2}
 .event-row:last-child,.workshop-row:last-child{border-bottom:0}
-.event-time{align-self:start;display:grid;gap:3px;padding-top:2px;color:#0b6693}
+.event-time{align-self:start;display:grid;gap:5px;border-radius:12px;background:#edf7fc;padding:10px;color:#075d8b}
 .event-time b{font:900 20px/1 Manrope,sans-serif}
 .event-time small{color:var(--mut);font-size:11px;font-weight:700}
 .event-copy{min-width:0}
@@ -108,6 +108,9 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .meeting-list{display:grid;gap:5px;margin:12px 0 0;padding:0;list-style:none}
 .meeting-list li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:8px;color:#49647d;font-size:11px;line-height:1.45}
 .meeting-list b{color:#14788f}
+.meeting-details{display:grid;gap:4px}.meeting-when{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.meeting-when strong{color:#243f59;font-size:12px}.meeting-when em{border-radius:7px;background:#dff1f8;padding:4px 7px;color:#075d8b;font-size:12px;font-style:normal;font-weight:900}
+.meeting-details>small{color:#60748a;font-size:11px}
 .workshop-series-note{display:flex;align-items:center;flex-wrap:wrap;gap:7px 10px;margin-top:12px;border:1px solid #f0d399;border-radius:11px;background:#fff8e8;padding:10px 12px;color:#8a5805}
 .workshop-series-note b{font-size:9px;letter-spacing:.08em}.workshop-series-note span{font-size:11px;font-weight:700}
 .attendees-kicker{display:block;margin-top:14px;color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em}
