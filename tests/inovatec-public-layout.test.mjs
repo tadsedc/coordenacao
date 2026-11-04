@@ -43,6 +43,8 @@ assert.match(schedule,/agenda\.sort/,'a programação deve permanecer em ordem c
 assert.match(schedule,/seen\.has/,'encontros duplicados não devem reaparecer na programação');
 assert.match(schedule,/Ver inscritos/,'as oficinas da programação devem abrir a lista de inscritos');
 assert.match(schedule,/listar_inscritos_oficina_inovatec/,'a lista pública deve usar a função restrita aos nomes');
+assert.match(schedule,/Ainda há/,'a lista de inscritos deve convidar o estudante quando houver vagas');
+assert.match(schedule,/Vagas preenchidas/,'a lista deve informar quando não houver vagas');
 assert.match(schedule,/oficinaId:o\.id/,'cada encontro deve preservar a oficina da inscrição');
 assert.match(publicAttendeesMigration,/returns table\(nome_completo text\)/,'a função pública deve retornar somente o nome completo');
 assert.doesNotMatch(publicAttendeesMigration,/email|telefone|whatsapp/i,'a função pública não deve expor dados de contato');
@@ -67,6 +69,7 @@ assert.match(styles,/\.certificate-warning/,'o aviso sobre certificado deve ter 
 assert.match(styles,/\.feedback-message\.success/,'avisos de sucesso devem usar o destaque verde');
 assert.match(styles,/\.feedback-message\.error/,'avisos de erro devem usar o destaque vermelho');
 assert.match(styles,/#confirmed-name/,'a confirmação dos dados deve usar o destaque azul');
+assert.match(styles,/\.vacancies-callout/,'o convite para vagas disponíveis deve ter destaque visual');
 assert.match(styles,/\.experience-workshop\.is-open/,'o card das oficinas abertas deve receber destaque visual');
 assert.match(styles,/@media\(max-width:760px\)/,'a lista deve possuir tratamento responsivo');
 

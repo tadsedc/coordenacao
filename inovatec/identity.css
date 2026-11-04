@@ -124,6 +124,9 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .attendees-kicker{display:block;margin-top:14px;color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em}
 .attendees-content>p{color:var(--mut);font-size:13px}.attendees-list{display:grid;gap:0;margin:16px 0 0;padding:0;list-style:none;border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .attendees-list li{padding:11px 14px;border-bottom:1px solid var(--line);background:#f9fbfd;font-size:13px;font-weight:700}.attendees-list li:last-child{border-bottom:0}
+.vacancies-callout{display:grid;gap:3px;margin-top:14px;border:1px solid #afe0cf;border-left:4px solid #15966f;border-radius:13px;background:#ecfaf5;padding:13px 14px;color:#11684f;text-decoration:none}
+.vacancies-callout b{font:800 14px Manrope,sans-serif}.vacancies-callout span{font-size:12px;font-weight:700}.vacancies-callout i{font-style:normal}
+.vacancies-callout.full{border-color:#d8dee5;border-left-color:#7a8794;background:#f3f5f7;color:#566472}
 
 @media(max-width:760px){
  .experience-row{grid-template-columns:45px minmax(0,1fr);gap:13px;padding:17px 16px}
