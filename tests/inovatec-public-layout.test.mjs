@@ -51,6 +51,8 @@ assert.match(schedule,/PARA INSCRITOS/,'oficinas da programação devem ser iden
 assert.match(workshops,/inscrever_inovatec/,'a nova lista deve preservar a inscrição nas oficinas');
 assert.match(workshops,/Faça sua inscrição no evento em inscricao\.aems\.edu\.br/,'o estudante não habilitado deve receber a orientação de inscrição');
 assert.match(workshops,/informe a coordenação para solicitar a liberação/,'o estudante deve ser orientado a avisar a coordenação');
+assert.match(workshops,/feedback\(error\.message,'error'\)/,'erros devem receber destaque visual próprio');
+assert.match(workshops,/vaga está garantida\.','success'/,'a confirmação deve receber destaque visual próprio');
 assert.match(workshops,/PARA INSCRITOS/,'a lista de oficinas deve indicar que a participação exige inscrição');
 assert.match(workshops,/OFICINA EM/,'oficinas em mais de um dia devem receber um aviso explícito');
 assert.match(workshops,/Parte /,'os encontros em dias diferentes devem ser identificados como partes');
@@ -62,6 +64,9 @@ assert.match(styles,/\.event-audience\.restricted/,'a indicação para inscritos
 assert.match(styles,/\.workshop-series-note/,'o aviso de oficina em vários dias deve ter destaque visual');
 assert.match(styles,/\.meeting-when/,'o horário ao lado da data deve receber destaque visual');
 assert.match(styles,/\.certificate-warning/,'o aviso sobre certificado deve ter destaque visual');
+assert.match(styles,/\.feedback-message\.success/,'avisos de sucesso devem usar o destaque verde');
+assert.match(styles,/\.feedback-message\.error/,'avisos de erro devem usar o destaque vermelho');
+assert.match(styles,/#confirmed-name/,'a confirmação dos dados deve usar o destaque azul');
 assert.match(styles,/\.experience-workshop\.is-open/,'o card das oficinas abertas deve receber destaque visual');
 assert.match(styles,/@media\(max-width:760px\)/,'a lista deve possuir tratamento responsivo');
 

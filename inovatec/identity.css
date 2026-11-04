@@ -52,6 +52,11 @@ dialog{max-height:calc(100dvh - 32px);overflow:auto;border-radius:24px;padding:2
 dialog h2{font:800 24px/1.2 Manrope,sans-serif;letter-spacing:-.6px;margin:22px 0 16px}
 dialog #close{display:block;margin-left:auto}dialog #meeting-details{font-size:13px;background:#edf6fb;padding:14px;border-radius:12px;line-height:1.7;color:#395671}
 dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#11243d99;backdrop-filter:blur(4px)}
+#confirmed-name{border:1px solid #bddcf0;border-left:4px solid #1683b5;border-radius:13px;background:#eef8fd;padding:13px 14px;color:#164f72;font-size:13px;font-weight:700;line-height:1.55}
+.feedback-message{margin:16px 0 0;border:1px solid;border-left-width:4px;border-radius:13px;padding:13px 14px;font-weight:700}
+.feedback-message.info{border-color:#bddcf0;border-left-color:#1683b5;background:#eef8fd;color:#164f72}
+.feedback-message.success{border-color:#afe0cf;border-left-color:#15966f;background:#ecfaf5;color:#11684f}
+.feedback-message.error{border-color:#efb9b9;border-left-color:#c83e3e;background:#fff1f1;color:#8f2929}
 .certificate-warning{display:grid;gap:6px;margin:16px 0;border:1px solid #efd292;border-left:4px solid #d89516;border-radius:13px;background:#fff8e8;padding:14px 15px;color:#704904}
 .certificate-warning b{font:800 14px Manrope,sans-serif}.certificate-warning span{font-size:12px;line-height:1.55}.certificate-warning a{color:#086aaa;font-size:12px;font-weight:800}
 .certificate-warning+#confirm{width:100%}
