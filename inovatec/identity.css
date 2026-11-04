@@ -52,6 +52,9 @@ dialog{max-height:calc(100dvh - 32px);overflow:auto;border-radius:24px;padding:2
 dialog h2{font:800 24px/1.2 Manrope,sans-serif;letter-spacing:-.6px;margin:22px 0 16px}
 dialog #close{display:block;margin-left:auto}dialog #meeting-details{font-size:13px;background:#edf6fb;padding:14px;border-radius:12px;line-height:1.7;color:#395671}
 dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#11243d99;backdrop-filter:blur(4px)}
+.certificate-warning{display:grid;gap:6px;margin:16px 0;border:1px solid #efd292;border-left:4px solid #d89516;border-radius:13px;background:#fff8e8;padding:14px 15px;color:#704904}
+.certificate-warning b{font:800 14px Manrope,sans-serif}.certificate-warning span{font-size:12px;line-height:1.55}.certificate-warning a{color:#086aaa;font-size:12px;font-weight:800}
+.certificate-warning+#confirm{width:100%}
 .status:empty{display:none}footer{font-size:12px;color:#748496}
 @media(max-width:720px){.hub{width:calc(100% - 28px);padding-top:14px}.hub>header{border-radius:18px;padding:12px;gap:9px}.hub>header strong{font-size:16px}.hub>header small{font-size:9px}.hub>header .admin{font-size:11px;padding:9px}.hero{margin-top:18px;padding:26px 22px;border-radius:22px}.hero h1{font-size:31px}.hero span{font-size:14px}.card{min-height:210px;padding:22px}.activity{min-height:0}.card h2{font-size:22px;margin-top:20px}.activity h2{margin-top:4px}.management{gap:0}.panel{padding:20px}.notice{padding:16px 18px}.notice strong{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.card{transition:none}a.card:hover{transform:none}}

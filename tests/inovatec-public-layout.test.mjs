@@ -32,6 +32,8 @@ assert.match(adminScript,/vaga liberada/,'a remoção deve confirmar a liberaç�
 assert.match(promotionMigration,/add column if not exists oficinas_inscricoes_abertas/,'a migração deve criar a configuração de forma segura');
 assert.match(scheduleHtml,/class="schedule-days"/,'a programação deve ser organizada por dias');
 assert.match(workshopsHtml,/class="schedule-days"/,'as oficinas devem ser organizadas por dias');
+assert.match(workshopsHtml,/Atenção ao certificado/,'a confirmação deve alertar sobre a emissão do certificado');
+assert.match(workshopsHtml,/inscricao\.aems\.edu\.br/,'o aviso deve levar à inscrição e ao pagamento do evento');
 for(const source of [schedule,workshops]){
   assert.match(source,/weekday/,'o dia da semana deve ser calculado e exibido');
   assert.match(source,/day-section/,'cada dia deve formar uma seção de lista');
@@ -57,6 +59,7 @@ assert.match(styles,/\.event-audience\.open/,'a indicação para todos deve ter 
 assert.match(styles,/\.event-audience\.restricted/,'a indicação para inscritos deve ter estilo próprio');
 assert.match(styles,/\.workshop-series-note/,'o aviso de oficina em vários dias deve ter destaque visual');
 assert.match(styles,/\.meeting-when/,'o horário ao lado da data deve receber destaque visual');
+assert.match(styles,/\.certificate-warning/,'o aviso sobre certificado deve ter destaque visual');
 assert.match(styles,/\.experience-workshop\.is-open/,'o card das oficinas abertas deve receber destaque visual');
 assert.match(styles,/@media\(max-width:760px\)/,'a lista deve possuir tratamento responsivo');
 
