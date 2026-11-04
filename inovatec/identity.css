@@ -68,7 +68,18 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .experience-action{display:flex;align-items:center;gap:10px;color:#0871a8;font-size:13px;font-weight:900;white-space:nowrap}
 .experience-action i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#edf7fc;font-size:18px;font-style:normal}
 .experience-workshop{border-left-color:#1c9b86}.experience-workshop .experience-icon{background:#e9f8f4;color:#147b68}
+.experience-workshop.is-open{border-color:#54b999;border-left-color:#0c8f68;background:linear-gradient(105deg,#e9fff6 0,#f7fffb 58%,#e8f7ff 100%);box-shadow:0 16px 38px #08755220}
+.experience-workshop.is-open .experience-icon{background:linear-gradient(145deg,#0b936b,#18b694);color:#fff;box-shadow:0 8px 18px #08755230}
+.experience-workshop.is-open .experience-copy small{color:#087552}.experience-workshop.is-open .experience-action{color:#087552}
+.experience-workshop.is-open .experience-action i{background:#d8f5e9}
 .experience-showcase{border-left-color:#3349a8}.experience-showcase .experience-icon{background:#edf0ff;color:#3349a8}
+
+.workshop-promotion{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,auto) auto;align-items:center;gap:22px;border-color:#b9dcd1;background:linear-gradient(120deg,#f1fff9,#fff)}
+.workshop-promotion h2{margin:7px 0 5px}.workshop-promotion p{margin:0;max-width:650px}
+.promotion-status{display:inline-flex;border-radius:999px;padding:5px 9px;background:#eef2f6;color:#66788a;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.promotion-status.open{background:#dff7ed;color:#087552}
+.promotion-toggle{display:flex;align-items:center;gap:10px;margin:0;border:1px solid #cce5dc;border-radius:14px;background:#fff;padding:12px 14px;cursor:pointer}
+.promotion-toggle input{flex:0 0 auto}.promotion-toggle span{display:grid;gap:2px}.promotion-toggle b{font-size:13px}.promotion-toggle small{color:var(--mut);font-size:10px}
 
 .schedule-days{display:grid;gap:28px}
 .day-section{display:grid;grid-template-columns:210px minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 10px 30px #14335508}
@@ -110,4 +121,5 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
  .event-time b{font-size:17px}
  .event-action,.workshop-action{grid-column:2;width:100%;justify-content:center;margin-top:4px}
  .meeting-list li{grid-template-columns:1fr;gap:1px;padding-top:5px}
+ .workshop-promotion{grid-template-columns:1fr;gap:15px}.workshop-promotion .primary{width:100%}
 }
