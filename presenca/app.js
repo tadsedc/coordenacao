@@ -44,6 +44,7 @@ function formScreen(){
         <label><b>Nome completo</b><input name="nome" maxlength="160" required></label>
         <label><b>RA / Matrícula</b><input name="ra" maxlength="30" required></label>
       </div>
+      ${a.inovatec?'<label><b>E-mail da inscrição no INOVATEC</b><input name="email" type="email" autocomplete="email" maxlength="254" required></label>':''}
       <div class="form-row">
         <label><b>Curso</b><select name="curso" id="presenca-curso" required>
           <option value="">Selecione</option>
@@ -146,7 +147,9 @@ async function verificarCodigo(codigo){
       return;
     }
     state.codigo=codigo;
-    state.atividade=data;
+    const vinculo=await api.rpc('codigo_presenca_inovatec',{p_codigo:codigo});
+    if(vinculo.error&&vinculo.error.code!=='PGRST202')throw vinculo.error;
+    state.atividade={...data,inovatec:vinculo.data===true};
     state.geo=null;
     state.geoStatus='idle';
     state.disciplinas=[];
@@ -186,7 +189,12 @@ async function onPresencaSubmit(event){
       p_user_agent:navigator.userAgent
     };
     if(state.atividade?.solicitar_disciplina)parametros.p_disciplina_id=Number(disciplinaId);
-    const {data,error}=await api.rpc('registrar_presenca',parametros);
+    const inovatec=state.atividade?.inovatec;
+    if(inovatec){
+      parametros.p_email=form.elements.email.value.trim();
+      parametros.p_disciplina_id??=null;
+    }
+    const {data,error}=await api.rpc(inovatec?'registrar_presenca_inovatec':'registrar_presenca',parametros);
     if(error)throw error;
     if(!data)throw new Error('O check-in não foi confirmado pelo servidor.');
     state.etapa='sucesso';

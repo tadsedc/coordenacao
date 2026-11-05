@@ -22,6 +22,7 @@
     </header>
     <section class="hero"><h1>Gestão do evento</h1><span>Oficinas, programação e estudantes habilitados.</span></section>
     <p id="status" class="status" role="status">Validando acesso…</p>
+    <section id="teacher-calls" class="panel" hidden><h2>Minhas chamadas de oficinas</h2></section>
     <div id="management" hidden>
       <section class="panel workshop-promotion">
         <div>
@@ -76,10 +77,21 @@
         <div id="students" class="table-wrap"></div>
       </section>
       <section class="panel"><h2>Inscrições por oficina</h2><div id="registrations" class="table-wrap"></div></section>
+      <section class="panel">
+        <h2>Frequência no INOVATEC</h2>
+        <p>Participação completa exige presença nas duas palestras e em todos os encontros de pelo menos uma oficina válida.</p>
+        <button id="load-attendance" class="primary" type="button">Consultar frequência</button>
+        <button id="load-workshop-calls" class="secondary" type="button">Chamadas das oficinas</button>
+        <button id="configure-calls" class="secondary" type="button">Configurar chamadas</button>
+        <div id="call-settings"></div>
+        <div id="workshop-calls"></div>
+        <p id="attendance-status" role="status"></p>
+        <div id="attendance-results" class="table-wrap"></div>
+      </section>
     </div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="common.js?v=5"></script>
-  <script src="admin.js?v=12"></script>
+  <script src="admin.js?v=15"></script>
 </body>
 </html>
