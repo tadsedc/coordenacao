@@ -80,7 +80,20 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .experience-workshop.is-open .experience-icon{background:linear-gradient(145deg,#0b936b,#18b694);color:#fff;box-shadow:0 8px 18px #08755230}
 .experience-workshop.is-open .experience-copy small{color:#087552}.experience-workshop.is-open .experience-action{color:#087552}
 .experience-workshop.is-open .experience-action i{background:#d8f5e9}
+.experience-rules{border-left-color:#d89516}.experience-rules .experience-icon{background:#fff4d9;color:#9b6508}
 .experience-showcase{border-left-color:#3349a8}.experience-showcase .experience-icon{background:#edf0ff;color:#3349a8}
+
+.regulation-hero{background:linear-gradient(135deg,#10284d,#126a91 58%,#167c73)}
+.regulation-summary{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:18px;border:1px solid #b7ddd2;border-left:5px solid #15966f;border-radius:17px;background:#effbf7;padding:17px 20px;color:#145c49}
+.regulation-summary strong{margin-right:auto;font:800 14px Manrope,sans-serif}.regulation-summary span{border-radius:999px;background:#fff;padding:7px 10px;font-size:11px;font-weight:800;box-shadow:0 3px 10px #176a5510}
+.regulation-intro{margin-bottom:14px;border:1px solid var(--line);border-radius:17px;background:#fff;padding:18px 21px;color:var(--mut);font-size:14px;line-height:1.7}
+.regulation-intro p{margin:0}.regulation-list{display:grid;gap:12px}
+.regulation-item{display:grid;grid-template-columns:54px minmax(0,1fr);gap:18px;border:1px solid var(--line);border-radius:20px;background:#fff;padding:23px;box-shadow:0 8px 24px #14335508}
+.regulation-item.featured{border-color:#b8d9e9;background:linear-gradient(115deg,#f4fbff,#fff)}
+.regulation-number{display:grid;place-items:center;width:50px;height:50px;border-radius:15px;background:#e9f5fb;color:#0871a8;font:900 13px Manrope,sans-serif}
+.regulation-item small{color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em}.regulation-item h2{margin:5px 0 10px;font:800 clamp(19px,2.8vw,24px)/1.25 Manrope,sans-serif;letter-spacing:-.45px}
+.regulation-item p,.regulation-item li{color:#536b83;font-size:13px;line-height:1.65}.regulation-item ul{display:grid;gap:7px;margin:12px 0;padding-left:20px}.regulation-item a{color:#0871a8;font-weight:800}
+.regulation-note,.regulation-warning{margin-top:14px;border-radius:12px;padding:12px 14px}.regulation-note{border:1px solid #b7ddd2;background:#effbf7;color:#145c49!important}.regulation-warning{border:1px solid #efd292;background:#fff8e8;color:#704904!important}
 
 .workshop-promotion{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,auto) auto;align-items:center;gap:22px;border-color:#b9dcd1;background:linear-gradient(120deg,#f1fff9,#fff)}
 .workshop-promotion h2{margin:7px 0 5px}.workshop-promotion p{margin:0;max-width:650px}
@@ -141,4 +154,5 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
  .event-action,.workshop-action{grid-column:2;width:100%;justify-content:center;margin-top:4px}
  .meeting-list li{grid-template-columns:1fr;gap:1px;padding-top:5px}
  .workshop-promotion{grid-template-columns:1fr;gap:15px}.workshop-promotion .primary{width:100%}
+ .regulation-summary{align-items:flex-start}.regulation-summary strong{width:100%}.regulation-item{grid-template-columns:42px minmax(0,1fr);gap:12px;padding:18px 16px}.regulation-number{width:40px;height:40px;border-radius:12px}.regulation-item h2{font-size:18px}
 }
