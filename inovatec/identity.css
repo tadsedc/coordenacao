@@ -130,10 +130,10 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
 .meeting-list li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:8px;color:#49647d;font-size:11px;line-height:1.45}
 .meeting-list b{color:#14788f}
 .meeting-details{display:grid;gap:4px}.meeting-when{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
-.meeting-when strong{color:#243f59;font-size:12px}.meeting-when em{border-radius:7px;background:#dff1f8;padding:4px 7px;color:#075d8b;font-size:12px;font-style:normal;font-weight:900}
+.meeting-when strong{display:flex;align-items:center;gap:7px;color:#243f59;font-size:12px}.meeting-weekday{border-radius:6px;background:#14788f;padding:4px 6px;color:#fff;font-size:9px;font-weight:900;letter-spacing:.06em}.meeting-when em{border-radius:7px;background:#dff1f8;padding:4px 7px;color:#075d8b;font-size:12px;font-style:normal;font-weight:900}
 .meeting-details>small{color:#60748a;font-size:11px}
-.workshop-series-note{display:flex;align-items:center;flex-wrap:wrap;gap:7px 10px;margin-top:12px;border:1px solid #f0d399;border-radius:11px;background:#fff8e8;padding:10px 12px;color:#8a5805}
-.workshop-series-note b{font-size:9px;letter-spacing:.08em}.workshop-series-note span{font-size:11px;font-weight:700}
+.workshop-series-note{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px 14px;margin-top:12px;border:1px solid #f0c772;border-radius:11px;background:#fff8e8;padding:12px 14px;color:#8a5805}
+.workshop-series-note b{font-size:9px;letter-spacing:.08em}.series-dates{color:#7b4300;font:900 14px Manrope,sans-serif;letter-spacing:.02em}.workshop-series-note>span{grid-column:1/-1;font-size:11px;font-weight:800}
 .attendees-kicker{display:block;margin-top:14px;color:#13809e;font-size:9px;font-weight:900;letter-spacing:.1em}
 .attendees-content>p{color:var(--mut);font-size:13px}.attendees-list{display:grid;gap:0;margin:16px 0 0;padding:0;list-style:none;border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .attendees-list li{padding:11px 14px;border-bottom:1px solid var(--line);background:#f9fbfd;font-size:13px;font-weight:700}.attendees-list li:last-child{border-bottom:0}
@@ -153,6 +153,7 @@ dialog #feedback{font-size:14px;line-height:1.5}dialog::backdrop{background:#112
  .event-time b{font-size:17px}
  .event-action,.workshop-action{grid-column:2;width:100%;justify-content:center;margin-top:4px}
  .meeting-list li{grid-template-columns:1fr;gap:1px;padding-top:5px}
+ .workshop-series-note{grid-template-columns:1fr}.series-dates{font-size:13px}
  .workshop-promotion{grid-template-columns:1fr;gap:15px}.workshop-promotion .primary{width:100%}
  .regulation-summary{align-items:flex-start}.regulation-summary strong{width:100%}.regulation-item{grid-template-columns:42px minmax(0,1fr);gap:12px;padding:18px 16px}.regulation-number{width:40px;height:40px;border-radius:12px}.regulation-item h2{font-size:18px}
 }

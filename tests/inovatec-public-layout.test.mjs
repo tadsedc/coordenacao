@@ -71,11 +71,15 @@ assert.match(workshops,/\+' EM '\+days\+' DIAS/,'atividades em mais de um dia de
 assert.match(workshops,/Parte /,'os encontros em dias diferentes devem ser identificados como partes');
 assert.match(workshops,/participação é necessária em todos eles/,'o estudante deve ser informado de que precisa participar de todos os dias');
 assert.match(workshops,/meeting-when/,'a data e o horário de cada parte devem aparecer juntos');
+assert.match(workshops,/series-dates/,'oficinas em vários dias devem destacar os dias da semana e os números das datas');
+assert.match(workshops,/weekdayShort/,'cada parte deve informar claramente o dia da semana');
 assert.match(styles,/\.day-heading/,'os dias devem ter destaque visual próprio');
 assert.match(styles,/\.event-audience\.open/,'a indicação para todos deve ter estilo próprio');
 assert.match(styles,/\.event-audience\.restricted/,'a indicação para inscritos deve ter estilo próprio');
 assert.match(styles,/\.workshop-series-note/,'o aviso de oficina em vários dias deve ter destaque visual');
 assert.match(styles,/\.meeting-when/,'o horário ao lado da data deve receber destaque visual');
+assert.match(styles,/\.series-dates/,'os dias das oficinas com várias partes devem receber destaque visual');
+assert.match(styles,/\.meeting-weekday/,'o dia da semana de cada parte deve ficar visível');
 assert.match(styles,/\.certificate-warning/,'o aviso sobre certificado deve ter destaque visual');
 assert.match(styles,/\.feedback-message\.success/,'avisos de sucesso devem usar o destaque verde');
 assert.match(styles,/\.feedback-message\.error/,'avisos de erro devem usar o destaque vermelho');
