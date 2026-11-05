@@ -65,7 +65,9 @@ assert.match(workshops,/informe a coordenação para solicitar a liberação/,'o
 assert.match(workshops,/feedback\(error\.message,'error'\)/,'erros devem receber destaque visual próprio');
 assert.match(workshops,/vaga está garantida\.','success'/,'a confirmação deve receber destaque visual próprio');
 assert.match(workshops,/PARA INSCRITOS/,'a lista de oficinas deve indicar que a participação exige inscrição');
-assert.match(workshops,/OFICINA EM/,'oficinas em mais de um dia devem receber um aviso explícito');
+assert.match(workshops,/games\?'JOGOS':'Oficina'/,'o E-Games deve ser classificado como jogos na página de inscrições');
+assert.match(workshops,/participação no E-Games/,'a descrição do E-Games não deve chamá-lo de oficina');
+assert.match(workshops,/\+' EM '\+days\+' DIAS/,'atividades em mais de um dia devem receber um aviso explícito');
 assert.match(workshops,/Parte /,'os encontros em dias diferentes devem ser identificados como partes');
 assert.match(workshops,/participação é necessária em todos eles/,'o estudante deve ser informado de que precisa participar de todos os dias');
 assert.match(workshops,/meeting-when/,'a data e o horário de cada parte devem aparecer juntos');
