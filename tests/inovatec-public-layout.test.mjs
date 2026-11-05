@@ -26,6 +26,8 @@ assert.match(home,/experience-icon">03/,'o regulamento deve ocupar a terceira po
 assert.match(regulation,/certificado geral de 20 horas/i,'o regulamento deve explicar o certificado geral');
 assert.match(regulation,/1,0 ponto na média de uma disciplina de sua escolha/i,'o regulamento deve explicar corretamente a pontuação acadêmica');
 assert.match(regulation,/Oficinas realizadas em dois dias/,'o regulamento deve explicar a certificação de oito horas');
+assert.match(regulation,/participação no E-Games é opcional/,'o regulamento deve informar que o E-Games não é obrigatório');
+assert.match(regulation,/não substitui a participação exigida em pelo menos uma das demais oficinas práticas/,'o E-Games não deve atender ao requisito de oficina prática');
 assert.match(regulation,/inscricao\.aems\.edu\.br/,'o regulamento deve direcionar para a inscrição oficial');
 assert.match(homeScript,/oficinas_inscricoes_abertas/,'a página inicial deve respeitar a divulgação controlada pela coordenação');
 assert.match(homeScript,/prepend\(card\)/,'as oficinas devem ir para o topo quando as inscrições estiverem abertas');
