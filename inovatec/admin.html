@@ -69,6 +69,12 @@
       </div>
       <section class="panel">
         <h2>Estudantes habilitados</h2>
+        <form id="manual-student">
+          <label>Nome completo<input name="nome" autocomplete="name" maxlength="160" required></label>
+          <label>E-mail<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+          <button type="submit" class="primary">Cadastrar estudante</button>
+          <p id="manual-student-status" role="status"></p>
+        </form>
         <p>CSV com apenas duas colunas: nome completo e e-mail. Aceita separador vírgula ou ponto e vírgula e campos entre aspas.</p>
         <input id="csv" type="file" accept=".csv,text/csv">
         <label class="inline-check"><input id="replace" type="checkbox">Substituir a lista de habilitados (mantém as inscrições existentes)</label>
@@ -92,6 +98,6 @@
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="common.js?v=5"></script>
-  <script src="admin.js?v=15"></script>
+  <script src="admin.js?v=16"></script>
 </body>
 </html>

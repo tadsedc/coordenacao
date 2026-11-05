@@ -121,5 +121,27 @@
    finally{button.disabled=false}
   };
  };
+ $('#manual-student').onsubmit=async event=>{
+  event.preventDefault();
+  const form=event.currentTarget, button=event.submitter, message=$('#manual-student-status');
+  const nome=form.elements.nome.value.trim();
+  const email=form.elements.email.value.trim().toLowerCase();
+  if(nome.length<5||nome.split(/\s+/).length<2){
+   message.textContent='Informe o nome completo do estudante.';
+   return;
+  }
+  button.disabled=true;
+  message.textContent='Salvando…';
+  try{
+   const {error}=await db.rpc('importar_estudantes_inovatec',{
+    p_estudantes:[{nome_completo:nome,email}],p_substituir:false
+   });
+   if(error)throw error;
+   form.reset();
+   message.textContent='Estudante habilitado com sucesso.';
+   try{await load()}catch{message.textContent+=' Recarregue a página para atualizar a lista.'}
+  }catch(error){message.textContent='Não foi possível habilitar o estudante. '+error.message}
+  finally{button.disabled=false}
+ };
  boot();
 })();
