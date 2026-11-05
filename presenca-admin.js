@@ -98,7 +98,7 @@
     +'.presenca-option-copy small{color:var(--muted);font-size:12px}'
     +'.presenca-form-actions{display:flex;justify-content:flex-end;padding-top:2px}'
     +'.presenca-form-actions .btn{min-width:170px}'
-    +'.presenca-card{display:grid;gap:12px}'
+    +'.presenca-card{display:grid;gap:12px;margin-bottom:18px;padding-bottom:18px;overflow:hidden}.presenca-card>:not(.cardhead){margin-inline:clamp(14px,3vw,24px)}.presenca-card .cardhead h2{overflow-wrap:anywhere}'
     +'.presenca-badge-sem-geo{display:inline-block;font-size:12px;color:#8a6d1a;background:#fff7df;border:1px solid #ecd08b;border-radius:999px;padding:3px 10px;width:fit-content}'
     +'.presenca-badge-disciplina{display:inline-block;font-size:12px;color:#17614a;background:#edf9f4;border:1px solid #b9e3d2;border-radius:999px;padding:3px 10px;width:fit-content}'
     +'.presenca-liberacao-ativa{display:flex;gap:20px;flex-wrap:wrap;align-items:center;border:1px solid #cfe8dd;background:#f2fbf7;border-radius:16px;padding:16px}'

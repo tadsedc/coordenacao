@@ -54,7 +54,7 @@ begin
   data_encontro := (coalesce((oficina.encontros->(p_encontro-1)->>'data_hora')::timestamptz,oficina.data_hora)
     at time zone 'America/Campo_Grande')::date;
   insert into public.presenca_atividades(titulo,categoria,data,capturar_geolocalizacao)
-  values(left(oficina.titulo,170)||' · Encontro '||p_encontro,'INOVATEC',data_encontro,false)
+  values(left(oficina.titulo,170)||' · Encontro '||p_encontro,'INOVATEC',data_encontro,true)
   returning id into atividade;
   insert into public.inovatec_chamadas(atividade_id,oficina_id,encontro,professor_id,conta_para_conclusao)
   values(atividade,p_oficina_id,p_encontro,p_professor_id,
