@@ -23,7 +23,7 @@ EAD não tem professor e não consome disponibilidade ou noites docentes. Ocupa 
 
 Esta versão respeita disponibilidade, limite de noites, quantidade de blocos, conflitos docentes e turmas conjuntas. Otimiza a preferência de dia de EAD; não distribui salas, não considera capacidade, datas/feriados ou durações diferentes. Revise esses aspectos antes de cadastrar as aulas no sistema. Não publica automaticamente.
 
-Recarregar a página descarta campos ainda não salvos. Navegar entre as etapas ou atualizar resultados preserva o rascunho em memória. Use Usar como base para copiar um planejamento salvo e ajustar uma nova versão. Planejamentos antigos com nomes de turma são associados aos cadastros quando possível; confira as seleções antes de salvar. Se o workflow for cancelado externamente, o registro pode permanecer processando; salve outro planejamento.
+O rascunho é salvo automaticamente no localStorage deste navegador, separado por coordenador, incluindo docentes, restrições, ofertas, título e etapa. Recarregar restaura esse rascunho. Se o navegador bloquear o armazenamento, a interface avisa. O rascunho local não sincroniza entre dispositivos e pode ser apagado pela limpeza dos dados do navegador. A etapa 3 salva uma versão no Supabase. Retomar planejamento salvo fica no início do gerador; Usar como base também continua disponível na etapa 3. Novo planejamento substitui apenas o rascunho local após confirmação. Planejamentos antigos com nomes de turma são associados aos cadastros quando possível; confira as seleções antes de salvar. Se o workflow for cancelado externamente, o registro pode permanecer processando; salve outro planejamento.
 
 ## Verificação
 
