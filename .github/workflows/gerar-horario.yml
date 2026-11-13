@@ -1,0 +1,29 @@
+name: Gerar horário
+on:
+  workflow_dispatch:
+    inputs:
+      planejamento_id:
+        description: ID do planejamento salvo pela coordenação
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: gerar-horario-${{ inputs.planejamento_id }}
+  cancel-in-progress: false
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install ortools==9.14.6206 requests==2.32.5
+      - run: python -m unittest discover -s scripts -p "test_*.py"
+      - run: python scripts/gerar_horario.py
+        env:
+          PLANEJAMENTO_ID: ${{ inputs.planejamento_id }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
