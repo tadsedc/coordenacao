@@ -5,6 +5,7 @@ Mantém GitHub Pages e Supabase. Exclusivo da coordenação; gera rascunhos sem 
 ## Ativação
 
 1. Execute `supabase_horarios_planejamento.sql` no SQL Editor do projeto atual. Depende da função existente `usuario_e_coordenador()`.
+   Execute também `supabase_aderencia_excluir_resposta.sql` para habilitar a exclusão de respostas da aderência pela coordenação.
 2. Em Settings → Secrets and variables → Actions, cadastre `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`. Nunca coloque a chave de serviço em arquivos públicos.
 3. Publique os arquivos deste commit pelo fluxo habitual do GitHub Pages.
 4. Entre como coordenador e abra Gerador de horários. Marque a disponibilidade, adicione ofertas e salve.
