@@ -84,6 +84,8 @@ def main():
         raise ValueError('Planejamento não encontrado.')
     if rows[0]['status'] != 'pendente':
         raise ValueError('Salve um novo planejamento para executar outra geração.')
+    if rows[0]['configuracao'].get('rascunho_etapa'):
+        raise ValueError('Esta versão é um preenchimento parcial. Retome no painel e salve o planejamento completo na etapa 3 antes de gerar.')
     update({'status': 'processando', 'mensagem': 'Gerando rascunho.'})
     try:
         result = solve(rows[0]['configuracao'])

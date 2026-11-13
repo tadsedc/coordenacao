@@ -1,8 +1,20 @@
 import unittest
-from gerar_horario import solve
+from unittest.mock import patch, Mock
+from gerar_horario import solve, main
 
 
 class SchedulingTests(unittest.TestCase):
+    def test_partial_plan_cannot_be_generated(self):
+        response = Mock()
+        response.json.return_value = [{'status': 'pendente', 'configuracao': {'rascunho_etapa': True}}]
+        with patch.dict('os.environ', {'PLANEJAMENTO_ID': '00000000-0000-0000-0000-000000000001',
+                                     'SUPABASE_URL': 'https://test.invalid', 'SUPABASE_SERVICE_ROLE_KEY': 'test'}), \
+             patch('gerar_horario.requests.get', return_value=response), \
+             patch('gerar_horario.requests.patch') as update:
+            with self.assertRaisesRegex(ValueError, 'preenchimento parcial'):
+                main()
+            update.assert_not_called()
+
     def ead_config(self, available):
         return {'total_slots': 10,
                 'professores': [{'id': 'p', 'disponiveis': available, 'max_noites': 3}],
