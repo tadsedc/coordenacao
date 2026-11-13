@@ -94,10 +94,24 @@
         <p id="attendance-status" role="status"></p>
         <div id="attendance-results" class="table-wrap"></div>
       </section>
+      <section class="panel">
+        <h2>Lançar presença manual</h2>
+        <p>Registre a participação conferida pela coordenação. A justificativa e o responsável ficam registrados.</p>
+        <button id="prepare-manual-attendance" class="secondary" type="button">Selecionar estudante e atividade</button>
+        <form id="manual-attendance" hidden>
+          <label>Atividade<select name="atividade" required></select></label>
+          <label>Pesquisar estudante<input name="busca" type="search" placeholder="Nome ou e-mail"></label>
+          <label>Estudante<select name="estudante" required></select></label>
+          <label>Curso<select name="curso" required><option value="">Selecione</option><option value="ADS">ADS</option><option value="EDC">EDC</option></select></label>
+          <label>Justificativa<textarea name="motivo" required minlength="10" maxlength="1000" placeholder="Explique como a participação foi conferida."></textarea></label>
+          <button class="primary" type="submit">Registrar presença manual</button>
+        </form>
+        <p id="manual-attendance-status" role="status"></p>
+      </section>
     </div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="common.js?v=5"></script>
-  <script src="admin.js?v=16"></script>
+  <script src="admin.js?v=17"></script>
 </body>
 </html>

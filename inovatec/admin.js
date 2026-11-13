@@ -143,5 +143,49 @@
   }catch(error){message.textContent='Não foi possível habilitar o estudante. '+error.message}
   finally{button.disabled=false}
  };
+ $('#prepare-manual-attendance').onclick=async event=>{
+  const button=event.currentTarget;
+  const form=$('#manual-attendance');
+  const message=$('#manual-attendance-status');
+  button.disabled=true;
+  message.textContent='Carregando estudantes e atividades…';
+  try{
+   const [calls,students]=await Promise.all([
+    db.from('inovatec_chamadas').select('atividade_id,presenca_atividades(titulo)').order('atividade_id'),
+    db.from('inovatec_estudantes').select('id,nome_completo,email').order('nome_completo')
+   ]);
+   if(calls.error)throw calls.error;
+   if(students.error)throw students.error;
+   form.elements.atividade.innerHTML='<option value="">Selecione</option>'+calls.data.map(call=>'<option value="'+call.atividade_id+'">'+I.esc(call.presenca_atividades?.titulo||'Atividade '+call.atividade_id)+'</option>').join('');
+   const filterStudents=()=>{
+    const search=I.norm(form.elements.busca.value);
+    const matches=students.data.filter(student=>I.norm(student.nome_completo+' '+student.email).includes(search));
+    form.elements.estudante.innerHTML='<option value="">Selecione</option>'+matches.map(student=>'<option value="'+student.id+'">'+I.esc(student.nome_completo+' · '+student.email)+'</option>').join('');
+   };
+   form.elements.busca.oninput=filterStudents;
+   filterStudents();
+   form.hidden=false;
+   message.textContent=calls.data.length?'':'Configure primeiro as chamadas do INOVATEC.';
+  }catch(error){message.textContent='Não foi possível carregar o formulário. '+error.message}
+  finally{button.disabled=false}
+ };
+ $('#manual-attendance').onsubmit=async event=>{
+  event.preventDefault();
+  const form=event.currentTarget,button=event.submitter,message=$('#manual-attendance-status');
+  button.disabled=true;
+  message.textContent='Registrando presença…';
+  try{
+   const {error}=await db.rpc('lancar_presenca_manual_inovatec',{
+    p_atividade_id:Number(form.elements.atividade.value),
+    p_estudante_id:Number(form.elements.estudante.value),
+    p_curso:form.elements.curso.value,
+    p_motivo:form.elements.motivo.value.trim()
+   });
+   if(error)throw error;
+   message.textContent='Presença manual registrada. Consulte a frequência para visualizar o resultado.';
+   form.elements.motivo.value='';
+  }catch(error){message.textContent='Não foi possível registrar a presença. '+error.message}
+  finally{button.disabled=false}
+ };
  boot();
 })();
