@@ -3,7 +3,7 @@
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const days=['Segunda','Terça','Quarta','Quinta','Sexta'];
  const weekDays=[...days,'Sábado'];
- const draft={titulo:'',professores:[],ofertas:[]};
+ const draft={titulo:'',professores:[],ofertas:[],planejamento_id:null};
  let people=[],runs=[],step=0,activeTeacher='',selectedRun='',filterGroup='',loading=false,saving=false,sequence=0,error='',loaded=false;
  let draftKey='',localSaved=false;
  let adherenceForms=[],adherenceResponses=[],adherenceForm='',adherenceWarning='';
@@ -21,7 +21,7 @@
  function restoreDraft(){
   const key='tadsedc.horarios.rascunho.v2.'+(state.teacherId||state.userName||'coordenacao');
   if(draftKey===key)return;
-  draftKey=key;draft.titulo='';draft.professores=[];draft.ofertas=[];step=0;sequence=0;activeTeacher='';selectedRun='';people=[];runs=[];loaded=false;
+  draftKey=key;draft.titulo='';draft.professores=[];draft.ofertas=[];draft.planejamento_id=null;step=0;sequence=0;activeTeacher='';selectedRun='';people=[];runs=[];loaded=false;
   try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(!saved)return;
    if(!Array.isArray(saved.draft?.professores)||!Array.isArray(saved.draft?.ofertas))return;
    Object.assign(draft,saved.draft);step=[0,1,2].includes(saved.step)?saved.step:0;sequence=Number(saved.sequence)||0;
@@ -30,8 +30,9 @@
  function persistDraft(){if(!draftKey||state.role!=='coord')return;try{localStorage.setItem(draftKey,JSON.stringify({draft,step,sequence,atualizado_em:new Date().toISOString()}));localSaved=true}catch(e){localSaved=false}}
  function resumePlan(id){
   const r=runs.find(r=>r.id===id);if(!r)return;
-  if((draft.ofertas.length||draft.professores.length)&&!confirm('Substituir o rascunho em edição por uma cópia deste planejamento?'))return;
-  const c=JSON.parse(JSON.stringify(r.configuracao));draft.titulo=r.titulo+' — cópia';draft.professores=c.professores.map(p=>({...p,max_noites:p.max_noites??5}));draft.ofertas=c.ofertas.map(o=>({...o,id:'offer-'+(++sequence),componentes:o.componentes.map(c=>({...c,disciplina_id:String(c.disciplina_id||(db.curriculum||[]).find(d=>d.subject===c.disciplina)?.id||''),turma:String((db.groups||[]).find(g=>String(g.id)===String(c.turma)||g.name===c.turma)?.id||'')}))}));activeTeacher='';step=0;draw();
+  if((draft.ofertas.length||draft.professores.length)&&!confirm('Abrir este planejamento para edição? O preenchimento local atual será substituído.'))return;
+  if(r.status==='processando')return toast('Aguarde a geração terminar antes de editar este planejamento.');
+  const c=JSON.parse(JSON.stringify(r.configuracao));draft.planejamento_id=r.id;draft.titulo=r.titulo;draft.professores=c.professores.map(p=>({...p,max_noites:p.max_noites??5}));draft.ofertas=c.ofertas.map(o=>({...o,id:'offer-'+(++sequence),componentes:o.componentes.map(c=>({...c,disciplina_id:String(c.disciplina_id||(db.curriculum||[]).find(d=>d.subject===c.disciplina)?.id||''),turma:String((db.groups||[]).find(g=>String(g.id)===String(c.turma)||g.name===c.turma)?.id||'')}))}));activeTeacher='';step=[0,1,2].includes(c.etapa)?c.etapa:0;draw();
  }
  const personName=id=>id?(people.find(p=>p.id===id)?.nome||id):'EAD · sem professor';
  const groupName=id=>(db.groups||[]).find(g=>String(g.id)===String(id))?.name||id;
@@ -100,7 +101,7 @@
   for(const select of [body.querySelector('#gh-resume'),body.querySelector('#gh-run')])if(select)for(const option of select.options){const row=runs.find(r=>r.id===option.value);if(row?.configuracao?.rascunho_etapa)option.textContent=row.titulo+' · Etapa '+(Number(row.configuracao.etapa)+1)+' salva'}
   const viewed=runs.find(r=>r.id===selectedRun);if(viewed?.configuracao?.rascunho_etapa){const badge=body.querySelector('.gh-runhead .gh-chip');if(badge)badge.textContent='Etapa '+(Number(viewed.configuracao.etapa)+1)+' salva';const instructions=body.querySelector('.gh-instructions');if(instructions)instructions.innerHTML='<b>Preenchimento parcial salvo no sistema</b><p>Use “Usar como base” ou “Retomar planejamento salvo” para continuar. Conclua as ofertas e salve o planejamento na etapa 3 para liberar a geração.</p>'}
   resume.querySelector('[data-resume-plan]')?.addEventListener('click',()=>{const id=resume.querySelector('#gh-resume').value;if(!id)return toast('Selecione um planejamento salvo.');resumePlan(id)});
-  resume.querySelector('[data-new-draft]').onclick=()=>{if(!confirm('Iniciar um novo planejamento? O rascunho local atual será substituído. Versões já salvas no sistema serão mantidas.'))return;draft.titulo='';draft.professores=[];draft.ofertas=[];step=0;activeTeacher='';draw()};
+  resume.querySelector('[data-new-draft]').onclick=()=>{if(!confirm('Iniciar um novo planejamento? O rascunho local atual será substituído. Planejamentos já salvos no sistema serão mantidos.'))return;draft.titulo='';draft.professores=[];draft.ofertas=[];draft.planejamento_id=null;selectedRun='';step=0;activeTeacher='';draw()};
   body.oninput=()=>{persistDraft();const status=body.querySelector('#gh-autosave');if(status)status.textContent=localSaved?'Rascunho salvo automaticamente neste navegador.':'Não foi possível salvar neste navegador. Salve na etapa 3 antes de sair.'};
   body.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{step=Number(b.dataset.step);draw()});body.querySelectorAll('[data-refresh]').forEach(b=>b.onclick=refresh);
   body.querySelector('[data-add-person]')?.addEventListener('click',()=>{const id=body.querySelector('#gh-person').value;if(!id)return toast('Selecione o professor.');draft.professores.push({id,disponiveis:Array.from({length:10},(_,i)=>i),max_noites:5});activeTeacher=id;draw()});
@@ -117,8 +118,15 @@
   body.querySelector('#gh-run')?.addEventListener('change',e=>{selectedRun=e.target.value;filterGroup='';draw()});body.querySelector('#gh-filter')?.addEventListener('change',e=>{filterGroup=e.target.value;draw()});
   body.querySelector('[data-copy]')?.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(selectedRun);toast('ID copiado.')}catch{toast('Selecione e copie o ID exibido abaixo dos botões.')}});
   body.querySelector('[data-reuse]')?.addEventListener('click',()=>resumePlan(selectedRun));
+  const editSaved=body.querySelector('[data-reuse]');if(editSaved)editSaved.textContent='Editar planejamento';
  }
  async function saveStage(){if(!draft.titulo.trim())return toast('Informe o nome do planejamento antes de salvar a etapa.');if(!draft.professores.length&&!draft.ofertas.length)return toast('Adicione ao menos um docente ou uma oferta antes de salvar.');await saveVersion(true)}
  async function save(){const problems=issues();if(problems.length)return toast(problems[0]);if(draft.professores.some(p=>p.restricao_informada&&!p.restricao_revisada))return toast('Revise as restrições de dias informadas pelos docentes na etapa 1.');if(draft.ofertas.some(o=>o.blocos_revisados===false))return toast('Confira os blocos semanais das ofertas importadas na etapa 2.');await saveVersion(false)}
- async function saveVersion(partial){if(saving)return;saving=true;draw();try{const{data,error:e}=await banco.from('horario_planejamentos').insert({titulo:draft.titulo.trim(),configuracao:{professores:draft.professores,ofertas:draft.ofertas,total_slots:12,versao:3,etapa:step,rascunho_etapa:partial}}).select('*').single();if(e)throw e;runs=[data,...runs].slice(0,20);selectedRun=data.id;filterGroup='';toast(partial?'Etapa salva no sistema. Você poderá retomá-la em outro dispositivo.':'Planejamento salvo. Inicie a geração pelo botão abaixo.')}catch(e){toast('Não foi possível salvar: '+e.message)}finally{saving=false;draw()}}
+ async function saveVersion(partial){if(saving)return;saving=true;draw();try{
+  const id=draft.planejamento_id,payload={titulo:draft.titulo.trim(),configuracao:{professores:draft.professores,ofertas:draft.ofertas,total_slots:12,versao:3,etapa:step,rascunho_etapa:partial}};
+  let query;if(id){query=banco.from('horario_planejamentos').update({...payload,status:'pendente',resultado:null,mensagem:null}).eq('id',id).neq('status','processando')}else{query=banco.from('horario_planejamentos').insert(payload)}
+  const{data,error:e}=await query.select('*').single();if(e)throw e;
+  if(!data)throw Error('Planejamento não atualizado. Confira a permissão de atualização no Supabase e se a geração está em andamento.');
+  draft.planejamento_id=data.id;runs=[data,...runs.filter(r=>r.id!==data.id)].slice(0,20);selectedRun=data.id;filterGroup='';toast(partial?'Etapa salva no mesmo planejamento.':'Planejamento atualizado. Inicie a geração pelo botão abaixo.');
+ }catch(e){toast('Não foi possível salvar: '+e.message+(draft.planejamento_id?' Verifique a migração supabase_horarios_atualizar_planejamento.sql.':''))}finally{saving=false;draw()}}
 })();
