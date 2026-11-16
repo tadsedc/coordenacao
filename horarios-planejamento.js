@@ -68,7 +68,12 @@
    const load=draft.ofertas.filter(o=>o.modalidade!=='ead'&&o.professor===p.id).reduce((n,o)=>n+Number(o.blocos),0);
    const perNight=days.map((_,d)=>p.disponiveis.filter(s=>Math.floor(s/2)===d).length).sort((a,b)=>b-a);
    const capacity=perNight.slice(0,p.max_noites).reduce((a,b)=>a+b,0);
-   if(load<=capacity)return;
+   if(load<=capacity){
+    const remaining=capacity-load,status=document.createElement('div');status.className='gh-teacher-capacity';status.setAttribute('role','status');
+    const title=document.createElement('strong');title.textContent=remaining?'✓ Ainda cabem '+remaining+' bloco(s)':'✓ Capacidade preenchida';
+    const description=document.createElement('span');description.textContent=load+' de '+capacity+' blocos atribuídos em até '+p.max_noites+' noite(s), considerando os bloqueios. Dois blocos correspondem a uma noite completa.';
+    status.append(title,description);const field=select.closest('label'),wrapper=document.createElement('div');wrapper.className='gh-teacher-assignment';field.before(wrapper);wrapper.append(field,status);return;
+   }
    const warning=document.createElement('div');warning.className='gh-teacher-overload';warning.setAttribute('role','alert');
    const minNights=Math.ceil(load/2);
    warning.innerHTML='<strong>⚠ Disponibilidade excedida</strong><span>'+esc(personName(p.id))+': '+load+' blocos atribuídos; cabem '+capacity+' em até '+p.max_noites+' noite(s), considerando os bloqueios.'+(minNights>p.max_noites?' A carga exige pelo menos '+minNights+' noites.':' Reveja também as restrições dos blocos.')+'</span>';
