@@ -9,6 +9,8 @@ def solve(config):
     people = {p['id']: set(p['disponiveis']) for p in config['professores']}
     offers = config['ofertas']
     count = config['total_slots']
+    if any(o.get('modalidade') == 'ead' for o in offers):
+        count = max(count, 12)
     if not offers or not 1 <= count <= 100:
         raise ValueError('Ofertas ou quantidade de blocos inválida.')
     model = cp_model.CpModel()
@@ -26,7 +28,9 @@ def solve(config):
             variables[i, slot] = model.new_bool_var(f'a_{i}_{slot}')
             if not ead and slot not in people[offer['professor']]:
                 model.add(variables[i, slot] == 0)
-            if offer.get('modalidade') == 'ead' and slot not in (6, 7, 8, 9):
+            if not ead and slot >= 10:
+                model.add(variables[i, slot] == 0)
+            if ead and slot not in (6, 7, 8, 9, 10, 11):
                 model.add(variables[i, slot] == 0)
         model.add(sum(variables[i, s] for s in range(count)) == offer['blocos'])
     groups = {c['turma'] for o in offers for c in o['componentes']}
@@ -52,15 +56,16 @@ def solve(config):
                 model.add(night == 0)
             nights.append(night)
         model.add(sum(nights) <= limit)
-    model.minimize(sum(variables[i, slot] for i, offer in enumerate(offers)
+    saturday_weight = 1 + sum(o['blocos'] for o in offers if o.get('modalidade') == 'ead')
+    model.minimize(sum(variables[i, slot] * (saturday_weight if slot >= 10 else 1) for i, offer in enumerate(offers)
                        if offer.get('modalidade') == 'ead'
-                       for slot in (6, 7) if slot < count))
+                       for slot in (6, 7, 10, 11) if slot < count))
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = 60
     solver.parameters.num_search_workers = 2
     status = solver.solve(model)
     if status == cp_model.INFEASIBLE:
-        raise ValueError('Não existe horário com estas disponibilidades, cargas, limites de noites e turmas conjuntas. EAD exige quinta ou sexta-feira. Revise o planejamento.')
+        raise ValueError('Não existe horário com estas disponibilidades, cargas, limites de noites e turmas conjuntas. EAD exige quinta, sexta ou sábado. Revise o planejamento.')
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
         raise ValueError('Busca encerrada sem solução. Isso não comprova incompatibilidade das regras.')
     return {'aulas': [dict(oferta=o['id'], professor=None if o.get('modalidade') == 'ead' else o['professor'], componentes=o['componentes'], slot=s,

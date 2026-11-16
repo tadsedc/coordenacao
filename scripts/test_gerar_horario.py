@@ -37,11 +37,18 @@ class SchedulingTests(unittest.TestCase):
         result = [a for a in solve(config)['aulas'] if a['modalidade'] == 'ead']
         self.assertEqual({a['slot'] for a in result}, {6, 7})
 
+    def test_ead_falls_back_to_saturday(self):
+        config = self.ead_config(list(range(10)))
+        config['ofertas'][1]['blocos'] = 10
+        config['professores'][0]['max_noites'] = 5
+        result = solve(config)['aulas']
+        self.assertEqual({a['slot'] for a in result if a['modalidade'] == 'ead'}, {10, 11})
+        self.assertTrue(all(a['slot'] < 10 for a in result if a['modalidade'] != 'ead'))
+
     def test_ead_does_not_use_other_days(self):
         with self.assertRaisesRegex(ValueError, 'Não existe horário'):
             config = self.ead_config(list(range(10)))
-            config['ofertas'][1]['blocos'] = 10
-            config['professores'][0]['max_noites'] = 5
+            config['ofertas'][0]['blocos'] = 7
             solve(config)
 
     def test_nights_are_chosen_by_solver_with_day_restriction(self):

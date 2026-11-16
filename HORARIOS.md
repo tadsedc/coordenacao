@@ -33,6 +33,8 @@ A atualização visual, os limites de noites e EAD usam configuracao JSON existe
 
 ## Salvar etapas e importar aderência
 
+Atualização: EAD também pode ocupar sábado (dois blocos), mantendo sexta como primeira opção, quinta como segunda e sábado como terceira. A grade de resultado exibe sábado. Ofertas presenciais continuam restritas a segunda–sexta. Planejamentos antigos com EAD são expandidos para considerar sábado na próxima geração; resultados anteriores não são alterados. Nenhuma nova migração SQL é necessária.
+
 Cada etapa tem Salvar etapa, que grava uma nova versão parcial no Supabase, mesmo sem turmas ou disciplinas completas. Informe o nome do planejamento no início. A versão fica identificada pela etapa salva e pode ser aberta em Retomar planejamento salvo, inclusive em outro dispositivo. Não exige nova migração. Versões parciais não liberam geração; após a conferência, use Salvar planejamento na etapa 3.
 
 Sem rascunho local, o gerador importa automaticamente as respostas do levantamento mais recente. O seletor permite importar docentes de outro levantamento. Somente docentes ainda ausentes são adicionados: reimportações não sobrescrevem edições da coordenação. Quem não respondeu pode ser adicionado manualmente.
