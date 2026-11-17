@@ -124,7 +124,8 @@
   }
 
   function presencaListaHtml(atividadeId){
-    const registros=(db.presencaRegistros&&db.presencaRegistros[atividadeId])||[];
+    const registros=[...((db.presencaRegistros&&db.presencaRegistros[atividadeId])||[])]
+      .sort((a,b)=>String(a.nome||'').trim().localeCompare(String(b.nome||'').trim(),'pt-BR',{sensitivity:'base'}));
     if(!registros.length)return '<div class="empty">Nenhum check-in registrado ainda.</div>';
     return '<div class="table"><table><thead><tr><th>Estudante</th><th>Disciplina escolhida</th><th>Horário</th><th>Localização</th></tr></thead><tbody>'
       +registros.map(presencaRegistroRow).join('')+'</tbody></table></div>'
