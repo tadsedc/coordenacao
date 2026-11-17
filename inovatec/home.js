@@ -3,6 +3,8 @@
   if(!api)return;
   api.from('inovatec_configuracoes').select('*').eq('id',1).maybeSingle().then(({data,error})=>{
     if(error||!data)return;
+    const point=document.getElementById('point-access');
+    if(point)point.hidden=data.ponto_divulgado!==true;
     if(data.inscricoes_abertas)document.getElementById('showcase').hidden=false;
     if(!data.oficinas_inscricoes_abertas)return;
     const card=document.getElementById('workshops');
