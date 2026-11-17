@@ -47,8 +47,7 @@ begin
  s:=public.situacao_ponto_inovatec(e.id);
  if not (s->>'concluido')::boolean then return jsonb_build_object('nome',e.nome_completo,'situacao',s);end if;
  select coalesce(jsonb_agg(jsonb_build_object('id',d.id,'curso',d.curso,'disciplina',d.disciplina,'semestre',d.semestre) order by d.curso,d.disciplina),'[]'::jsonb)
- into opcoes from public.matriz_disciplinas d where d.ativa and d.curso in('ADS','EDC')
- and exists(select 1 from public.presenca_registros r where r.inovatec_estudante_id=e.id and upper(trim(r.curso))=d.curso);
+ into opcoes from public.matriz_disciplinas d where d.ativa and d.curso in('ADS','EDC');
  return jsonb_build_object('nome',e.nome_completo,'situacao',s,'disciplinas',opcoes);
 end $$;
 
@@ -63,7 +62,6 @@ begin
  if not e.ativo or not (public.situacao_ponto_inovatec(e.id)->>'concluido')::boolean then raise exception 'É necessário concluir as duas palestras e todos os encontros de ao menos uma oficina válida. E-Games não conta.';end if;
  select * into d from public.matriz_disciplinas where id=p_disciplina and ativa and curso in('ADS','EDC');
  if not found then raise exception 'Selecione uma disciplina válida da matriz.';end if;
- if not exists(select 1 from public.presenca_registros where inovatec_estudante_id=e.id and upper(trim(curso))=d.curso) then raise exception 'A disciplina deve pertencer ao seu curso registrado nas presenças. Consulte a coordenação se houver divergência.';end if;
  insert into public.inovatec_pontos(estudante_id,disciplina_id,nome_estudante,curso,disciplina) values(e.id,d.id,e.nome_completo,d.curso,d.disciplina);
  return public.acessar_ponto_inovatec(p_nome,p_email);
 end $$;
