@@ -1,5 +1,7 @@
 (()=>{
  const I=Inovatec,db=I.api(),el=document.querySelector('#agenda');
+ const memorial=new URLSearchParams(location.search).get('memorial')==='2026';
+ if(memorial){document.querySelector('.hero h1').textContent='Memórias do INOVATEC 2026';document.querySelector('.hero>p').textContent='PROGRAMAÇÃO DE 2026';document.querySelector('.hero>span').textContent='Relembre os encontros, as oficinas e as ideias que fizeram parte desta edição.';}
  const zone='America/Campo_Grande';
  const dateOf=value=>new Date(value);
  const key=value=>new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit'}).format(dateOf(value));
@@ -7,7 +9,7 @@
  const fullDate=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:zone,day:'2-digit',month:'long'}).format(dateOf(value));
  const time=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:zone,hour:'2-digit',minute:'2-digit'}).format(dateOf(value)).replace(':','h');
  const groupByDay=items=>items.reduce((groups,item)=>{const day=key(item.data_hora);(groups[day]??=[]).push(item);return groups},{});
- const row=item=>'<article class="event-row"><div class="event-time"><b>'+I.esc(time(item.data_hora))+'</b>'+(item.fim?'<small>até '+I.esc(time(item.fim))+'</small>':'')+'</div><div class="event-copy"><div class="event-meta"><span class="event-kind">'+I.esc(item.tipo)+'</span><span class="event-audience '+(item.tipo==='Oficina'?'restricted':'open')+'">'+(item.tipo==='Oficina'?'PARA INSCRITOS':'PARA TODOS')+'</span></div><h2>'+I.esc(item.nome)+'</h2><p>'+I.esc(item.local||'Local a definir')+'</p>'+(item.dia?'<small>'+I.esc(item.dia)+' · Mesma turma de inscritos em todos os encontros.</small>':'')+'</div>'+(item.tipo==='Oficina'?'<button class="event-action" data-attendees="'+item.oficinaId+'" data-title="'+I.esc(item.nome)+'" data-vacancies="'+item.vagasDisponiveis+'">Ver inscritos <span>→</span></button>':'')+'</article>';
+ const row=item=>'<article class="event-row"><div class="event-time"><b>'+I.esc(time(item.data_hora))+'</b>'+(item.fim?'<small>até '+I.esc(time(item.fim))+'</small>':'')+'</div><div class="event-copy"><div class="event-meta"><span class="event-kind">'+I.esc(item.tipo)+'</span><span class="event-audience '+(item.tipo==='Oficina'?'restricted':'open')+'">'+(item.tipo==='Oficina'?'PARA INSCRITOS':'PARA TODOS')+'</span></div><h2>'+I.esc(item.nome)+'</h2><p>'+I.esc(item.local||'Local a definir')+'</p>'+(item.dia?'<small>'+I.esc(item.dia)+' · Mesma turma de inscritos em todos os encontros.</small>':'')+'</div>'+(item.tipo==='Oficina'&&!memorial?'<button class="event-action" data-attendees="'+item.oficinaId+'" data-title="'+I.esc(item.nome)+'" data-vacancies="'+item.vagasDisponiveis+'">Ver inscritos <span>→</span></button>':'')+'</article>';
  const render=items=>Object.values(groupByDay(items)).map(dayItems=>'<section class="day-section"><header class="day-heading"><span>'+I.esc(weekday(dayItems[0].data_hora))+'</span><strong>'+I.esc(fullDate(dayItems[0].data_hora))+'</strong><small>'+dayItems.length+' '+(dayItems.length===1?'atividade':'atividades')+'</small></header><div class="event-list">'+dayItems.map(row).join('')+'</div></section>').join('');
  async function load(){
   el.textContent='Carregando programação…';
@@ -17,6 +19,7 @@
    if(activities.error)throw activities.error;if(workshops.error)throw workshops.error;
    const agenda=(activities.data||[]).map(x=>({...x,tipo:'Atividade'}));
    for(const o of workshops.data||[]){const encontros=o.encontros?.length?o.encontros:[o],seen=new Set();encontros.forEach((v,index)=>{if(!v.data_hora)return;const id=v.data_hora+'|'+v.local;if(seen.has(id))return;seen.add(id);agenda.push({nome:o.titulo,data_hora:v.data_hora,fim:v.fim,local:v.local,tipo:'Oficina',oficinaId:o.id,vagasDisponiveis:Number(o.vagas_disponiveis||0),dia:encontros.length>1?'Encontro '+(index+1)+' de '+encontros.length:'',multiday:encontros.length>1})})}
+   if(memorial){for(let i=agenda.length-1;i>=0;i--){if(new Date(agenda[i].data_hora).getFullYear()!==2026)agenda.splice(i,1);}}
    agenda.sort((a,b)=>new Date(a.data_hora)-new Date(b.data_hora)||a.nome.localeCompare(b.nome,'pt-BR'));
    el.innerHTML=agenda.length?render(agenda):'<div class="empty">A programação será divulgada em breve.</div>';el.querySelectorAll('[data-attendees]').forEach(button=>button.onclick=()=>openAttendees(button.dataset.attendees,button.dataset.title,Number(button.dataset.vacancies||0)));
   }catch(error){console.error(error);el.innerHTML='<div class="empty error">Não foi possível carregar a programação completa. Atualize a página para tentar novamente.</div>'}

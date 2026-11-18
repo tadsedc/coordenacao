@@ -1,0 +1,7 @@
+.event-farewell{margin-top:30px;padding:clamp(28px,7vw,76px)}
+.event-farewell h1{font-size:clamp(34px,6vw,66px);max-width:850px}
+.event-farewell>span{max-width:680px}
+.event-farewell>strong{display:block;margin-top:26px;color:#a8eee0;font-size:18px}
+.memorial-link{display:inline-flex;align-items:center;gap:20px;margin-top:30px;padding:16px 22px;background:#fff;color:#075d8b;border-radius:14px;text-decoration:none;font-size:14px;font-weight:800}
+.memorial-link span{font-size:23px}.memorial-link:focus-visible{outline:3px solid #ffd96c;outline-offset:5px}
+@media(max-width:600px){.memorial-link{display:flex;justify-content:space-between;gap:12px;padding:15px;font-size:13px}}
