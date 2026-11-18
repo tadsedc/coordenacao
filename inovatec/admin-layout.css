@@ -1,0 +1,9 @@
+.management-navigation{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px;padding:14px;background:#fff;border:1px solid #dce6ef;border-radius:18px}
+.management-navigation button[aria-pressed=true]{background:#086aaa;color:#fff;border-color:#086aaa}
+#management .management{display:block}
+#management [hidden]{display:none!important}
+.list-controls{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding:12px 0;white-space:normal}
+.list-controls input{flex:1;min-width:160px;max-width:360px}
+.list-controls span{font-size:12px;color:#62748b}
+#management select{max-width:100%;width:100%;padding:11px;border:1px solid #dce6ef;border-radius:10px;background:#f9fbfd;font:inherit}
+@media(max-width:600px){.management-navigation{display:grid;grid-template-columns:1fr 1fr;padding:10px}.management-navigation button{white-space:normal}.list-controls input{max-width:none;flex-basis:100%}.list-controls span{flex-basis:100%}}
