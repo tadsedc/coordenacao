@@ -2,6 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {buildNotice} from '../supabase/functions/tcc-mail/notice.ts';
 
+test('aviso do orientador aponta para a equipe e não inclui protocolo ou PDF',()=>{
+ const mail=buildNotice({tipo:'orientador',email:'docente@example.com',titulo:'Pesquisa',codigo:'privado'});
+ assert.deepEqual(mail.to,['docente@example.com']);
+ assert.match(mail.subject,/novo tcc para orientação/);
+ for(const body of [mail.html,mail.text]){
+  assert.match(body,/tcc\/\?acesso=equipe/);
+  assert.doesNotMatch(body,/privado/);
+ }
+ assert.equal(mail.attachments,undefined);
+});
+
 test('confirmação informa o código somente ao responsável',()=>{
  const mail=buildNotice({tipo:'protocolo',email:'autor@example.com',titulo:'Pesquisa',codigo:'protocolo-teste'});
  assert.deepEqual(mail.to,['autor@example.com']);

@@ -4,19 +4,23 @@ const escapeHtml = (value: string) => value.replace(/[&<>"']/g, char =>
 
 export function buildNotice(data: Notice) {
   const protocol = data.tipo === "protocolo";
+  const advisor = data.tipo === "orientador";
+  const url = advisor ? "https://tadsedc.site/tcc/?acesso=equipe" : "https://tadsedc.site/tcc/";
   const approved = !protocol && data.situacao === "aprovado";
-  const heading = protocol ? "TCC recebido" : approved ? "Aprovado para a banca" : "Ajustes solicitados";
-  const intro = protocol
+  const heading = advisor ? "Novo TCC para orientação" : protocol ? "TCC recebido" : approved ? "Aprovado para a banca" : "Ajustes solicitados";
+  const intro = advisor
+    ? "Um trabalho foi enviado para sua análise. Entre com sua conta no portal para consultar o PDF e registrar o parecer."
+    : protocol
     ? "Guarde seu código de acompanhamento e use-o com o e-mail desta mensagem."
     : approved
     ? "Aguarde o agendamento da banca pela coordenação. Este parecer autoriza a apresentação e não é a aprovação final do trabalho."
     : "Confira as orientações abaixo e acompanhe o trabalho no portal.";
-  const details = protocol
+  const details = advisor ? intro : protocol
     ? `${heading}.\nCódigo de acompanhamento: ${data.codigo}\n${intro}`
     : `Parecer do orientador: ${heading}. ${intro}` + (data.parecer ? `\n\nObservações:\n${data.parecer}` : "");
   const block = protocol
     ? `<p style="padding:16px;background:#edf5fc;border-radius:12px"><strong>Código de acompanhamento</strong><br><span style="font-family:monospace;word-break:break-all">${escapeHtml(data.codigo ?? "")}</span></p>`
-    : data.parecer
+    : !advisor && data.parecer
     ? `<p style="padding:16px;background:#edf5fc;border-radius:12px;overflow-wrap:anywhere"><strong>Observações do orientador</strong><br>${escapeHtml(data.parecer).replace(/\r?\n/g, "<br>")}</p>`
     : "";
   const html = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#f3f6fb;color:#10213d;font-family:Arial,sans-serif">
@@ -30,13 +34,13 @@ export function buildNotice(data: Notice) {
     <h1 style="margin:8px 0 12px;font-size:26px;line-height:1.2">${heading}</h1>
     <p style="overflow-wrap:anywhere"><strong>Trabalho:</strong> ${escapeHtml(data.titulo)}</p>
     <p>${intro}</p>${block}
-    <p style="margin:24px 0 8px"><a href="https://tadsedc.site/tcc/" style="display:inline-block;background:#116bb0;color:#fff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold">Acompanhar no portal</a></p>
+    <p style="margin:24px 0 8px"><a href="${url}" style="display:inline-block;background:#116bb0;color:#fff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold">${advisor ? "Abrir painel de TCC" : "Acompanhar no portal"}</a></p>
   </td></tr></table></td></tr></table></body></html>`;
   return {
     from: "TCC | Coordenação <tcc@avisos.tadsedc.site>",
     to: [data.email],
     subject: protocol ? "TCC recebido — código de acompanhamento" : `TCC — ${heading.toLowerCase()}`,
-    text: `Trabalho: ${data.titulo}\n\n${details}\n\nAcompanhe em https://tadsedc.site/tcc/\n\nCoordenação de TADS e EDC · AEMS`,
+    text: `Trabalho: ${data.titulo}\n\n${details}\n\nAcesse ${url}\n\nCoordenação de TADS e EDC · AEMS`,
     html,
   };
 }

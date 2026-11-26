@@ -32,9 +32,8 @@ Deno.serve(async (request) => {
       teacher = user.id;
     }
     const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, options);
-    const { data, error } = await admin.rpc("tcc_reservar_aviso", {
-      p_codigo: code, p_trabalho: work, p_docente: teacher,
-    });
+    async function send(rpc: string, args: Record<string, string | null>) {
+    const { data, error } = await admin.rpc(rpc, args);
     if (error) return json(false, 503);
     if (!data) return json(false);
     if (data.enviado) return json(true);
@@ -51,6 +50,17 @@ Deno.serve(async (request) => {
     if (!response.ok) return json(false, 502);
     const { error: confirmError } = await admin.rpc("tcc_confirmar_aviso", { p_id: data.id });
     return json(!confirmError, confirmError ? 503 : 200);
+    }
+    const studentNotice = send("tcc_reservar_aviso", {
+      p_codigo: code, p_trabalho: work, p_docente: teacher,
+    });
+    if (!code) return await studentNotice;
+    const [student] = await Promise.allSettled([
+      studentNotice,
+      send("tcc_reservar_aviso_orientador", { p_codigo: code }),
+    ]);
+    // A confirmação exibida ao estudante diz respeito somente ao próprio aviso.
+    return student.status === "fulfilled" ? student.value : json(false, 503);
   } catch {
     return json(false, 503);
   }
