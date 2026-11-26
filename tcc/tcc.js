@@ -14,6 +14,12 @@
   if(result.error)throw new Error(result.error.message);
   return result.data;
  }
+ async function notify(data){
+  try{
+   const result=await db.functions.invoke('tcc-mail',{body:data});
+   return !result.error&&result.data?.sent===true;
+  }catch{return false}
+ }
  function bind(form,status,fn){
   form.addEventListener('submit',async e=>{
    e.preventDefault();const button=e.submitter||form.querySelector('button');
@@ -51,6 +57,9 @@
    $('lookup').elements.codigo.value=result.codigo;$('lookup').elements.email.value=f.get('email');
    $('receipt').textContent='TCC recebido em '+format(result.enviado_em)+'. Guarde este código de acompanhamento: '+result.codigo;
    $('submit-initial').reset();$('submit-initial').hidden=true;
+   $('receipt').textContent+=await notify({codigo:result.codigo})
+    ? '. O serviço de e-mail aceitou o envio do código.'
+    : '. Não foi possível confirmar o aviso por e-mail. Sua entrega está registrada.';
   });
   $('lookup').addEventListener('input',()=>{work=null;credentials=null;$('progress').textContent='';refreshStudent()});
   bind($('lookup'),$('progress'),async f=>{
@@ -107,7 +116,13 @@
      form.innerHTML='<label>Observações<textarea name="parecer" maxlength="2000"></textarea></label><button value="aprovado">Dar OK</button><button value="ajustes">Solicitar ajustes</button>';
      form.elements.parecer.value=item.parecer||'';
      const status=node('p','');status.setAttribute('role','status');form.append(status);
-     bind(form,status,async(f,button)=>{await call('parecer',{id:item.id,situacao:button.value,parecer:f.get('parecer')});await draw();$('page-feedback').textContent='Parecer registrado.'});
+     bind(form,status,async(f,button)=>{
+      await call('parecer',{id:item.id,situacao:button.value,parecer:f.get('parecer')});
+      status.textContent='Parecer registrado. Enviando aviso…';
+      const sent=await notify({trabalho:item.id});
+      $('page-feedback').textContent=sent?'Parecer registrado e aviso aceito pelo serviço de e-mail.':'Parecer registrado. Não foi possível confirmar o aviso por e-mail; o estudante pode consultar no portal.';
+      await draw();
+     });
      article.append(form);
     }
     list.append(article);

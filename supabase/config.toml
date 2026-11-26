@@ -3,3 +3,6 @@ verify_jwt = true
 
 [functions.tcc-test-email]
 verify_jwt = true
+
+[functions.tcc-mail]
+verify_jwt = false
