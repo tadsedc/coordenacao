@@ -147,6 +147,11 @@
      article.append(button);
     }
     if(coord){
+     if(item.situacao==='aprovado'){
+      const ata=node('button','Configurar banca e gerar ata');ata.type='button';
+      ata.onclick=()=>window.TccAta.open(db,item);
+      article.append(ata);
+     }
      const remove=node('button','Excluir trabalho');remove.type='button';remove.className='tcc-danger';
      remove.onclick=async()=>{
       remove.disabled=true;

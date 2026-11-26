@@ -43,3 +43,4 @@
 .tcc-code-row code{max-width:100%;overflow-wrap:anywhere;background:#fff;padding:8px;border:1px solid var(--status-line);border-radius:8px}
 .tcc-shell .tcc-code-row button{padding:8px 12px}
 .tcc-mail-status{color:var(--status-ink);font-size:.9rem}
+#tcc-ata{max-height:calc(100dvh - 24px);overflow:auto}

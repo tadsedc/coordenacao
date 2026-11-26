@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/novo-site/styles.css?v=27">
-  <link rel="stylesheet" href="tcc.css?v=5">
+  <link rel="stylesheet" href="tcc.css?v=6">
 </head>
 <body class="tcc-page">
   <div class="ambient ambient-one" aria-hidden="true"></div><div class="ambient ambient-two" aria-hidden="true"></div>
@@ -72,6 +72,23 @@
     <section><h2>Trabalhos recebidos</h2><div id="work-list"></div></section>
   </div>
   <p id="page-feedback" role="status"></p>
+  <dialog id="tcc-ata" aria-labelledby="tcc-ata-title">
+    <form id="tcc-ata-form">
+      <h2 id="tcc-ata-title">Configurar banca e gerar ata</h2>
+      <p id="tcc-ata-work"></p>
+      <label>Curso<select name="curso" required><option value="">Selecione</option><option value="ADS">Análise e Desenvolvimento de Sistemas</option><option value="EDC">Engenharia de Computação</option></select></label>
+      <label>Data da defesa<input type="date" name="data" required></label>
+      <label>Período do curso<input type="number" name="periodo" min="1" max="10" required></label>
+      <label>Titulação do orientador<input name="tituloOrientador" maxlength="160" required></label>
+      <label>Nome completo do primeiro examinador<input name="nome1" maxlength="160" required></label>
+      <label>Titulação do primeiro examinador<input name="titulo1" maxlength="160" required></label>
+      <label>Nome completo do segundo examinador<input name="nome2" maxlength="160" required></label>
+      <label>Titulação do segundo examinador<input name="titulo2" maxlength="160" required></label>
+      <p role="status"></p>
+      <button type="button" id="tcc-ata-close">Fechar</button>
+      <button type="submit">Salvar e baixar ata em Word</button>
+    </form>
+  </dialog>
   <dialog id="delete-work" aria-labelledby="delete-work-title">
     <form method="dialog">
       <h2 id="delete-work-title">Excluir trabalho?</h2>
@@ -83,5 +100,7 @@
   </dialog>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="tcc.js?v=6"></script>
+<script src="/vendor/pizzip.min.js"></script>
+<script src="ata.js?v=1"></script>
+<script src="tcc.js?v=7"></script>
 </body></html>
