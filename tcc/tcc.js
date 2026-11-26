@@ -8,6 +8,18 @@
  const labels={pendente:'Aguardando o orientador',aprovado:'Aprovado para a banca',ajustes:'Ajustes solicitados pelo orientador'};
  const format=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Cuiaba',dateStyle:'short',timeStyle:'short'}).format(new Date(value));
  const node=(tag,text)=>Object.assign(document.createElement(tag),{textContent:text});
+ function feedback(el,tone,title,...details){
+  el.dataset.tone=tone;
+  const icon=node('span',({success:'✓',warning:'!',error:'×',info:'i'})[tone]);
+  icon.className='tcc-status-icon';icon.setAttribute('aria-hidden','true');
+  const body=node('span','');body.className='tcc-status-body';
+  body.append(node('strong',title));
+  for(const detail of details.filter(Boolean)){
+   const line=node('span',detail);line.className='tcc-status-detail';body.append(line);
+  }
+  el.replaceChildren(icon,body);
+  return body;
+ }
  let periods={}, credentials=null, work=null;
  async function call(action,data={}){
   const result=await db.rpc('tcc_portal',{p_acao:action,p_dados:data});
@@ -24,8 +36,8 @@
   form.addEventListener('submit',async e=>{
    e.preventDefault();const button=e.submitter||form.querySelector('button');
    if(button.disabled)return;
-   button.disabled=true;status.textContent='Processando…';
-   try{await fn(new FormData(form),button)}catch(error){status.textContent=error.message}
+   button.disabled=true;feedback(status,'info','Processando…');
+   try{await fn(new FormData(form),button)}catch(error){feedback(status,'error','Não foi possível concluir',error.message)}
    finally{button.disabled=false}
   });
  }
@@ -55,11 +67,21 @@
   bind($('submit-initial'),$('receipt'),async f=>{
    const result=await call('inicial',{titulo:f.get('titulo'),email:f.get('email'),orientador:f.get('orientador'),autores:f.get('autores').split(/\r?\n/).map(x=>x.trim()).filter(Boolean),pdf:await pdf(f.get('pdf'))});
    $('lookup').elements.codigo.value=result.codigo;$('lookup').elements.email.value=f.get('email');
-   $('receipt').textContent='TCC recebido em '+format(result.enviado_em)+'. Guarde este código de acompanhamento: '+result.codigo;
+   const body=feedback($('receipt'),'success','TCC recebido','Enviado em '+format(result.enviado_em)+'.','Guarde o código para consultar seu trabalho.');
+   const row=node('span','');row.className='tcc-code-row';
+   const code=node('code',result.codigo), copy=node('button','Copiar código');
+   copy.type='button';
+   const copyStatus=node('span','');copyStatus.setAttribute('aria-live','polite');
+   copy.onclick=async()=>{
+    try{await navigator.clipboard.writeText(result.codigo);copy.textContent='Copiado ✓';copyStatus.textContent='Código copiado.'}
+    catch{copyStatus.textContent='Não foi possível copiar automaticamente. Selecione e copie o código acima.'}
+   };
+   row.append(code,copy);body.append(row,copyStatus);
    $('submit-initial').reset();$('submit-initial').hidden=true;
-   $('receipt').textContent+=await notify({codigo:result.codigo})
-    ? '. O serviço de e-mail aceitou o envio do código.'
-    : '. Não foi possível confirmar o aviso por e-mail. Sua entrega está registrada.';
+   const mail=node('span','Enviando aviso por e-mail…');mail.className='tcc-mail-status';body.append(mail);
+   const sent=await notify({codigo:result.codigo});
+   mail.dataset.tone=sent?'success':'warning';
+   mail.textContent=sent?'✓ Aviso aceito pelo serviço de e-mail.':'! E-mail não confirmado. Sua entrega está registrada.';
   });
   $('lookup').addEventListener('input',()=>{work=null;credentials=null;$('progress').textContent='';refreshStudent()});
   bind($('lookup'),$('progress'),async f=>{
@@ -70,7 +92,11 @@
    periods=await call('periodos');
    if($('lookup').elements.codigo.value.trim()!==next.codigo||$('lookup').elements.email.value.trim()!==next.email)return;
    work=current;credentials=next;
-   $('progress').textContent=work.titulo+' · '+work.orientador_nome+' · '+labels[work.situacao]+(work.analisado_em?' em '+format(work.analisado_em):'')+(work.situacao==='aprovado'&&!work.final_em?'. Aguarde o agendamento da banca pela coordenação. Este parecer não é a aprovação final do trabalho':'')+(work.parecer?'. Observações: '+work.parecer:'.');
+   feedback($('progress'),work.situacao==='aprovado'?'success':work.situacao==='ajustes'?'warning':'info',labels[work.situacao],
+    work.titulo+' · Orientador: '+work.orientador_nome,
+    work.analisado_em?'Parecer registrado em '+format(work.analisado_em)+'.':'',
+    work.situacao==='aprovado'&&!work.final_em?'Aguarde o agendamento da banca pela coordenação. Este parecer não é a aprovação final do trabalho.':'',
+    work.parecer?'Observações: '+work.parecer:'');
    refreshStudent();
   });
   bind($('submit-final'),$('final-feedback'),async f=>{
@@ -78,7 +104,7 @@
    if(!access)throw new Error('Consulte o trabalho novamente.');
    const result=await call('final',{...access,pdf:await pdf(f.get('pdf'))});
    if(credentials===access){work=result;refreshStudent()}
-   $('final-feedback').textContent='Versão final recebida em '+format(result.final_em)+'.';
+   feedback($('final-feedback'),'success','Versão final recebida','Enviada em '+format(result.final_em)+'.');
    $('submit-final').reset();
   });
   refreshStudent();
@@ -131,9 +157,9 @@
        const {error}=await db.rpc('tcc_excluir_trabalho',{p_id:item.id});
        if(error)throw new Error(error.message);
        article.remove();
-       status.textContent='Trabalho e arquivos excluídos.';
+       feedback(status,'success','Trabalho e arquivos excluídos');
        if(!list.children.length)list.textContent='Nenhum trabalho recebido.';
-      }catch(error){status.textContent='Não foi possível excluir: '+error.message}
+      }catch(error){feedback(status,'error','Não foi possível excluir',error.message)}
       finally{remove.disabled=false}
      };
      article.append(remove);
@@ -147,7 +173,7 @@
       await call('parecer',{id:item.id,situacao:button.value,parecer:f.get('parecer')});
       status.textContent='Parecer registrado. Enviando aviso…';
       const sent=await notify({trabalho:item.id});
-      $('page-feedback').textContent=sent?'Parecer registrado e aviso aceito pelo serviço de e-mail.':'Parecer registrado. Não foi possível confirmar o aviso por e-mail; o estudante pode consultar no portal.';
+      feedback($('page-feedback'),sent?'success':'warning','Parecer registrado',sent?'O serviço de e-mail aceitou o aviso.':'E-mail não confirmado. O estudante pode consultar o parecer no portal.');
       await draw();
      });
      article.append(form);
@@ -162,7 +188,7 @@
     const payload=Object.fromEntries(dates.map(k=>[k,f.get(k)+'-04:00']));
     const [a,b,c,d]=dates.map(k=>Date.parse(payload[k]));
     if(!(a<b&&c<d))throw new Error('Em cada período, o encerramento deve ser após a abertura.');
-    await call('salvar_periodos',payload);$('period-feedback').textContent='Prazos salvos.';
+    await call('salvar_periodos',payload);feedback($('period-feedback'),'success','Prazos salvos');
    });
   }
   await draw();$('staff').hidden=false;

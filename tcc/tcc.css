@@ -31,3 +31,15 @@
 .tcc-shell dialog{width:min(470px,calc(100% - 28px));border:1px solid var(--line);border-radius:20px;padding:24px;color:var(--ink);box-shadow:var(--shadow)}
 .tcc-shell dialog::backdrop{background:#10213d99;backdrop-filter:blur(4px)}
 .tcc-shell dialog p{overflow-wrap:anywhere}
+.tcc-shell [role=status][data-tone]:not(:empty){display:flex;align-items:flex-start;gap:12px;padding:14px;background:var(--status-bg);color:var(--status-ink);border:1px solid var(--status-line)}
+.tcc-shell [data-tone=success]{--status-bg:#eaf7f1;--status-ink:#176047;--status-line:#c0e5d3}
+.tcc-shell [data-tone=warning]{--status-bg:#fff6df;--status-ink:#744800;--status-line:#efd69b}
+.tcc-shell [data-tone=error]{--status-bg:#fff0f1;--status-ink:#8e2532;--status-line:#efc6cb}
+.tcc-shell [data-tone=info]{--status-bg:#eaf3fd;--status-ink:#174566;--status-line:#c7dff4}
+.tcc-status-icon{display:grid;place-items:center;flex:0 0 30px;height:30px;border:1px solid currentColor;border-radius:10px;font-weight:800}
+.tcc-status-body{min-width:0;display:grid;gap:6px;line-height:1.5}
+.tcc-status-detail{white-space:pre-wrap}
+.tcc-code-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.tcc-code-row code{max-width:100%;overflow-wrap:anywhere;background:#fff;padding:8px;border:1px solid var(--status-line);border-radius:8px}
+.tcc-shell .tcc-code-row button{padding:8px 12px}
+.tcc-mail-status{color:var(--status-ink);font-size:.9rem}
