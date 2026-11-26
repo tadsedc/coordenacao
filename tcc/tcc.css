@@ -27,3 +27,7 @@
 .tcc-integrated{background:transparent}
 .tcc-integrated :is(.ambient,.tcc-header,.tcc-intro){display:none}
 .tcc-integrated .tcc-shell{width:100%;padding:0 2px 16px}
+.tcc-shell .tcc-danger{background:#a52736;color:#fff}
+.tcc-shell dialog{width:min(470px,calc(100% - 28px));border:1px solid var(--line);border-radius:20px;padding:24px;color:var(--ink);box-shadow:var(--shadow)}
+.tcc-shell dialog::backdrop{background:#10213d99;backdrop-filter:blur(4px)}
+.tcc-shell dialog p{overflow-wrap:anywhere}

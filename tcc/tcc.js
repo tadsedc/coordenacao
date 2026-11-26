@@ -91,6 +91,15 @@
   const link=document.createElement('a');link.href=url;link.download='TCC-'+id+'-'+stage+'.pdf';link.click();
   setTimeout(()=>URL.revokeObjectURL(url),30000);
  }
+ function confirmDeletion(title){
+  const dialog=$('delete-work');
+  $('delete-work-name').textContent=title;
+  dialog.returnValue='cancelar';
+  return new Promise(resolve=>{
+   dialog.showModal();
+   dialog.addEventListener('close',()=>resolve(dialog.returnValue==='excluir'),{once:true});
+  });
+ }
  async function staffView(){
   $('students').hidden=true;
   const {data:{user}}=await db.auth.getUser();
@@ -110,6 +119,24 @@
      const button=node('button',stage==='inicial'?'Baixar trabalho inicial':'Baixar versão final');
      button.onclick=async()=>{button.disabled=true;try{await download(item.id,stage)}catch(e){$('page-feedback').textContent=e.message}finally{button.disabled=false}};
      article.append(button);
+    }
+    if(coord){
+     const remove=node('button','Excluir trabalho');remove.type='button';remove.className='tcc-danger';
+     remove.onclick=async()=>{
+      remove.disabled=true;
+      const status=$('page-feedback');
+      try{
+       if(!await confirmDeletion(item.titulo))return;
+       status.textContent='Excluindo trabalho…';
+       const {error}=await db.rpc('tcc_excluir_trabalho',{p_id:item.id});
+       if(error)throw new Error(error.message);
+       article.remove();
+       status.textContent='Trabalho e arquivos excluídos.';
+       if(!list.children.length)list.textContent='Nenhum trabalho recebido.';
+      }catch(error){status.textContent='Não foi possível excluir: '+error.message}
+      finally{remove.disabled=false}
+     };
+     article.append(remove);
     }
     if(!coord&&!item.final_em){
      const form=document.createElement('form');
