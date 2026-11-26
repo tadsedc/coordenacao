@@ -15,7 +15,7 @@
   const items=[...template.content.children];const used=new Set();
   const groups=[
    ['', ['dash']],
-   ['Acadêmico',['classes','gerador-horarios','integral','people','rooms','aderencia','exams','presenca','requirements','sorteador']],
+   ['Acadêmico',['classes','gerador-horarios','integral','people','rooms','aderencia','exams','presenca','requirements','tcc','sorteador']],
    ['Comunicação',['notices','forms','documents','public']],
    ['Eventos',['eceaems','inovatec']],
    ['Sistema',['maintenance','settings']]

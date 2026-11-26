@@ -1,7 +1,9 @@
 (async()=>{
  const $=id=>document.getElementById(id);
  const db=window.supabase.createClient('https://uvdnejmdqgwdcipctyur.supabase.co','sb_publishable_Afn5llFEgcHD4Uhmt8N4pA_W0T_NHZk');
- const staff=new URLSearchParams(location.search).get('acesso')==='equipe';
+ const params=new URLSearchParams(location.search);
+ const staff=params.get('acesso')==='equipe';
+ if(staff&&params.get('integrado')==='1')document.body.classList.add('tcc-integrated');
  const dates=['inicial_abre','inicial_fecha','final_abre','final_fecha'];
  const labels={pendente:'Aguardando o orientador',aprovado:'Aprovado pelo orientador',ajustes:'Ajustes solicitados pelo orientador'};
  const format=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Cuiaba',dateStyle:'short',timeStyle:'short'}).format(new Date(value));

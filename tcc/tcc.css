@@ -24,3 +24,6 @@
  .tcc-shell .steps{grid-template-columns:1fr;gap:8px}.tcc-shell .steps li{padding:10px 13px}.tcc-shell .steps p{margin:4px 0 0 35px}
 }
 @media(max-width:360px){.tcc-header{flex-wrap:wrap}.tcc-shell .steps p{margin-left:0}}
+.tcc-integrated{background:transparent}
+.tcc-integrated :is(.ambient,.tcc-header,.tcc-intro){display:none}
+.tcc-integrated .tcc-shell{width:100%;padding:0 2px 16px}

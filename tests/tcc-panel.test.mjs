@@ -4,13 +4,18 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
-test('o acesso à gestão aparece apenas nas páginas da coordenação e do docente',()=>{
- const context={layout:content=>content,state:{},document:{}};
+test('TCC integra o menu e abre a gestão dentro do painel somente para a equipe',()=>{
+ const root={};let fallback=0;
+ const context={layout:content=>content,nav:()=>'<button data-page="public">Portal</button>',navIcon:()=>'',render:()=>fallback++,bind:()=>{},auth:true,state:{},document:{getElementById:()=>root}};
  vm.runInNewContext(read('tcc-panel.js'),context);
- for(const [role,page,visible] of [['coord','dash',true],['teacher','mine',true],['student','public',false],['coord','inovatec',false]]){
-  context.state={role,page};
-  assert.equal(context.layout('conteúdo').includes('/tcc/?acesso=equipe'),visible);
+ for(const [role,allowed] of [['coord',true],['teacher',true],['student',false]]){
+  context.state={role,page:'tcc'};
+  assert.equal(context.nav().includes('data-page="tcc"'),allowed);
+  root.innerHTML='';
+  context.render();
+  assert.equal(root.innerHTML.includes('acesso=equipe&amp;integrado=1'),allowed);
  }
+ assert.equal(fallback,1);
 });
 
 test('as duas submissões começam fechadas no HTML',()=>{
