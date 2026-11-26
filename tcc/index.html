@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Entrega de TCC · Coordenação AEMS</title>
+  <link rel="stylesheet" href="tcc.css?v=1">
+</head>
+<body><main>
+  <header><a href="/">Coordenação · TADS e EDC</a><a href="/painel.html?acesso=professor">Painel do portal</a></header>
+  <h1>Entrega de TCC</h1>
+  <div id="students">
+    <ol class="steps">
+      <li><a href="#initial">Envie seu TCC</a><p>Cadastre o grupo e envie o PDF. Guarde o código mostrado ao concluir.</p></li>
+      <li><a href="#tracking">Acompanhe o orientador</a><p>Consulte com o código e o e-mail do responsável para ver o parecer.</p></li>
+      <li><a href="#tracking">Entregue a versão final</a><p>Com o OK do orientador, volte ao mesmo registro dentro do prazo final.</p></li>
+    </ol>
+    <section id="initial"><h2>1. Submissão inicial</h2><p id="initial-period">Consultando prazo…</p>
+      <form id="submit-initial" hidden>
+        <label>Título <input name="titulo" required minlength="3" maxlength="300"></label>
+        <label>Nomes completos dos autores, um por linha <textarea name="autores" rows="4" required maxlength="1940"></textarea></label>
+        <label>E-mail do autor responsável <input name="email" type="email" required maxlength="254"></label>
+        <label>Professor orientador <select name="orientador" required><option value="">Selecione</option></select></label>
+        <label>Trabalho em PDF (até 5 MB) <input name="pdf" type="file" accept=".pdf,application/pdf" required></label>
+        <button>Enviar TCC</button>
+      </form>
+      <p id="receipt" role="status"></p>
+    </section>
+    <section id="tracking"><h2>2. Acompanhamento</h2>
+      <form id="lookup">
+        <label>Código de acompanhamento <input name="codigo" required maxlength="36" autocomplete="off"></label>
+        <label>E-mail do autor responsável <input name="email" type="email" required maxlength="254"></label>
+        <button>Consultar trabalho</button>
+      </form>
+      <p id="progress" role="status"></p>
+    </section>
+    <section><h2>3. Entrega da versão final</h2><p id="final-period">Consultando prazo…</p><p id="final-state">Consulte seu trabalho para liberar esta etapa.</p>
+      <form id="submit-final" hidden>
+        <label>Versão corrigida em PDF (até 5 MB) <input name="pdf" type="file" accept=".pdf,application/pdf" required></label>
+        <button>Enviar versão final</button>
+      </form>
+      <p id="final-feedback" role="status"></p>
+    </section>
+  </div>
+  <div id="staff" hidden>
+    <section id="period-settings" hidden><h2>Prazos de entrega</h2><p>Horário de Cuiabá (UTC−4). Os envios encerram no horário indicado.</p>
+      <form id="save-periods">
+        <label>Submissão inicial: abertura <input name="inicial_abre" type="datetime-local" required></label>
+        <label>Submissão inicial: encerramento <input name="inicial_fecha" type="datetime-local" required></label>
+        <label>Versão final: abertura <input name="final_abre" type="datetime-local" required></label>
+        <label>Versão final: encerramento <input name="final_fecha" type="datetime-local" required></label>
+        <button>Salvar prazos</button>
+      </form><p id="period-feedback" role="status"></p>
+    </section>
+    <section><h2>Trabalhos recebidos</h2><div id="work-list"></div></section>
+  </div>
+  <p id="page-feedback" role="status"></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="tcc.js?v=1"></script>
+</body></html>

@@ -1,0 +1,13 @@
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:#f1f5fa;color:#142b47;font:16px/1.55 system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:20px}
+header{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+a{color:#075a9d;font-weight:700}h1{font-size:clamp(34px,6vw,54px);margin:24px 0 12px}
+h2{margin-top:0}.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:0;list-style:none;counter-reset:step}
+.steps li{counter-increment:step;background:#e1eefb;padding:16px;border-radius:16px}.steps li::before{content:counter(step) ". ";font-weight:800}
+section{background:white;border:1px solid #d6e3f0;padding:20px;border-radius:18px;margin:16px 0}
+label{display:grid;gap:6px;margin:0 0 12px;font-weight:650}
+input,select,textarea,button{font:inherit;padding:10px;border-radius:9px;border:1px solid #a8c0d9}
+input,select,textarea{width:100%;background:#f8fbff}button{background:#075a9d;color:#fff;cursor:pointer;border:0}
+button:disabled{opacity:.6;cursor:wait}button+button{margin-left:8px}
+[role=status]{overflow-wrap:anywhere}.work{border-top:1px solid #d6e3f0;padding:14px 0}.work form{margin-top:14px}
