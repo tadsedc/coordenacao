@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/novo-site/styles.css?v=27">
-  <link rel="stylesheet" href="tcc.css?v=6">
+  <link rel="stylesheet" href="tcc.css?v=7">
 </head>
 <body class="tcc-page">
   <div class="ambient ambient-one" aria-hidden="true"></div><div class="ambient ambient-two" aria-hidden="true"></div>
@@ -32,7 +32,7 @@
       <li><a href="#tracking">Acompanhe o orientador</a><p>Consulte com o código e o e-mail do responsável para ver o parecer.</p></li>
       <li><a href="#tracking">Entregue a versão final</a><p>Após a banca, volte ao mesmo registro e envie o PDF no prazo da versão final.</p></li>
     </ol>
-    <section id="initial"><h2>1. Submissão inicial</h2><p id="initial-period">Consultando prazo…</p>
+    <section id="initial"><h2>1. Submissão inicial</h2><div id="initial-period" class="tcc-period">Consultando prazo…</div>
       <form id="submit-initial" hidden>
         <label>Título <input name="titulo" required minlength="3" maxlength="300"></label>
         <label>Nomes completos dos autores, um por linha <textarea name="autores" rows="4" required maxlength="1940"></textarea></label>
@@ -51,7 +51,7 @@
       </form>
       <p id="progress" role="status"></p>
     </section>
-    <section><h2>3. Entrega da versão final</h2><p id="final-period">Consultando prazo…</p><p id="final-state">Consulte seu trabalho para liberar esta etapa.</p>
+    <section><h2>3. Entrega da versão final</h2><div id="final-period" class="tcc-period">Consultando prazo…</div><p id="final-state">Consulte seu trabalho para liberar esta etapa.</p>
       <form id="submit-final" hidden>
         <label>Versão corrigida em PDF (até 5 MB) <input name="pdf" type="file" accept=".pdf,application/pdf" required></label>
         <button>Enviar versão final</button>
@@ -60,7 +60,7 @@
     </section>
   </div>
   <div id="staff" hidden>
-    <section id="period-settings" hidden><h2>Prazos de entrega</h2><p>Horário de Cuiabá (UTC−4). Os envios encerram no horário indicado.</p>
+    <section id="period-settings" hidden><h2>Prazos de entrega</h2><p>Horário de MS (UTC−4). Os envios encerram no horário indicado.</p>
       <form id="save-periods">
         <label>Submissão inicial: abertura <input name="inicial_abre" type="datetime-local" required></label>
         <label>Submissão inicial: encerramento <input name="inicial_fecha" type="datetime-local" required></label>
@@ -102,5 +102,5 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/vendor/pizzip.min.js"></script>
 <script src="ata.js?v=1"></script>
-<script src="tcc.js?v=7"></script>
+<script src="tcc.js?v=8"></script>
 </body></html>

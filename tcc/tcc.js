@@ -6,7 +6,7 @@
  if(staff&&params.get('integrado')==='1')document.body.classList.add('tcc-integrated');
  const dates=['inicial_abre','inicial_fecha','final_abre','final_fecha'];
  const labels={pendente:'Aguardando o orientador',aprovado:'Aprovado para a banca',ajustes:'Ajustes solicitados pelo orientador'};
- const format=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Cuiaba',dateStyle:'short',timeStyle:'short'}).format(new Date(value));
+ const format=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Campo_Grande',dateStyle:'short',timeStyle:'short'}).format(new Date(value));
  const node=(tag,text)=>Object.assign(document.createElement(tag),{textContent:text});
  function feedback(el,tone,title,...details){
   el.dataset.tone=tone;
@@ -43,9 +43,21 @@
  }
  function windowState(stage){
   const start=periods[stage+'_abre'],end=periods[stage+'_fecha'],now=Date.now();
-  if(!start||!end)return {open:false,text:'Prazos ainda não publicados pela coordenação.'};
-  const open=now>=Date.parse(start)&&now<Date.parse(end);
-  return {open,text:(open?'Envios abertos.':now<Date.parse(start)?'Envios ainda não abertos.':'Envios encerrados.')+' De '+format(start)+' a '+format(end)+' (horário de Cuiabá).'};
+  if(!start||!end)return {open:false,tone:'info',label:'Prazos ainda não publicados'};
+  const upcoming=now<Date.parse(start),open=!upcoming&&now<Date.parse(end);
+  return {open,start,end,tone:open?'success':upcoming?'info':'warning',label:open?'Envios abertos':upcoming?'Envios ainda não abertos':'Envios encerrados'};
+ }
+ function showPeriod(el,period){
+  const badge=node('strong',period.label);badge.className='tcc-period-badge';badge.dataset.tone=period.tone;
+  el.replaceChildren(badge);
+  if(!period.start)return;
+  const dates=node('div','');dates.className='tcc-period-dates';
+  for(const [label,value] of [['Abertura',period.start],['Encerramento',period.end]]){
+   const field=node('div',''),time=node('time',format(value));time.dateTime=value;
+   field.append(node('span',label),time);dates.append(field);
+  }
+  const timezone=node('small','Horário de MS (UTC−4)');
+  el.append(dates,timezone);
  }
  async function pdf(file){
   if(!file?.size||file.size>5*1024*1024)throw new Error('Selecione um PDF de até 5 MB.');
@@ -56,7 +68,7 @@
  }
  function refreshStudent(){
   const initial=windowState('inicial'),final=windowState('final');
-  $('initial-period').textContent=initial.text;$('final-period').textContent=final.text;
+  showPeriod($('initial-period'),initial);showPeriod($('final-period'),final);
   $('submit-initial').hidden=!initial.open;
   $('submit-final').hidden=!(work?.situacao==='aprovado'&&!work.final_em&&final.open);
   $('final-state').textContent=!work?'Consulte seu trabalho para acompanhar esta etapa.':work.final_em?'Versão final recebida em '+format(work.final_em)+'.':work.situacao!=='aprovado'?'A versão final exige o OK do orientador.':final.open?'Seu trabalho está liberado para o envio final.':'Seu trabalho tem o OK do orientador. Confira o período de envio acima.';
