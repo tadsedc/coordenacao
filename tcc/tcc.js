@@ -5,7 +5,7 @@
  const staff=params.get('acesso')==='equipe';
  if(staff&&params.get('integrado')==='1')document.body.classList.add('tcc-integrated');
  const dates=['inicial_abre','inicial_fecha','final_abre','final_fecha'];
- const labels={pendente:'Aguardando o orientador',aprovado:'Aprovado pelo orientador',ajustes:'Ajustes solicitados pelo orientador'};
+ const labels={pendente:'Aguardando o orientador',aprovado:'Aprovado para a banca',ajustes:'Ajustes solicitados pelo orientador'};
  const format=value=>new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Cuiaba',dateStyle:'short',timeStyle:'short'}).format(new Date(value));
  const node=(tag,text)=>Object.assign(document.createElement(tag),{textContent:text});
  let periods={}, credentials=null, work=null;
@@ -70,7 +70,7 @@
    periods=await call('periodos');
    if($('lookup').elements.codigo.value.trim()!==next.codigo||$('lookup').elements.email.value.trim()!==next.email)return;
    work=current;credentials=next;
-   $('progress').textContent=work.titulo+' · '+work.orientador_nome+' · '+labels[work.situacao]+(work.analisado_em?' em '+format(work.analisado_em):'')+(work.parecer?'. Observações: '+work.parecer:'');
+   $('progress').textContent=work.titulo+' · '+work.orientador_nome+' · '+labels[work.situacao]+(work.analisado_em?' em '+format(work.analisado_em):'')+(work.situacao==='aprovado'&&!work.final_em?'. Aguarde o agendamento da banca pela coordenação. Este parecer não é a aprovação final do trabalho':'')+(work.parecer?'. Observações: '+work.parecer:'.');
    refreshStudent();
   });
   bind($('submit-final'),$('final-feedback'),async f=>{
@@ -140,7 +140,7 @@
     }
     if(!coord&&!item.final_em){
      const form=document.createElement('form');
-     form.innerHTML='<label>Observações<textarea name="parecer" maxlength="2000"></textarea></label><button value="aprovado">Dar OK</button><button value="ajustes">Solicitar ajustes</button>';
+     form.innerHTML='<label>Observações<textarea name="parecer" maxlength="2000"></textarea></label><button value="aprovado">Aprovar para a banca</button><button value="ajustes">Solicitar ajustes</button>';
      form.elements.parecer.value=item.parecer||'';
      const status=node('p','');status.setAttribute('role','status');form.append(status);
      bind(form,status,async(f,button)=>{

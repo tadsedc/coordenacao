@@ -15,3 +15,13 @@ test('parecer preserva as observações sem incluir código ou anexos',()=>{
  assert.doesNotMatch(mail.text,/reservado/);
  assert.equal(mail.attachments,undefined);
 });
+
+test('HTML distingue aprovação para a banca de aprovação final e escapa dados',()=>{
+ const mail=buildNotice({tipo:'parecer',email:'autor@example.com',titulo:'<script>alert(1)</script>',situacao:'aprovado',parecer:'Rever <seção>.'});
+ for(const body of [mail.text,mail.html]){
+  assert.match(body,/Aprovado para a banca/);
+  assert.match(body,/Aguarde o agendamento da banca pela coordenação/);
+ }
+ assert.doesNotMatch(mail.html,/<script>/);
+ assert.match(mail.html,/Rever &lt;seção&gt;/);
+});
